@@ -1,0 +1,98 @@
+
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+@use "assets/base";
+
+
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+}
+
+/* Fix content jumping issue */
+.app-main__inner {
+  position: relative !important;
+  display: block !important;
+  flex: none !important;
+  min-height: calc(100vh - 120px) !important;
+}
+
+.router-outlet-container {
+  position: relative !important;
+  display: block !important;
+  min-height: inherit !important;
+  overflow: visible !important;
+}
+
+/* Stabilize tab content positioning */
+.tab-content {
+  position: relative;
+}
+
+.tab-pane {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+/* Force immediate positioning for all routed components */
+router-outlet + *,
+.router-outlet-container > *,
+app-accordions,
+app-tabs,
+app-carousel,
+app-modals,
+app-pagination,
+app-progress-bar,
+app-tooltips-popovers {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+  display: block !important;
+}
+
+/* Prevent ONLY route animations on initial load, keep sidebar transitions */
+router-outlet + * {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+
+/* Re-enable route animations after initial load */
+.animations-ready router-outlet + * {
+  animation-duration: initial !important;
+  animation-delay: initial !important;
+}
+
+/* Remove this section - transitions are now defined in component styles */
+
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

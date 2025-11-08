@@ -1,0 +1,146 @@
+<div class="vh-100 bg-plum-plate bg-animation">
+  <div class="d-flex h-100 justify-content-center align-items-center p-3">
+    <div class="w-100 app-login-box" style="max-width: 600px;">
+
+      <div class="app-logo-inverse mx-auto mb-4 d-block" style="width: 60px; height: 60px; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('assets/images/logo-inverse.png');"></div>
+
+      <div class="card shadow-lg border-0">
+        <div class="card-body p-4 p-md-5">
+
+          <div class="text-center mb-4">
+            <h3 class="mb-2 fw-normal">Welcome,</h3>
+            <p class="text-muted mb-0">
+              It only takes a <span class="text-success fw-medium">few seconds</span> to create your account
+            </p>
+          </div>
+
+          <hr class="my-4">
+
+          <div *ngIf="message()"
+               [class.alert-success]="message() === 'Registration successful!'"
+               [class.alert-danger]="message() !== 'Registration successful!'"
+               class="alert" role="alert">
+            {{ message() }}
+          </div>
+
+          <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="mb-3">
+                  <label for="firstNameInput" class="form-label visually-hidden">First Name</label>
+                  <input
+                    id="firstNameInput"
+                    type="text"
+                    class="form-control form-control-lg"
+                    placeholder="First Name *"
+                    formControlName="first_name"
+                    autocomplete="given-name">
+                  <div *ngIf="registerForm.get('first_name')?.invalid && registerForm.get('first_name')?.touched" class="text-danger small mt-1">
+                      <span *ngIf="registerForm.get('first_name')?.errors?.['required']">First name is required.</span>
+                      <span *ngIf="registerForm.get('first_name')?.errors?.['serverError']">{{ registerForm.get('first_name')?.errors?.['serverError'] }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="mb-3">
+                  <label for="lastNameInput" class="form-label visually-hidden">Last Name</label>
+                  <input
+                    id="lastNameInput"
+                    type="text"
+                    class="form-control form-control-lg"
+                    placeholder="Last Name *"
+                    formControlName="last_name"
+                    autocomplete="family-name">
+                  <div *ngIf="registerForm.get('last_name')?.invalid && registerForm.get('last_name')?.touched" class="text-danger small mt-1">
+                      <span *ngIf="registerForm.get('last_name')?.errors?.['required']">Last name is required.</span>
+                      <span *ngIf="registerForm.get('last_name')?.errors?.['serverError']">{{ registerForm.get('last_name')?.errors?.['serverError'] }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="emailInput" class="form-label visually-hidden">Email address</label>
+              <input
+                id="emailInput"
+                type="email"
+                class="form-control form-control-lg"
+                placeholder="Enter email address"
+                formControlName="email"
+                autocomplete="email">
+              <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="text-danger small mt-1">
+                <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</span>
+                <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email.</span>
+                <span *ngIf="registerForm.get('email')?.errors?.['serverError']">{{ registerForm.get('email')?.errors?.['serverError'] }}</span>
+              </div>
+
+            </div>
+
+            <div class="mb-3">
+              <label for="phoneInput" class="form-label visually-hidden">Phone Number</label>
+              <input
+                id="phoneInput"
+                type="tel"
+                class="form-control form-control-lg"
+                placeholder="Enter phone number *"
+                formControlName="phone_number"
+                autocomplete="tel">
+              <div *ngIf="registerForm.get('phone_number')?.invalid && registerForm.get('phone_number')?.touched" class="text-danger small mt-1">
+                <span *ngIf="registerForm.get('phone_number')?.errors?.['required']">Phone number is required.</span>
+                <span *ngIf="registerForm.get('phone_number')?.errors?.['serverError']">{{ registerForm.get('phone_number')?.errors?.['serverError'] }}</span>
+              </div>
+              <div class="form-text text-muted small">
+                We'll share verification code.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="passwordInput" class="form-label visually-hidden">Password</label>
+              <input
+                id="passwordInput"
+                type="password"
+                class="form-control form-control-lg"
+                placeholder="Enter password *"
+                formControlName="password"
+                autocomplete="new-password">
+              <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="text-danger small mt-1">
+                <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required.</span>
+                <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters.</span>
+                <span *ngIf="registerForm.get('password')?.errors?.['serverError']">{{ registerForm.get('password')?.errors?.['serverError'] }}</span>
+              </div>
+            </div>
+
+            <div class="card-footer bg-transparent border-0 p-2 mt-4 pt-0">
+              <div class="d-grid">
+                <button
+                  type="submit"
+                  class="btn btn-secondary btn-lg rounded-pill shadow-sm"
+                  [disabled]="registerForm.invalid || isLoading()"> <span *ngIf="isLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <i *ngIf="!isLoading()" class="fa fa-user-plus me-2" aria-hidden="true"></i>
+                  {{ isLoading() ? 'Creating Account...' : 'Create Account' }}
+                </button>
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="text-center mb-0">
+              <p class="mb-0 small">
+                Already have an account?
+                <a [routerLink]="'/pages/login-boxed'" class="text-primary text-decoration-none fw-medium">Sign in</a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="text-center text-white mt-4">
+        <p class="mb-0 opacity-75 small">
+          Copyright © Daz Electronics Repair 2025
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

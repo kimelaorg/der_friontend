@@ -1,0 +1,104 @@
+<div class="vh-100 bg-plum-plate bg-animation">
+  <div class="d-flex h-100 justify-content-center align-items-center p-3">
+    <div class="w-100 app-login-box" style="max-width: 500px;">
+      <!-- Logo -->
+      <div class="app-logo-inverse mx-auto mb-4 d-block" style="width: 60px; height: 60px; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+
+      <!-- Login Card -->
+      <div class="card shadow-lg border-0">
+        <div class="card-body p-4 p-md-5">
+          <!-- Header -->
+          <div class="text-center mb-4">
+            <h3 class="mb-2 fw-normal">Welcome back,</h3>
+            <p class="text-muted mb-0">Please sign in to your account below.</p>
+          </div>
+
+          <!-- Login Form -->
+          <form id="loginForm" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+            <!-- Email Input -->
+            <div class="mb-3">
+              <label for="phoneInput" class="form-label visually-hidden">Phone Number</label>
+              <input
+                id="phoneInput"
+                type="tel"
+                class="form-control form-control-lg"
+                placeholder="Enter phone number *"
+                formControlName="phone_number"
+                autocomplete="tel">
+              <div *ngIf="loginForm.get('phone_number')?.invalid && loginForm.get('phone_number')?.touched" class="text-danger small mt-1">
+                <!-- <span *ngIf="loginForm.get('phone_number')?.errors?.['required']">Phone number is required.</span> -->
+                <span *ngIf="loginForm.get('phone_number')?.errors?.['serverError']">{{ loginForm.get('phone_number')?.errors?.['serverError'] }}</span>
+              </div>
+              <div class="form-text text-muted small">
+                We'll share verification code.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="passwordInput" class="form-label visually-hidden">Password</label>
+              <input
+                id="passwordInput"
+                type="password"
+                class="form-control form-control-lg"
+                placeholder="Enter password *"
+                formControlName="password"
+                autocomplete="new-password">
+              <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-danger small mt-1">
+                <!-- <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required.</span> -->
+                <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters.</span>
+                <span *ngIf="loginForm.get('password')?.errors?.['serverError']">{{ loginForm.get('password')?.errors?.['serverError'] }}</span>
+              </div>
+            </div>
+
+            <div class="card-footer bg-transparent border-0 p-2 mt-4 pt-0">
+
+              <div class="d-grid gap-2">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg rounded-pill shadow-sm"
+                  [disabled]="loginForm.invalid || isLoading()"> <span *ngIf="isLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <i *ngIf="!isLoading()" aria-hidden="true"></i>
+                  {{ isLoading() ? 'Validating...' : 'Sign in' }}
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Remember Me Checkbox -->
+            <!-- <div class="form-check mb-3">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="rememberCheck"
+                name="rememberMe"
+                ngModel>
+              <label class="form-check-label" for="rememberCheck">
+                Keep me logged in
+              </label>
+            </div> -->
+
+            <!-- Divider -->
+            <hr class="my-4">
+
+            <!-- Sign up link -->
+            <div class="text-center mb-0">
+              <p class="mb-0">
+                Don't have an account?
+                <a [routerLink]="'/pages/register-boxed'" class="text-primary text-decoration-none fw-medium">Sign up now</a>
+              </p>
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer with buttons -->
+      </div>
+
+      <!-- Copyright -->
+      <div class="text-center text-white mt-4">
+        <p class="mb-0 opacity-75 small">
+          Copyright © Daz Electronics Repair 2025
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

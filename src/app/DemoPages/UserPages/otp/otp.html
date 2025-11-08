@@ -1,0 +1,99 @@
+<div class="vh-100 bg-plum-plate bg-animation">
+  <div class="d-flex h-100 justify-content-center align-items-center p-3">
+    <div class="w-100 app-login-box" style="max-width: 600px;">
+
+      <!-- Logo (Mimics Register component structure) -->
+      <div class="app-logo-inverse mx-auto mb-4 d-block" style="width: 60px; height: 60px; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('assets/images/logo-inverse.png');"></div>
+
+      <div class="card shadow-lg border-0">
+        <div class="card-body p-4 p-md-5">
+
+          <div class="text-center mb-4">
+            <h4 class="mb-2 fw-normal" *ngIf="password()">Authentication required</h4>
+            <h4 class="mb-2 fw-normal" *ngIf="!password()">Enter verification code</h4>
+
+            <!-- Phone Number Display -->
+            <p *ngIf="!password()" class="text-muted mb-0">
+              We've sent the code to your phone number:
+              <span class="text-success fw-medium">{{ phoneNumber() }}</span>
+            </p>
+            <p *ngIf="password()" class="text-muted mb-0">
+              We've sent the a security code to your phone number:
+              <span class="text-success fw-medium">{{ phoneNumber() }}</span>
+              . Please enter it to complete verification
+            </p>
+            <p *ngIf="!phoneNumber()" class="text-danger fw-medium mb-0">
+              Error: Phone number not found. Please return to registration.
+            </p>
+
+          </div>
+
+          <hr class="my-4">
+
+          <form [formGroup]="otpForm" (ngSubmit)="onOtpSubmit()">
+
+            <!-- OTP Input Field -->
+            <div class="mb-3">
+              <label for="otpInput" class="form-label visually-hidden">Verification Code</label>
+              <input
+                id="otpInput"
+                type="text"
+                class="form-control form-control-lg text-center fw-bold"
+                formControlName="OTP"
+                maxlength="6"
+                autocomplete="one-time-code" />
+
+              <!-- Validation Messages -->
+              <div *ngIf="otpForm.get('otp_code')?.invalid && otpForm.get('otp_code')?.touched" class="text-danger small mt-1">
+                <span *ngIf="otpForm.get('otp_code')?.errors?.['required']">Code is required.</span>
+                <span *ngIf="otpForm.get('otp_code')?.errors?.['minlength'] || otpForm.get('otp_code')?.errors?.['maxlength']">Code must be 4 to 6 digits.</span>
+                <span *ngIf="otpForm.get('otp_code')?.errors?.['serverError']">{{ otpForm.get('otp_code')?.errors?.['serverError'] }}</span>
+              </div>
+            </div>
+
+            <!-- Verification Button -->
+            <div class="card-footer bg-transparent border-0 p-2 mt-4 pt-0">
+              <div class="d-grid">
+                <button
+                  type="submit"
+                  class="btn btn-secondary btn-lg rounded-pill shadow-sm"
+                  [disabled]="otpForm.invalid || isLoading()">
+                  <span *ngIf="isLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <i *ngIf="!isLoading()" class="fa fa-check me-2" aria-hidden="true"></i>
+                  {{ isLoading() ? 'Verifying...' : 'Verify Account' }}
+                </button>
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Resend Code and Back to Login Link -->
+            <div class="text-center mb-0">
+              <p class="mb-2 small">
+                Didn't receive a code?
+                <button
+                  type="button"
+                  (click)="onRequestOtp()"
+                  [disabled]="isResending()"
+                  class="btn btn-link text-primary text-decoration-none fw-medium p-0 align-baseline" style="box-shadow: none;">
+                  <span *ngIf="isResending()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  {{ isResending() ? 'Sending...' : 'Resend Code' }}
+                </button>
+              </p>
+              <p class="mb-0 small">
+                Back to
+                <a [routerLink]="'/pages/login-boxed'" class="text-primary text-decoration-none fw-medium">Sign in</a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="text-center text-white mt-4">
+        <p class="mb-0 opacity-75 small">
+          Copyright © Daz Electronics Repair 2025
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
