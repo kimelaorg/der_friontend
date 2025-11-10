@@ -13,6 +13,10 @@
             <p class="text-muted mb-0">Please sign in to your account below.</p>
           </div>
 
+          <div *ngIf="message()" class="alert alert-danger text-center mb-4 p-2" role="alert">
+                {{ message() }}
+          </div>
+
           <!-- Login Form -->
           <form id="loginForm" [formGroup]="loginForm" (ngSubmit)="onLogin()">
             <!-- Email Input -->
@@ -84,7 +88,7 @@
             <div class="text-center mb-0">
               <p class="mb-0">
                 Don't have an account?
-                <a [routerLink]="'/pages/register-boxed'" class="text-primary text-decoration-none fw-medium">Sign up now</a>
+                <a [routerLink]="'/der/account/register'" class="text-primary text-decoration-none fw-medium">Sign up now</a>
               </p>
             </div>
           </form>

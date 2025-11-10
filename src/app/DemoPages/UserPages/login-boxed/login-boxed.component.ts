@@ -40,44 +40,60 @@ export class LoginBoxedComponent implements OnInit {
 
   // Handles Login Step 1: Request OTP
   onLogin(): void {
-    this.message.set(null);
-    this.isLoading.set(true);
+      this.message.set(null);
+      this.isLoading.set(true);
 
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      this.isLoading.set(false);
-      return;
-    }
+      if (this.loginForm.invalid) {
+          this.loginForm.markAllAsTouched();
+          this.isLoading.set(false);
+          return;
+      }
 
-    const credentials = this.loginForm.getRawValue();
+      const credentials = this.loginForm.getRawValue();
 
-    this.authService.login(credentials)
-      .pipe(
-        finalize(() => this.isLoading.set(false))
-      )
-      .subscribe({
-        next: (res: any) => {
-          console.log('Login successful. Proceeding to OTP verification.');
+      this.authService.login(credentials)
+          .pipe(
+              finalize(() => this.isLoading.set(false))
+          )
+          .subscribe({
+              next: () => {
 
-          // Redirect to OTP and pass the necessary credentials for the next step
-          this.router.navigate(['/pages/otp'], {
-            state: {
-              phoneNumber: credentials.phone_number,
-              password: credentials.password
-            }
+                  console.log('Authentication successful. Tokens saved.');
+                  // Redirect directly to the secure main application page
+                  this.router.navigate(['der/account/otp'], {
+                    state: {
+                      phoneNumber: credentials.phone_number,
+                      password: credentials.password
+                    }
+                  });
+              },
+              error: err => {
+                  const errors = err?.error;
+
+                  // 🎯 CHANGE 2: Robust error handling for DRF/Django errors
+
+                  if (errors && errors.detail) {
+                      // Case 1: Specific error from Django (e.g., {"detail": "No active account..."})
+                      this.message.set(errors.detail);
+                  } else if (errors && typeof errors === 'object') {
+                      // Case 2: Validation errors (e.g., {"phone_number": ["This field is required."]})
+                      // Flatten all error values from the object into a single message
+                      const errorMessages = Object.values(errors)
+                                                  .flat()
+                                                  .filter(msg => typeof msg === 'string');
+                      if (errorMessages.length > 0) {
+                          this.message.set(errorMessages.join('; '));
+                      } else {
+                           // Fallback for complex/unknown object errors
+                           this.message.set('Login failed due to invalid data.');
+                      }
+                  } else {
+                      // Case 3: Network errors or simple string response
+                      this.message.set('Something went wrong please try again later.');
+                      console.error('Login error:', err);
+                  }
+              }
           });
-        },
-        error: err => {
-          const errors = err?.error;
-          // Display the server's error message
-          if (errors && errors.detail) {
-            this.message.set(errors.detail);
-          } else {
-            this.message.set('Login failed. Please check your credentials or ensure you are registered.');
-            console.error('Login error:', err);
-          }
-        }
-      });
   }
 
   onForgotPassword(): void {

@@ -25,6 +25,7 @@ export { Cartegories } from './DemoPages/Components/cartegories/cartegories';
 export { Specifications } from './DemoPages/Components/specifications/specifications';
 export { Expenses } from './DemoPages/Components/expenses/expenses';
 export { Savings } from './DemoPages/Components/savings/savings';
+export { Home } from './DemoPages/Components/home/home';
 
 // Components
 export { AccordionsComponent } from './DemoPages/Components/accordions/accordions.component';

@@ -1,0 +1,98 @@
+<div class="product-page-container">
+
+    <header class="page-header">
+        <h1 class="logo">Daz Electronics</h1>
+        <div class="search-bar">
+            <input type="text" placeholder="Search products...">
+            <button class="search-btn">Search</button>
+        </div>
+        <nav class="user-nav">
+            <span>Language</span>
+            <a href="#">Login</a>
+            <a href="#">Cart (0)</a>
+        </nav>
+    </header>
+
+    <div class="main-content-grid">
+
+        <aside class="sidebar">
+            <h3 class="filter-title">Filters</h3>
+
+            <div class="filter-group">
+                <h4>Brands</h4>
+                <ul class="filter-list">
+                    <li *ngFor="let brand of filterOptions.brands">{{ brand }}</li>
+                </ul>
+            </div>
+
+            <div class="filter-group">
+                <h4>Display</h4>
+                <ul class="filter-list">
+                    <li *ngFor="let display of filterOptions.display">{{ display }}</li>
+                </ul>
+            </div>
+
+            <div class="filter-group">
+                <h4>Size</h4>
+                <ul class="filter-list">
+                    <li *ngFor="let size of filterOptions.size">{{ size }}</li>
+                </ul>
+            </div>
+
+            <div class="filter-group">
+                <h4>Voltage</h4>
+                <ul class="filter-list">
+                    <li *ngFor="let voltage of filterOptions.voltage">{{ voltage }}</li>
+                </ul>
+            </div>
+
+        </aside>
+
+        <section class="product-detail-area">
+
+            <div class="product-image-section">
+                <span class="image-placeholder"></span>
+            </div>
+
+            <div class="product-info-section">
+
+                <h2 class="product-name">{{ product.name }}</h2>
+
+                <div class="rating-info">
+                    <span class="stars">★★★★★</span> ({{ product.rating }} / 5) | <span>{{ product.reviews }} Reviews</span>
+                </div>
+
+                <p class="product-price">${{ product.price | number:'1.2-2' }}</p>
+
+                <p class="product-description">{{ product.description }}</p>
+
+                <p class="availability-status" [class.in-stock]="product.availability">
+                    <span class="material-icons">{{ product.availability ? 'check_circle' : 'cancel' }}</span>
+                    {{ product.availability ? 'In Stock' : 'Out of Stock' }}
+                </p>
+
+                <hr>
+
+                <div class="quantity-control-group">
+                    <label for="quantity">Quantity:</label>
+                    <div class="quantity-picker">
+                        <button (click)="updateQuantity('subtract')" [disabled]="quantity === 1">-</button>
+                        <input type="number" id="quantity" [(ngModel)]="quantity" min="1" readonly>
+                        <button (click)="updateQuantity('add')">+</button>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-add-to-cart" (click)="addToCart()" [disabled]="!product.availability">Add to Cart</button>
+                    <button class="btn-buy-now" (click)="buyNow()" [disabled]="!product.availability">Buy Now</button>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <footer class="footer-others">
+        <h3 class="section-title">Others / Related Products</h3>
+        </footer>
+
+</div>

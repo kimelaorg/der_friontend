@@ -9,7 +9,6 @@ import { configReducer } from './ThemeOptions/store/config.reducer.ngrx';
 import { ConfigService } from './ThemeOptions/store/config.service';
 import { environment } from '../environments/environment';
 import {AppRoutingModule} from './app-routing.module';
-
 import {CommonModule} from '@angular/common';
 // Imported HTTP_INTERCEPTORS from Angular HTTP client library
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
@@ -56,6 +55,9 @@ import {ThemeOptions} from './theme-options';
 
 // Import the AuthInterceptor for JWT handling
 import { AuthenticationInterceptor } from './DemoPages/UserPages/login-boxed/interceptor/authentication-interceptor';
+import { roleGuard } from './DemoPages/UserPages/login-boxed/guard/role-guard';
+
+
 
 @NgModule({
   declarations: [

@@ -58,7 +58,7 @@ export class RegisterBoxedComponent {
         next: (res: any) => {
           console.log('User registered successfully');
 
-          this.router.navigate(['/pages/otp'], {
+          this.router.navigate(['der/account/otp'], {
             state: {
               phoneNumber: formValue.phone_number
             }

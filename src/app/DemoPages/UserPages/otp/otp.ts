@@ -61,9 +61,9 @@ export class Otp implements OnInit { // Renamed class from Otp to OtpComponent f
 
     } else {
       console.error('Critical auth data missing from router state. Redirecting to login.');
-      this.message.set('Error: Session data lost. Redirecting to login.');
+      this.message.set('Authentication credentials were not provided');
       // Fallback: redirect back to login if critical data is missing
-      setTimeout(() => this.router.navigate(['/pages/login-boxed']), 3000);
+      setTimeout(() => this.router.navigate(['/der/account/login']), 3000);
     }
   }
 
@@ -83,8 +83,8 @@ export class Otp implements OnInit { // Renamed class from Otp to OtpComponent f
 
     const isLoginVerification = !!this.password();
     const endpoint = isLoginVerification
-      ? `${this.baseUrl}/login/verify-otp/` // Login requires email
-      : `${this.baseUrl}/confirm-registration/`; // Registration only requires phone
+      ? `${this.baseUrl}/login/verify-otp/`
+      : `${this.baseUrl}/confirm-registration/`;
 
     const payload: any = {
       phone_number: this.phoneNumber(),
@@ -115,7 +115,7 @@ export class Otp implements OnInit { // Renamed class from Otp to OtpComponent f
 
           // Success: Redirect to the main application dashboard (for login)
           // or to the login page (for registration)
-          const redirectRoute = isLoginVerification ? '/dashboard' : '/pages/login-boxed';
+          const redirectRoute = isLoginVerification ? '/der/dashboards' : '/der/account/login';
           this.router.navigate([redirectRoute]);
         },
         error: err => {

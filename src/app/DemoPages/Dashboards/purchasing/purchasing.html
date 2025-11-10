@@ -1,1 +1,158 @@
-<p>purchasing works!</p>
+<app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon"></app-page-title>
+
+
+<div class="p-4">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="{{ icon }} me-2"></i> {{ heading }}</h2>
+            <p class="text-muted">{{ subheading }}</p>
+        </div>
+        <button *ngIf="mode !== 'create-po'" class="btn btn-primary" (click)="router.navigate(['/purchasing', 'list'])">
+            <i class="pe-7s-back-2 me-1"></i> Back to List
+        </button>
+    </div>
+
+    <hr>
+
+    <div *ngIf="isLoading" class="alert alert-info">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <strong>Loading data...</strong>
+    </div>
+
+    <div *ngIf="!isLoading && (mode === 'create-po' || mode === 'edit-po')" class="card shadow-sm p-4">
+        <form [formGroup]="poForm" (ngSubmit)="onPoSubmit()">
+
+            <h4 class="text-primary mb-3">{{ mode === 'create-po' ? 'Header Details' : 'PO Header Details' }}</h4>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="supplier" class="form-label">Supplier <span class="text-danger">*</span></label>
+                    <select id="supplier" formControlName="supplier" class="form-select"
+                            [class.is-invalid]="poForm.get('supplier')?.invalid && poForm.get('supplier')?.touched">
+                        <option [ngValue]="null">Select Supplier</option>
+                        <option *ngFor="let supplier of suppliers" [ngValue]="supplier.id">{{ supplier.name }}</option>
+                    </select>
+                    <div class="invalid-feedback">Supplier is required.</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="expected_delivery_date" class="form-label">Expected Delivery Date <span class="text-danger">*</span></label>
+                    <input id="expected_delivery_date" type="date" formControlName="expected_delivery_date" class="form-control"
+                           [class.is-invalid]="poForm.get('expected_delivery_date')?.invalid && poForm.get('expected_delivery_date')?.touched">
+                    <div class="invalid-feedback">Delivery date is required.</div>
+                </div>
+            </div>
+
+            <hr class="mt-4 mb-4">
+
+            <h4 class="text-primary mb-3 d-flex justify-content-between align-items-center">
+                Line Items
+                <button type="button" class="btn btn-sm btn-info" (click)="addItem()" [disabled]="isSubmitting">
+                    <i class="pe-7s-plus"></i> Add Item
+                </button>
+            </h4>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead>
+                        <tr class="table-light">
+                            <th style="width: 35%;">Product</th>
+                            <th style="width: 20%;">Quantity Ordered</th>
+                            <th style="width: 20%;">Unit Cost</th>
+                            <th style="width: 15%;">Line Total</th>
+                            <th style="width: 10%;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody formArrayName="items">
+                        <tr *ngFor="let itemGroup of poItems.controls; let i = index" [formGroupName]="i">
+                            <td>
+                                <select formControlName="product" class="form-select form-select-sm"
+                                        [class.is-invalid]="itemGroup.get('product')?.invalid && itemGroup.get('product')?.touched">
+                                    <option [ngValue]="null">Select Product</option>
+                                    <option *ngFor="let product of products" [ngValue]="product.id">{{ product.name }}</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" formControlName="quantity_ordered" class="form-control form-control-sm text-center" min="1">
+                            </td>
+                            <td>
+                                <input type="number" formControlName="unit_cost" class="form-control form-control-sm text-end" min="0" step="0.01">
+                            </td>
+                            <td class="text-end fw-bold">
+                                {{ itemGroup.value.quantity_ordered * itemGroup.value.unit_cost | currency }}
+                            </td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-danger" (click)="removeItem(i)" [disabled]="isSubmitting">
+                                    <i class="pe-7s-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div *ngIf="poForm.get('items')?.hasError('minLengthArray') && poForm.get('items')?.touched" class="alert alert-warning small">
+                A Purchase Order must contain at least one line item.
+            </div>
+
+            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-lg btn-success" [disabled]="poForm.invalid || isSubmitting">
+                    <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+                    <i class="pe-7s-cloud-upload me-1"></i> {{ mode === 'create-po' ? 'Create PO' : 'Update PO' }}
+                </button>
+            </div>
+        </form>
+    </div>
+
+
+    <div *ngIf="!isLoading && mode === 'receive-stock' && currentPo" class="card shadow-sm p-4">
+        <div *ngIf="currentPo.po_status === 'RECEIVED_FULL'" class="alert alert-success">
+            This Purchase Order has been **fully received**. No further reception entries are required.
+        </div>
+
+        <form [formGroup]="srForm" (ngSubmit)="onSrSubmit()" *ngIf="currentPo.po_status !== 'RECEIVED_FULL'">
+            <h4 class="text-primary mb-3">Items to Receive (PO #{{ poId }})</h4>
+            <p class="text-info small">Record the quantity received for each line item below.</p>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead>
+                        <tr class="table-light">
+                            <th style="width: 30%;">Product</th>
+                            <th style="width: 20%;" class="text-center">Ordered</th>
+                            <th style="width: 20%;" class="text-center">Previously Received</th>
+                            <th style="width: 15%;">New Quantity Received <span class="text-danger">*</span></th>
+                            <th style="width: 15%;">Decayed/Damaged</th>
+                        </tr>
+                    </thead>
+                    <tbody formArrayName="receptions">
+                        <tr *ngFor="let srGroup of srItems.controls; let i = index" [formGroupName]="i">
+                            <td class="fw-bold">{{ srGroup.get('product_name')?.value }}</td>
+                            <td class="text-center">{{ srGroup.get('quantity_ordered')?.value }}</td>
+                            <td class="text-center">{{ srGroup.get('quantity_received_sum')?.value }}</td>
+
+                            <td>
+                                <input type="number" formControlName="quantity_received" class="form-control form-control-sm" min="0"
+                                       [max]="srGroup.get('max_receivable')?.value"
+                                       [class.is-invalid]="srGroup.get('quantity_received')?.invalid && srGroup.get('quantity_received')?.touched">
+                                <div class="invalid-feedback small" *ngIf="srGroup.get('quantity_received')?.errors?.['max']">
+                                    Max: {{ srGroup.get('max_receivable')?.value }}
+                                </div>
+                            </td>
+
+                            <td>
+                                <input type="number" formControlName="decayed_products" class="form-control form-control-sm" min="0">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-lg btn-success" [disabled]="srForm.invalid || isSubmitting">
+                    <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+                    <i class="pe-7s-box1 me-1"></i> Confirm Stock Reception
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

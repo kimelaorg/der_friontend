@@ -116,7 +116,7 @@
               <div class="d-grid">
                 <button
                   type="submit"
-                  class="btn btn-secondary btn-lg rounded-pill shadow-sm"
+                  class="btn btn-primary btn-lg rounded-pill shadow-sm"
                   [disabled]="registerForm.invalid || isLoading()"> <span *ngIf="isLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                   <i *ngIf="!isLoading()" class="fa fa-user-plus me-2" aria-hidden="true"></i>
                   {{ isLoading() ? 'Creating Account...' : 'Create Account' }}
@@ -129,7 +129,7 @@
             <div class="text-center mb-0">
               <p class="mb-0 small">
                 Already have an account?
-                <a [routerLink]="'/pages/login-boxed'" class="text-primary text-decoration-none fw-medium">Sign in</a>
+                <a [routerLink]="'/der/account/login'" class="text-primary text-decoration-none fw-medium">Sign in</a>
               </p>
             </div>
           </form>

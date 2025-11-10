@@ -22,6 +22,7 @@ import { Cartegories } from './DemoPages/Components/cartegories/cartegories';
 import { Specifications } from './DemoPages/Components/specifications/specifications';
 import { Savings } from './DemoPages/Components/savings/savings';
 import { Expenses } from './DemoPages/Components/expenses/expenses';
+import { Home } from './DemoPages/Components/home/home';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { Expenses } from './DemoPages/Components/expenses/expenses';
     Specifications,
     Savings,
     Expenses,
+    Home,
   ],
   imports: [
     SharedModule,

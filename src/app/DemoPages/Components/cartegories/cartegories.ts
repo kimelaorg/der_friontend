@@ -79,19 +79,19 @@ export class Cartegories implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadAll(`${this.categoryUrl}`);
+    this.loadAll();
   }
 
 
-  loadAll(url: string): void {
-    this.http.get<CategoryResponse>(url).subscribe(res => {
-      this.categories = res.results;
+  loadAll(): void {
+    this.http.get<ProductCategory[]>(`${this.categoryUrl}`).subscribe(res => {
+      this.categories = res;
     });
   }
 
   handlePageEvent(event: PageEvent): void {
     const newUrl = `${this.categoryUrl}`;
-    this.loadAll(newUrl);
+    this.loadAll();
   }
 
   open(content: any | null){
@@ -100,7 +100,7 @@ export class Cartegories implements OnInit {
 
       if (result === 'saved' || result === 'deleted') {
         // Reload data from the first page after a successful operation
-        this.loadAll(`${this.categoryUrl}`);
+        this.loadAll();
       }
       console.log(this.closeResult);
     }, (reason) => {
@@ -222,7 +222,7 @@ export class Cartegories implements OnInit {
         console.log(`Cartegory ${this.modalMode}ed successfully`);
 
         // Reload data from the first page after successful operation
-        this.loadAll(`${this.categoryUrl}?page=1&page_size=${this.pageSize}`);
+        this.loadAll();
         this.currentPage = 1; // Reset to page 1
 
         this.router.navigate(['/dashboards/cartegories'], {});
@@ -267,7 +267,7 @@ export class Cartegories implements OnInit {
           console.log('Cartegory deleted successfully');
 
           // Reload data and reset to page 1
-          this.loadAll(`${this.categoryUrl}?page=1&page_size=${this.pageSize}`);
+          this.loadAll();
           this.currentPage = 1;
 
           this.modalService.dismissAll('deleted');

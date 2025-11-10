@@ -1,44 +1,98 @@
 import { Injectable, inject } from '@angular/core';
 import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  // 🛑 Removed and re-added HttpInterceptor to force correct type recognition
-  HttpInterceptor
+    HttpRequest,
+    HttpHandler,
+    HttpEvent,
+    HttpInterceptor,
+    HttpErrorResponse
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
-// NOTE: Corrected relative path to point to the sibling 'service' folder
-import { Auth } from '../service/auth';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { catchError, filter, take, switchMap } from 'rxjs/operators';
+import { Auth } from '../service/auth'; // Your finalized AuthService
 
 @Injectable()
-export class AuthenticationInterceptor implements HttpInterceptor { // This line requires the 'intercept' method
+export class AuthenticationInterceptor implements HttpInterceptor {
 
-  // Inject AuthService to retrieve the in-memory token
-  private authService = inject(Auth);
+    private authService = inject(Auth);
+    // Flag to prevent concurrent token refresh requests (race condition protection)
+    private isRefreshing = false;
+    // Subject used to queue up failed requests until a new Access Token is available
+    private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const authToken = this.authService.getAccessToken();
+    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 
-    // Define the path segments that DO NOT require the token (Auth Endpoints)
-    const isAuthRequest =
-      request.url.includes('/login/') ||
-      request.url.includes('/verify-otp/') ||
-      request.url.includes('/register/');
+        // --- 1. Attaching the Token ---
+        const authToken = this.authService.getAccessToken();
+        let authReq = this.addToken(request, authToken);
 
-    // If a token exists AND the request is not an auth request, clone and add the header
-    if (authToken && !isAuthRequest) {
+        // --- 2. Defining Exclusion Paths ---
+        // Exclude /token/ and other auth endpoints from having a potentially expired token attached
+        const isAuthEndpoint =
+            request.url.includes('/token/') ||
+            request.url.includes('/login/') ||
+            request.url.includes('/verify-otp/') ||
+            request.url.includes('/register/');
 
-      // Clone the request and add the Authorization header
-      const authReq = request.clone({
-        setHeaders: {
-          Authorization: `Bearer ${authToken}`
+        if (isAuthEndpoint) {
+            return next.handle(request);
         }
-      });
 
-      return next.handle(authReq);
+        // --- 3. Error Handling and Token Refresh Logic ---
+        return next.handle(authReq).pipe(
+            catchError((error) => {
+                if (error instanceof HttpErrorResponse && error.status === 401) {
+                    return this.handle401Error(authReq, next);
+                }
+                // For all other errors (400, 403, 500, etc.), just rethrow
+                return throwError(() => error);
+            })
+        );
     }
 
-    // Otherwise, pass the original request unmodified
-    return next.handle(request);
-  }
+    /** Helper function to clone request and add the Bearer token */
+    private addToken(request: HttpRequest<any>, token: string | null): HttpRequest<any> {
+        if (!token) return request;
+
+        return request.clone({
+            setHeaders: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+    }
+
+    /** Handles token refresh when a 401 error is received */
+    private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        if (!this.isRefreshing) {
+            this.isRefreshing = true;
+            this.refreshTokenSubject.next(null); // Signal that no new token is available yet
+
+            // Call the refresh service method (which uses the persistent Refresh Token)
+            return this.authService.refreshAccessToken().pipe(
+                switchMap(() => {
+                    this.isRefreshing = false;
+                    const newAccessToken = this.authService.getAccessToken();
+                    this.refreshTokenSubject.next(newAccessToken);
+                    // Retry the original failed request with the new token
+                    return next.handle(this.addToken(request, newAccessToken));
+                }),
+                catchError((err) => {
+                    // If the refresh itself fails (e.g., Refresh Token expired), log the user out
+                    this.isRefreshing = false;
+                    this.authService.logout();
+                    return throwError(() => err);
+                })
+            );
+
+        } else {
+            // If another request fails while a refresh is in progress, queue it up
+            // by waiting for the new token to be emitted by the Subject.
+            return this.refreshTokenSubject.pipe(
+                filter(token => token != null),
+                take(1),
+                switchMap(jwt => {
+                    return next.handle(this.addToken(request, jwt));
+                })
+            );
+        }
+    }
 }
