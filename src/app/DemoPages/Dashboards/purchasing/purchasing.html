@@ -1,158 +1,598 @@
 <app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon"></app-page-title>
 
 
-<div class="p-4">
-    <div class="mb-4 d-flex justify-content-between align-items-center">
-        <div>
-            <h2><i class="{{ icon }} me-2"></i> {{ heading }}</h2>
-            <p class="text-muted">{{ subheading }}</p>
+  <!-- <hr> -->
+
+  <div *ngIf="isLoading" class="alert alert-info">
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+      <strong>Loading data...</strong>
+  </div>
+
+
+  <div class="card main-card mb-3" *ngIf="!isLoading">
+    <div class="card-header">
+      Purchasing Details
+    </div>
+    <div class="card-body">
+      <!-- Justified Tabs -->
+      <ul class="nav nav-tabs"
+          [class.nav-justified]="currentJustify === 'justified'"
+          [class.nav-fill]="currentJustify === 'fill'"
+          [class.justify-content-center]="currentJustify === 'center'"
+          [class.justify-content-end]="currentJustify === 'end'"
+          id="justifiedTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="just-tab1-tab" data-bs-toggle="tab" data-bs-target="#just-tab1" type="button" role="tab" aria-controls="just-tab1" aria-selected="true"><b>Supplier</b> Details</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="just-tab2-tab" data-bs-toggle="tab" data-bs-target="#just-tab2" type="button" role="tab" aria-controls="just-tab2" aria-selected="false">New <b>Order</b> Line</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="just-tab3-tab" data-bs-toggle="tab" data-bs-target="#just-tab3" type="button" role="tab" aria-controls="just-tab3" aria-selected="false"><b>Order</b> Progress</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="just-tab4-tab" data-bs-toggle="tab" data-bs-target="#just-tab4" type="button" role="tab" aria-controls="just-tab4" aria-selected="false"><b>Recieving</b> Details</button>
+        </li>
+      </ul>
+      <div class="tab-content" id="justifiedTabContent">
+        <div class="tab-pane fade show active" id="just-tab1" role="tabpanel" aria-labelledby="just-tab1-tab">
+          <div class="text-end mt-3">
+              <button class="me-2 btn btn-primary btn-sm" (click)="handleCreateSupplierModal()">
+                  <i class="fa fa-plus me-1"></i> Create New Supplier
+              </button>
+          </div>
+          @if (supplierLoading()) {
+              <div class="text-center p-3">
+                  <div class="spinner-border text-primary" role="status">
+                      <span class="sr-only">Loading Suppliers...</span>
+                  </div>
+              </div>
+          } @else {
+              <div class="table-responsive mt-2">
+                  <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                      <thead>
+                      <tr>
+                          <th class="text-center">#</th>
+                          <th class="text-center">Name</th>
+                          <th class="text-center">Phone</th>
+                          <th class="text-center">Email</th>
+                          <th class="text-center">Address</th>
+                          <th class="text-center">Created At</th>
+                          <th class="text-center">Actions</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      @for(item of suppliersSignal(); track item.id; let sn = $index) {
+                          <tr>
+                              <td class="text-center text-muted" style="width: 80px;">
+                                  {{ sn + 1 }}
+                              </td>
+                              <td class="text-start">{{ item.name }}</td>
+                              <td class="text-justify">{{ item.phone }}</td>
+                              <td class="text-justify">{{ item.email }}</td>
+                              <td class="text-justify">{{ item.address }}</td>
+
+                              <td class="text-center">
+                                  <span class="pe-2 opacity-6">
+                                      <i class="fa fa-calendar-alt"></i>
+                                  </span>
+                                  {{ item.created_at | date: 'MMM dd, yyyy hh:mm a' }}
+                              </td>
+
+                              <td class="text-center">
+                                  <div role="group" class="btn-group-sm btn-group">
+                                      <button class="btn-shadow btn btn-info" (click)="handleEditSupplierModal(item)">
+                                          <i class="fa fa-pen"></i> Edit
+                                      </button>
+                                      <button class="btn-shadow btn btn-danger" (click)="handleDeleteSupplierModal(item.id!)">
+                                          <i class="fa fa-trash-alt"></i> Delete
+                                      </button>
+                                  </div>
+                              </td>
+                          </tr>
+                      } @empty {
+                          <tr>
+                              <td colspan="7" class="text-center p-5 text-muted">
+                                  <i class="fa fa-info-circle me-2"></i> No suppliers found.
+                              </td>
+                          </tr>
+                      }
+                      </tbody>
+                  </table>
+              </div>
+          }
         </div>
-        <button *ngIf="mode !== 'create-po'" class="btn btn-primary" (click)="router.navigate(['/purchasing', 'list'])">
-            <i class="pe-7s-back-2 me-1"></i> Back to List
+        <div class="tab-pane fade" id="just-tab2" role="tabpanel" aria-labelledby="just-tab2-tab">
+          <div *ngIf="!isLoading && (mode === 'create-po' || mode === 'edit-po')" class="mt-2 p-4">
+              <form [formGroup]="poForm" (ngSubmit)="onPoSubmit()">
+
+                  <h4 class="text-primary mb-3">{{ mode === 'create-po' ? 'Header Details' : 'PO Header Details' }}</h4>
+                  <div class="row">
+                      <div class="col-md-6 mb-3">
+                          <label for="supplier" class="form-label">Supplier <span class="text-danger">*</span></label>
+                          <select id="supplier" formControlName="supplier" class="form-select"
+                                  [class.is-invalid]="poForm.get('supplier')?.invalid && poForm.get('supplier')?.touched">
+                              <option [ngValue]="null">Select Supplier</option>
+                              <option *ngFor="let supplier of suppliersSignal()" [ngValue]="supplier.id">{{ supplier.name }}</option>
+                          </select>
+                          <div class="invalid-feedback">Supplier is required.</div>
+                      </div>
+
+                      <div class="col-md-6 mb-3">
+                          <label for="expected_delivery_date" class="form-label">Expected Delivery Date <span class="text-danger">*</span></label>
+                          <input id="expected_delivery_date" type="date" formControlName="expected_delivery_date" class="form-control"
+                                 [class.is-invalid]="poForm.get('expected_delivery_date')?.invalid && poForm.get('expected_delivery_date')?.touched">
+                          <div class="invalid-feedback">Delivery date is required.</div>
+                      </div>
+                  </div>
+
+                  <hr class="mt-4 mb-4">
+
+                  <h4 class="text-primary mb-3 d-flex justify-content-between align-items-center">
+                      Line Items
+                      <button type="button" class="btn btn-sm btn-info" (click)="addItem()" [disabled]="isSubmitting">
+                          <i class="pe-7s-plus"></i> Add Item
+                      </button>
+                  </h4>
+
+                  <div class="table-responsive">
+                      <table class="table table-bordered table-striped align-middle">
+                          <thead>
+                              <tr class="table-light">
+                                  <th style="width: 35%;">Product</th>
+                                  <th style="width: 20%;">Quantity Ordered</th>
+                                  <th style="width: 20%;">Unit Cost</th>
+                                  <th style="width: 15%;">Line Total</th>
+                                  <th style="width: 10%;">Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody formArrayName="items">
+                              <tr *ngFor="let itemGroup of poItems.controls; let i = index" [formGroupName]="i">
+                                  <td>
+                                      <select formControlName="product" class="form-select form-select-sm"
+                                              [class.is-invalid]="itemGroup.get('product')?.invalid && itemGroup.get('product')?.touched">
+                                          <option [ngValue]="null">Select Product</option>
+                                          <option *ngFor="let product of products" [ngValue]="product.id">{{ product.name }}</option>
+                                      </select>
+                                  </td>
+                                  <td>
+                                      <input type="number" formControlName="quantity_ordered" class="form-control form-control-sm text-center" min="1">
+                                  </td>
+                                  <td>
+                                      <input type="number" formControlName="unit_cost" class="form-control form-control-sm text-end" min="0" step="0.01">
+                                  </td>
+                                  <td class="text-end fw-bold">
+                                      {{ itemGroup.value.quantity_ordered * itemGroup.value.unit_cost | currency: 'TZS': 'symbol' }}
+                                  </td>
+                                  <td class="text-center">
+                                      <button type="button" class="btn btn-sm btn-danger" (click)="removeItem(i)" [disabled]="isSubmitting">
+                                          <i class="pe-7s-trash"></i>
+                                      </button>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+
+                  <div *ngIf="poForm.get('items')?.hasError('minLengthArray') && poForm.get('items')?.touched" class="alert alert-warning small">
+                      A Purchase Order must contain at least one line item.
+                  </div>
+
+                  <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                      <button type="submit" class="btn btn-lg btn-success" [disabled]="poForm.invalid || isSubmitting">
+                          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+                          <i class="pe-7s-cloud-upload me-1"></i> {{ mode === 'create-po' ? 'Create PO' : 'Update PO' }}
+                      </button>
+                  </div>
+              </form>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="just-tab3" role="tabpanel" aria-labelledby="just-tab3-tab">
+          <div class="container my-4">
+
+            @for (po of purchaseOrders(); track po.id) {
+
+              <div class="card mt-3">
+
+                <div class="" [id]="'heading' + po.id">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link"
+                            type="button"
+                            (click)="openAccordionPanel('panel' + po.id)"
+                            [attr.aria-expanded]="activePanel() === 'panel' + po.id"
+                            [attr.aria-controls]="'collapse' + po.id">
+                      <div class="row">
+                        <div class="col-sm-3">
+                          <b>Order: {{ po.po_number }}</b>
+                        </div>
+                        <div class="col-sm-6">
+                          <b>Supplier: {{ po.supplier_name }}</b>
+                        </div>
+                        <div class="col-sm-3">
+                          <b>Due Date: {{ po.po_date | date:'MMM d, y h:mm a' }}</b>
+                        </div>
+                      </div>
+
+                    </button>
+                  </h5>
+                </div>
+
+                <div [id]="'collapse' + po.id"
+                     [ngbCollapse]="activePanel() !== 'panel' + po.id"
+                     class="collapse"
+                     [attr.aria-labelledby]="'heading' + po.id">
+
+                  <div class="card-body p-0">
+                    <div class="table-responsive">
+                      <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                        <thead>
+                          <tr>
+                            <th class="text-center">Item ID</th>
+                            <th class="text-center">Product Name</th>
+                            <th class="text-center">Qty Ordered</th>
+                            <th class="text-center">Unit Cost</th>
+                            <th class="text-center">Line Total</th>
+                            <th class="text-center">Total Received</th>
+                            <th class="text-center">Receptions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (item of po.items; track item.id) {
+                            <tr>
+                              <td class="text-center text-muted" style="width: 80px;">#00{{ item.id }}</td>
+                              <td class="text-center">{{ item.product_name }}</td>
+                              <td class="text-center">{{ item.quantity_ordered }}</td>
+                              <td class="text-center">{{ item.unit_cost | currency: 'TZS': 'symbol' }}</td>
+                              <td class="text-center">{{ item.line_total | currency: 'TZS': 'symbol' }}</td>
+                              <td class="text-center">{{ item.quantity_received_sum }}</td>
+
+                              <td class="text-center" style="width: 150px;">
+                                <button class="btn btn-sm btn-outline-secondary"
+                                        type="button"
+                                        (click)="openAccordionPanel('item-reception-' + item.id)">
+                                  View Receptions ({{ item.receptions.length }})
+                                </button>
+                              </td>
+                            </tr>
+
+                            <tr [ngbCollapse]="activePanel() !== 'item-reception-' + item.id" class="collapse-row">
+                              <td colspan="7" class="p-0 border-top-0">
+                                <div class="p-3 bg-light border-top">
+                                  <h6>Reception Details for {{ item.product_name }}</h6>
+                                  <table class="table table-striped table-sm mb-0">
+                                    <thead>
+                                      <tr class="text-muted">
+                                        <th>Date</th>
+                                        <th>Received Qty</th>
+                                        <th>Decayed Qty</th>
+                                        <th>Received By</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      @for (reception of item.receptions; track reception.id) {
+                                        <tr>
+                                          <td>{{ reception.reception_date }}</td>
+                                          <td>{{ reception.quantity_received }}</td>
+                                          <td>{{ reception.decayed_products }}</td>
+                                          <td>{{ reception.received_by_name }}</td>
+                                        </tr>
+                                      } @empty {
+                                        <tr><td colspan="4" class="text-center">No reception history.</td></tr>
+                                      }
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </td>
+                            </tr>
+                          } @empty {
+                            <tr><td colspan="7" class="text-center">This order contains no items.</td></tr>
+                          }
+                        </tbody>
+                        <tfoot>
+                            <tr class="text-muted table-secondary fw-bold">
+                              <td colspan="5" class="text-start">Total Amount:</td>
+                              <td colspan="8" class="text-center">{{ po.order_total | currency: 'TZS': 'symbol'}}</td>
+                            </tr>
+                          </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            } @empty {
+              <div class="alert alert-info mt-3" role="alert">
+                There are no purchase orders to display.
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <div class="tab-pane fade" id="just-tab4" role="tabpanel" aria-labelledby="just-tab4-tab">
+          <div *ngIf="!isLoading && mode === 'receive-stock' && currentPo" class="card shadow-sm p-4">
+              <div *ngIf="currentPo.po_status === 'RECEIVED_FULL'" class="alert alert-success">
+                  This Purchase Order has been **fully received**. No further reception entries are required.
+              </div>
+
+              <form [formGroup]="srForm" (ngSubmit)="onSrSubmit()" *ngIf="currentPo.po_status !== 'RECEIVED_FULL'">
+                  <h4 class="text-primary mb-3">Items to Receive (PO #{{ poId }})</h4>
+                  <p class="text-info small">Record the quantity received for each line item below.</p>
+
+                  <div class="table-responsive">
+                      <table class="table table-bordered table-striped align-middle">
+                          <thead>
+                              <tr class="table-light">
+                                  <th style="width: 30%;">Product</th>
+                                  <th style="width: 20%;" class="text-center">Ordered</th>
+                                  <th style="width: 20%;" class="text-center">Previously Received</th>
+                                  <th style="width: 15%;">New Quantity Received <span class="text-danger">*</span></th>
+                                  <th style="width: 15%;">Decayed/Damaged</th>
+                              </tr>
+                          </thead>
+                          <tbody formArrayName="receptions">
+                              <tr *ngFor="let srGroup of srItems.controls; let i = index" [formGroupName]="i">
+                                  <td class="fw-bold">{{ srGroup.get('product_name')?.value }}</td>
+                                  <td class="text-center">{{ srGroup.get('quantity_ordered')?.value }}</td>
+                                  <td class="text-center">{{ srGroup.get('quantity_received_sum')?.value }}</td>
+
+                                  <td>
+                                      <input type="number" formControlName="quantity_received" class="form-control form-control-sm" min="0"
+                                             [max]="srGroup.get('max_receivable')?.value"
+                                             [class.is-invalid]="srGroup.get('quantity_received')?.invalid && srGroup.get('quantity_received')?.touched">
+                                      <div class="invalid-feedback small" *ngIf="srGroup.get('quantity_received')?.errors?.['max']">
+                                          Max: {{ srGroup.get('max_receivable')?.value }}
+                                      </div>
+                                  </td>
+
+                                  <td>
+                                      <input type="number" formControlName="decayed_products" class="form-control form-control-sm" min="0">
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+
+                  <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                      <button type="submit" class="btn btn-lg btn-success" [disabled]="srForm.invalid || isSubmitting">
+                          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+                          <i class="pe-7s-box1 me-1"></i> Confirm Stock Reception
+                      </button>
+                  </div>
+              </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="text-center">
+        <div class="btn-group btn-group-toggle" role="group" aria-label="Tab justify options">
+          <input type="radio" class="btn-check" name="justify" id="justify-start" value="start"
+                 [(ngModel)]="currentJustify" autocomplete="off">
+          <label class="btn btn-outline-primary btn-sm" for="justify-start">Start</label>
+
+          <input type="radio" class="btn-check" name="justify" id="justify-center" value="center"
+                 [(ngModel)]="currentJustify" autocomplete="off">
+          <label class="btn btn-outline-primary btn-sm" for="justify-center">Center</label>
+
+          <input type="radio" class="btn-check" name="justify" id="justify-end" value="end"
+                 [(ngModel)]="currentJustify" autocomplete="off">
+          <label class="btn btn-outline-primary btn-sm" for="justify-end">End</label>
+
+          <input type="radio" class="btn-check" name="justify" id="justify-fill" value="fill"
+                 [(ngModel)]="currentJustify" autocomplete="off">
+          <label class="btn btn-outline-primary btn-sm" for="justify-fill">Fill</label>
+
+          <input type="radio" class="btn-check" name="justify" id="justify-justified" value="justified"
+                 [(ngModel)]="currentJustify" autocomplete="off">
+          <label class="btn btn-outline-primary btn-sm" for="justify-justified">Justified</label>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- <hr> -->
+
+<ng-template #supplierModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="supplierModalLabel">
+            {{ supplierModalMode === 'create' ? 'Create New Supplier' : 'Edit Supplier' }}
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form [formGroup]="supplierForm" (ngSubmit)="onAddOrEditSupplier()">
+        <div class="modal-body">
+
+            @if (supplierMessage()) {
+                <div class="alert alert-danger" role="alert">
+                    {{ supplierMessage() }}
+                </div>
+            }
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                <input type="text" id="name" formControlName="name" class="form-control"
+                       placeholder="Supplier Name" [class.is-invalid]="supplierForm.get('name')?.invalid && supplierForm.get('name')?.touched">
+                @if (supplierForm.get('name')?.hasError('required') && supplierForm.get('name')?.touched) {
+                    <div class="invalid-feedback">Name is required.</div>
+                }
+                @if (supplierForm.get('name')?.hasError('serverError')) {
+                    <div class="invalid-feedback">{{ supplierForm.get('name')?.getError('serverError') }}</div>
+                }
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                <input type="email" id="email" formControlName="email" class="form-control"
+                       placeholder="Email Address" [class.is-invalid]="supplierForm.get('email')?.invalid && supplierForm.get('email')?.touched">
+                @if (supplierForm.get('email')?.hasError('required') && supplierForm.get('email')?.touched) {
+                    <div class="invalid-feedback">Email is required.</div>
+                }
+                @if (supplierForm.get('email')?.hasError('email') && !supplierForm.get('email')?.hasError('required')) {
+                    <div class="invalid-feedback">Enter a valid email address.</div>
+                }
+            </div>
+
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
+                <input type="tel" id="phone" formControlName="phone" class="form-control"
+                       placeholder="Phone Number" [class.is-invalid]="supplierForm.get('phone')?.invalid && supplierForm.get('phone')?.touched">
+                @if (supplierForm.get('phone')?.hasError('required') && supplierForm.get('phone')?.touched) {
+                    <div class="invalid-feedback">Phone number is required.</div>
+                }
+            </div>
+
+            <div class="mb-3">
+                <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
+                <textarea id="address" formControlName="address" class="form-control" rows="3"
+                          placeholder="Supplier Address" [class.is-invalid]="supplierForm.get('address')?.invalid && supplierForm.get('address')?.touched"></textarea>
+                @if (supplierForm.get('address')?.hasError('required') && supplierForm.get('address')?.touched) {
+                    <div class="invalid-feedback">Address is required.</div>
+                }
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light" (click)="modal.dismiss('Cancel click')">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="supplierForm.invalid || supplierLoading()">
+                @if (supplierLoading()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                }
+                {{ supplierModalMode === 'create' ? 'Create Supplier' : 'Save Changes' }}
+            </button>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #deleteSupplierConfirmationModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title text-danger">Confirm Deletion</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p>Are you sure you want to delete this supplier?</p>
+        <p class="text-muted">This action cannot be undone and may fail if the supplier is linked to existing Purchase Orders.</p>
+        @if (supplierMessage()) {
+            <div class="alert alert-danger" role="alert">
+                {{ supplierMessage() }}
+            </div>
+        }
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modal.dismiss('Cancel click')">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="onDeleteSupplier()" [disabled]="supplierLoading()">
+            @if (supplierLoading()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            }
+            Delete
         </button>
     </div>
-
-    <hr>
-
-    <div *ngIf="isLoading" class="alert alert-info">
-        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-        <strong>Loading data...</strong>
-    </div>
-
-    <div *ngIf="!isLoading && (mode === 'create-po' || mode === 'edit-po')" class="card shadow-sm p-4">
-        <form [formGroup]="poForm" (ngSubmit)="onPoSubmit()">
-
-            <h4 class="text-primary mb-3">{{ mode === 'create-po' ? 'Header Details' : 'PO Header Details' }}</h4>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="supplier" class="form-label">Supplier <span class="text-danger">*</span></label>
-                    <select id="supplier" formControlName="supplier" class="form-select"
-                            [class.is-invalid]="poForm.get('supplier')?.invalid && poForm.get('supplier')?.touched">
-                        <option [ngValue]="null">Select Supplier</option>
-                        <option *ngFor="let supplier of suppliers" [ngValue]="supplier.id">{{ supplier.name }}</option>
-                    </select>
-                    <div class="invalid-feedback">Supplier is required.</div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="expected_delivery_date" class="form-label">Expected Delivery Date <span class="text-danger">*</span></label>
-                    <input id="expected_delivery_date" type="date" formControlName="expected_delivery_date" class="form-control"
-                           [class.is-invalid]="poForm.get('expected_delivery_date')?.invalid && poForm.get('expected_delivery_date')?.touched">
-                    <div class="invalid-feedback">Delivery date is required.</div>
-                </div>
-            </div>
-
-            <hr class="mt-4 mb-4">
-
-            <h4 class="text-primary mb-3 d-flex justify-content-between align-items-center">
-                Line Items
-                <button type="button" class="btn btn-sm btn-info" (click)="addItem()" [disabled]="isSubmitting">
-                    <i class="pe-7s-plus"></i> Add Item
-                </button>
-            </h4>
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped align-middle">
-                    <thead>
-                        <tr class="table-light">
-                            <th style="width: 35%;">Product</th>
-                            <th style="width: 20%;">Quantity Ordered</th>
-                            <th style="width: 20%;">Unit Cost</th>
-                            <th style="width: 15%;">Line Total</th>
-                            <th style="width: 10%;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody formArrayName="items">
-                        <tr *ngFor="let itemGroup of poItems.controls; let i = index" [formGroupName]="i">
-                            <td>
-                                <select formControlName="product" class="form-select form-select-sm"
-                                        [class.is-invalid]="itemGroup.get('product')?.invalid && itemGroup.get('product')?.touched">
-                                    <option [ngValue]="null">Select Product</option>
-                                    <option *ngFor="let product of products" [ngValue]="product.id">{{ product.name }}</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="number" formControlName="quantity_ordered" class="form-control form-control-sm text-center" min="1">
-                            </td>
-                            <td>
-                                <input type="number" formControlName="unit_cost" class="form-control form-control-sm text-end" min="0" step="0.01">
-                            </td>
-                            <td class="text-end fw-bold">
-                                {{ itemGroup.value.quantity_ordered * itemGroup.value.unit_cost | currency }}
-                            </td>
-                            <td class="text-center">
-                                <button type="button" class="btn btn-sm btn-danger" (click)="removeItem(i)" [disabled]="isSubmitting">
-                                    <i class="pe-7s-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div *ngIf="poForm.get('items')?.hasError('minLengthArray') && poForm.get('items')?.touched" class="alert alert-warning small">
-                A Purchase Order must contain at least one line item.
-            </div>
-
-            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-                <button type="submit" class="btn btn-lg btn-success" [disabled]="poForm.invalid || isSubmitting">
-                    <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-                    <i class="pe-7s-cloud-upload me-1"></i> {{ mode === 'create-po' ? 'Create PO' : 'Update PO' }}
-                </button>
-            </div>
-        </form>
-    </div>
+</ng-template>
 
 
-    <div *ngIf="!isLoading && mode === 'receive-stock' && currentPo" class="card shadow-sm p-4">
-        <div *ngIf="currentPo.po_status === 'RECEIVED_FULL'" class="alert alert-success">
-            This Purchase Order has been **fully received**. No further reception entries are required.
-        </div>
+<div class="container my-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>🚚 Stock Reception Records</h2>
+    <button class="btn btn-primary" (click)="openModal(receptionModal)">
+      <i class="bi bi-plus-circle me-2"></i> Add Stock Reception Record
+    </button>
+  </div>
 
-        <form [formGroup]="srForm" (ngSubmit)="onSrSubmit()" *ngIf="currentPo.po_status !== 'RECEIVED_FULL'">
-            <h4 class="text-primary mb-3">Items to Receive (PO #{{ poId }})</h4>
-            <p class="text-info small">Record the quantity received for each line item below.</p>
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped align-middle">
-                    <thead>
-                        <tr class="table-light">
-                            <th style="width: 30%;">Product</th>
-                            <th style="width: 20%;" class="text-center">Ordered</th>
-                            <th style="width: 20%;" class="text-center">Previously Received</th>
-                            <th style="width: 15%;">New Quantity Received <span class="text-danger">*</span></th>
-                            <th style="width: 15%;">Decayed/Damaged</th>
-                        </tr>
-                    </thead>
-                    <tbody formArrayName="receptions">
-                        <tr *ngFor="let srGroup of srItems.controls; let i = index" [formGroupName]="i">
-                            <td class="fw-bold">{{ srGroup.get('product_name')?.value }}</td>
-                            <td class="text-center">{{ srGroup.get('quantity_ordered')?.value }}</td>
-                            <td class="text-center">{{ srGroup.get('quantity_received_sum')?.value }}</td>
-
-                            <td>
-                                <input type="number" formControlName="quantity_received" class="form-control form-control-sm" min="0"
-                                       [max]="srGroup.get('max_receivable')?.value"
-                                       [class.is-invalid]="srGroup.get('quantity_received')?.invalid && srGroup.get('quantity_received')?.touched">
-                                <div class="invalid-feedback small" *ngIf="srGroup.get('quantity_received')?.errors?.['max']">
-                                    Max: {{ srGroup.get('max_receivable')?.value }}
-                                </div>
-                            </td>
-
-                            <td>
-                                <input type="number" formControlName="decayed_products" class="form-control form-control-sm" min="0">
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-                <button type="submit" class="btn btn-lg btn-success" [disabled]="srForm.invalid || isSubmitting">
-                    <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-                    <i class="pe-7s-box1 me-1"></i> Confirm Stock Reception
-                </button>
-            </div>
-        </form>
-    </div>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>PO Item</th>
+          <th class="text-end">Received Qty</th>
+          <th class="text-end">Decayed Qty</th>
+          <th>Received By</th>
+          <th>Date</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (record of receptions(); track record.id) {
+          <tr>
+            <td>{{ record.id }}</td>
+            <td>{{ record.product_name }}</td>
+            <td class="text-end fw-bold">{{ record.quantity_received }}</td>
+            <td class="text-end text-danger">{{ record.decayed_products }}</td>
+            <td>{{ record.received_by_name }}</td>
+            <td>{{ record.reception_date | date:'short' }}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-info me-2" (click)="openModal(receptionModal, record)">Edit</button>
+              <button class="btn btn-sm btn-danger" (click)="deleteReception(record.id)">Delete</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="text-center text-muted">No reception records found.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </div>
+
+
+<ng-template #receptionModal let-modal>
+  <div class="modal-body">
+    <form (ngSubmit)="saveReception()">
+
+      <div class="mb-3">
+        <label for="poItem" class="form-label">Purchase order item:</label>
+        <select
+          id="poItem"
+          class="form-select"
+          name="purchase_order_item"
+          required
+          [(ngModel)]="currentReception().purchase_order_item">
+
+          <option [ngValue]="undefined" disabled>----------</option>
+          @for (item of availableItems(); track item.id) {
+            <option [ngValue]="item.id">
+              {{ item.display }}
+            </option>
+          }
+          @empty {
+            <option [ngValue]="undefined" disabled>Loading items or none available...</option>
+          }
+        </select>
+        <div class="form-text text-muted">Select the specific PO line item being received.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="quantityReceived" class="form-label">Quantity received:</label>
+        <input
+          type="number"
+          id="quantityReceived"
+          class="form-control"
+          name="quantity_received"
+          required
+          min="1"
+          [(ngModel)]="currentReception().quantity_received">
+      </div>
+
+      <div class="mb-3">
+        <label for="decayedProducts" class="form-label">Decayed products:</label>
+        <input
+          type="number"
+          id="decayedProducts"
+          class="form-control"
+          name="decayed_products"
+          min="0"
+          [(ngModel)]="currentReception().decayed_products">
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Cancel')">Cancel</button>
+    <button type="submit" class="btn btn-success" (click)="saveReception()">
+      {{ isEditMode() ? 'Save Changes' : 'Create Record' }}
+    </button>
+  </div>
+
+  </ng-template>

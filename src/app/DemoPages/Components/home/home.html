@@ -1,98 +1,116 @@
-<div class="product-page-container">
+<header class="top-nav">
+    <div class="nav-brand">Daz Electronics</div>
 
-    <header class="page-header">
-        <h1 class="logo">Daz Electronics</h1>
-        <div class="search-bar">
-            <input type="text" placeholder="Search products...">
-            <button class="search-btn">Search</button>
+    <nav class="nav-links-desktop">
+        <a *ngFor="let link of navLinks" [routerLink]="link.link" [ngClass]="link.class">{{ link.label }}</a>
+    </nav>
+
+    <div class="nav-actions">
+        <input type="search" placeholder="Search TVs & Accessories..." class="search-input">
+        <a routerLink="/cart" class="cart-icon">🛒</a>
+        <button class="menu-toggle" (click)="toggleSideNav()">☰</button>
+    </div>
+</header>
+
+<div class="layout-container">
+
+    <aside class="side-nav" [class.open]="isSideNavOpen">
+        <button class="close-btn" (click)="toggleSideNav()">✕</button>
+
+        <h3>Browse & Filter</h3>
+
+        <div *ngFor="let filter of filterOptions" class="filter-group">
+            <h4>{{ filter.group }}</h4>
+            <label *ngFor="let value of filter.values" class="filter-option">
+                <input type="checkbox" [value]="value"> {{ value }}
+            </label>
         </div>
-        <nav class="user-nav">
-            <span>Language</span>
-            <a href="#">Login</a>
-            <a href="#">Cart (0)</a>
-        </nav>
-    </header>
 
-    <div class="main-content-grid">
+        <a routerLink="/shop" class="apply-filter-btn">Apply Filters</a>
+    </aside>
 
-        <aside class="sidebar">
-            <h3 class="filter-title">Filters</h3>
+    <div class="overlay" [class.active]="isSideNavOpen" (click)="toggleSideNav()"></div>
 
-            <div class="filter-group">
-                <h4>Brands</h4>
-                <ul class="filter-list">
-                    <li *ngFor="let brand of filterOptions.brands">{{ brand }}</li>
-                </ul>
+    <main class="main-content">
+
+        <section class="hero-section" style="background-image: url('https://images.unsplash.com/photo-1616259021644-80975e533c39?q=80&w=1400&h=500&fit=crop');">
+            <div class="hero-content">
+                <h1>Spring TV Upgrade Event!</h1>
+                <p>Save up to 30% on 4K Smart TVs and get a free wall mount with every purchase over $1000.</p>
+                <a routerLink="/sale" class="cta-button">Shop All Deals →</a>
             </div>
+        </section>
 
-            <div class="filter-group">
-                <h4>Display</h4>
-                <ul class="filter-list">
-                    <li *ngFor="let display of filterOptions.display">{{ display }}</li>
-                </ul>
+        <section class="trust-bar">
+            <div class="trust-item">⭐ **4.8/5** Customer Rating</div>
+            <div class="trust-item">🚚 Free 2-Day Shipping on TVs</div>
+            <div class="trust-item">🛡️ 5-Year Extended Warranty</div>
+            <div class="trust-item">🔄 Easy 30-Day Returns</div>
+        </section>
+
+        <section class="content-module recently-viewed-module">
+            <h2>Continue Shopping for TV Gear</h2>
+            <div class="mini-card-grid">
+                <a *ngFor="let item of recentlyViewed" [routerLink]="item.link" class="mini-card">
+                    <img [src]="item.image" [alt]="item.name" loading="lazy">
+                    <div class="info">
+                        <p class="name">{{ item.name }}</p>
+                        <p class="price">${{ item.price | number:'1.2-2' }}</p>
+                    </div>
+                </a>
             </div>
+        </section>
 
-            <div class="filter-group">
-                <h4>Size</h4>
-                <ul class="filter-list">
-                    <li *ngFor="let size of filterOptions.size">{{ size }}</li>
-                </ul>
-            </div>
-
-            <div class="filter-group">
-                <h4>Voltage</h4>
-                <ul class="filter-list">
-                    <li *ngFor="let voltage of filterOptions.voltage">{{ voltage }}</li>
-                </ul>
-            </div>
-
-        </aside>
-
-        <section class="product-detail-area">
-
-            <div class="product-image-section">
-                <span class="image-placeholder"></span>
-            </div>
-
-            <div class="product-info-section">
-
-                <h2 class="product-name">{{ product.name }}</h2>
-
-                <div class="rating-info">
-                    <span class="stars">★★★★★</span> ({{ product.rating }} / 5) | <span>{{ product.reviews }} Reviews</span>
+        <section class="content-module premium-spotlight-module">
+            <a [routerLink]="premiumSpotlight.link" class="premium-card">
+                <div class="text-content">
+                    <h3>🏆 {{ premiumSpotlight.name }}</h3>
+                    <p class="description">{{ premiumSpotlight.description }}</p>
+                    <p class="price-tag">View Price: **${{ premiumSpotlight.price | number:'1.2-2' }}**</p>
+                    <span class="shop-link">Explore Elite TVs →</span>
                 </div>
+                <img [src]="premiumSpotlight.image" [alt]="premiumSpotlight.name" loading="lazy">
+            </a>
+        </section>
 
-                <p class="product-price">${{ product.price | number:'1.2-2' }}</p>
+        <section class="product-listing content-module">
+            <h2>All Products - Best Sellers</h2>
+            <div class="product-grid">
+                <div *ngFor="let product of allProducts" class="product-card">
+                    <div class="product-image-container">
+                        <img [src]="product.image" [alt]="product.name" loading="lazy">
+                        <span class="stock-badge" [class.low-stock]="product.stock < 10">
+                            Stock: **{{ product.stock }}**
+                        </span>
+                    </div>
 
-                <p class="product-description">{{ product.description }}</p>
+                    <div class="product-info">
+                        <h3 class="name">{{ product.name }}</h3>
+                        <p class="description">{{ product.description }}</p>
 
-                <p class="availability-status" [class.in-stock]="product.availability">
-                    <span class="material-icons">{{ product.availability ? 'check_circle' : 'cancel' }}</span>
-                    {{ product.availability ? 'In Stock' : 'Out of Stock' }}
-                </p>
+                        <div class="price-rating">
+                            <p class="price">${{ product.price | number:'1.2-2' }}</p>
+                            <div class="rating">⭐⭐⭐⭐<span> ({{ product.rating }})</span></div>
+                        </div>
 
-                <hr>
+                        <div class="media-links">
+                            <a *ngIf="product.imagesCount > 0" href="#" class="media-btn">🖼️ {{ product.imagesCount }} Photos</a>
+                            <a *ngIf="product.videoLink" [href]="product.videoLink" target="_blank" class="media-btn video-btn">▶️ Video</a>
+                        </div>
 
-                <div class="quantity-control-group">
-                    <label for="quantity">Quantity:</label>
-                    <div class="quantity-picker">
-                        <button (click)="updateQuantity('subtract')" [disabled]="quantity === 1">-</button>
-                        <input type="number" id="quantity" [(ngModel)]="quantity" min="1" readonly>
-                        <button (click)="updateQuantity('add')">+</button>
+                        <button class="add-to-cart-btn">Add to Cart</button>
                     </div>
                 </div>
-
-                <div class="action-buttons">
-                    <button class="btn-add-to-cart" (click)="addToCart()" [disabled]="!product.availability">Add to Cart</button>
-                    <button class="btn-buy-now" (click)="buyNow()" [disabled]="!product.availability">Buy Now</button>
-                </div>
             </div>
-
         </section>
-    </div>
-
-    <footer class="footer-others">
-        <h3 class="section-title">Others / Related Products</h3>
-        </footer>
-
+    </main>
 </div>
+
+<footer class="footer">
+    <p>Your TV Experts | SSEAMS &copy; 2025. All rights reserved.</p>
+    <div class="footer-links">
+        <a routerLink="/privacy">Privacy Policy</a> |
+        <a routerLink="/returns">Returns & Exchange</a> |
+        <a routerLink="/contact">Contact Us</a>
+    </div>
+</footer>

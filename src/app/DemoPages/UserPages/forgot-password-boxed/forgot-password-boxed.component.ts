@@ -10,6 +10,8 @@ export class ForgotPasswordBoxedComponent {
 
   constructor() { }
 
+  readonly currentYear: number = new Date().getFullYear();
+
   onSubmit() {
     // Handle password recovery form submission
   }

@@ -1,468 +1,469 @@
 <app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon"></app-page-title>
-<!-- <app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon" [actionButtons]="actionButtons"></app-page-title> -->
 
 <div class="card mb-3">
-  <div class="g-0 row">
-    <div class="col-md-12 col-lg-4">
-      <ul class="list-group list-group-flush">
-        <li class="bg-transparent list-group-item">
-          <div class="widget-content p-0">
-            <div class="widget-content-outer">
-              <div class="widget-content-wrapper">
-                <div class="widget-content-left">
-                  <div class="widget-heading">Total Brands</div>
-                  <div class="widget-subheading">All registered Brands</div>
-                </div>
-                <div class="widget-content-right">
-                    <div class="widget-numbers text-success">{{ brands().length }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li class="bg-transparent list-group-item">
-          <div class="widget-content p-0">
-            <div class="widget-content-outer">
-              <div class="widget-content-wrapper">
-                <div class="widget-content-left">
-                  <div class="widget-heading">Available resolutions</div>
-                  <div class="widget-subheading">Available Screen resolutions</div>
-                </div>
-                <div class="widget-content-right">
-                  <div class="widget-numbers text-primary">{{ resolutions().length }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-      </ul>
+    <div class="g-0 row">
+        <div class="col-md-12 col-lg-4">
+            <ul class="list-group list-group-flush">
+                <li class="bg-transparent list-group-item">
+                    <div class="widget-content p-0">
+                        <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Total Brands</div>
+                                    <div class="widget-subheading">All registered Brands</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers text-success">{{ brands().length }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="bg-transparent list-group-item">
+                    <div class="widget-content p-0">
+                        <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Available Resolutions</div>
+                                    <div class="widget-subheading">Available Screen resolutions</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers text-primary">{{ resolutions().length }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-12 col-lg-4">
+            <ul class="list-group list-group-flush">
+                <li class="bg-transparent list-group-item">
+                    <div class="widget-content p-0">
+                        <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Total Panel Types</div>
+                                    <div class="widget-subheading">Sum of all Panel Types</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers text-danger">{{ panelTypes().length }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="bg-transparent list-group-item">
+                    <div class="widget-content p-0">
+                        <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Internet Services</div>
+                                    <div class="widget-subheading">Available internet services</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers text-warning">{{ internetServices().length }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-12 col-lg-4">
+            <ul class="list-group list-group-flush">
+                <li class="bg-transparent list-group-item">
+                    <div class="widget-content p-0">
+                        <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Total Connectivity</div>
+                                    <div class="widget-subheading">Connections for adapter plugin</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers text-success">{{ connectivityOptions().length }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="bg-transparent list-group-item">
+                    <div class="widget-content p-0">
+                        <div class="widget-content-outer">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left">
+                                    <div class="widget-heading">Screen Sizes</div>
+                                    <div class="widget-subheading">In stock screen sizes</div>
+                                </div>
+                                <div class="widget-content-right">
+                                    <div class="widget-numbers text-primary">{{ screenSizes().length }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </div>
-    <div class="col-md-12 col-lg-4">
-      <ul class="list-group list-group-flush">
-        <li class="bg-transparent list-group-item">
-          <div class="widget-content p-0">
-            <div class="widget-content-outer">
-              <div class="widget-content-wrapper">
-                <div class="widget-content-left">
-                  <div class="widget-heading">Total panel Types</div>
-                  <div class="widget-subheading">Sum of all Panel Types</div>
-                </div>
-                <div class="widget-content-right">
-                  <div class="widget-numbers text-danger">{{ panelTypes().length }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li class="bg-transparent list-group-item">
-          <div class="widget-content p-0">
-            <div class="widget-content-outer">
-              <div class="widget-content-wrapper">
-                <div class="widget-content-left">
-                  <div class="widget-heading">Internet Services</div>
-                  <div class="widget-subheading">Available internent services</div>
-                </div>
-                <div class="widget-content-right">
-                  <div class="widget-numbers text-warning">{{ internetServices().length }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="col-md-12 col-lg-4">
-      <ul class="list-group list-group-flush">
-        <li class="bg-transparent list-group-item">
-          <div class="widget-content p-0">
-            <div class="widget-content-outer">
-              <div class="widget-content-wrapper">
-                <div class="widget-content-left">
-                  <div class="widget-heading">Total Connectivity</div>
-                  <div class="widget-subheading">Connections for adapter plugin</div>
-                </div>
-                <div class="widget-content-right">
-                  <div class="widget-numbers text-success">{{ connectivityOptions().length }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li class="bg-transparent list-group-item">
-          <div class="widget-content p-0">
-            <div class="widget-content-outer">
-              <div class="widget-content-wrapper">
-                <div class="widget-content-left">
-                  <div class="widget-heading">Screen Sizes</div>
-                  <div class="widget-subheading">In stock screen sizes</div>
-                </div>
-                <div class="widget-content-right">
-                  <div class="widget-numbers text-primary">{{ screenSizes().length }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
 </div>
 
 <div class="card main-card mb-3">
-  <div class="card-header">
-    Manage Product Specifications
-  </div>
-  <div class="card-body">
-    <!-- Vertical Pills -->
-    <div class="row">
-      <div class="col-3">
-        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <button class="nav-link active" id="v-pills-brands-tab" data-bs-toggle="pill" data-bs-target="#v-pills-brands" type="button" role="tab" aria-controls="v-pills-brands" aria-selected="true">Brands</button>
-          <button class="nav-link" id="v-pills-internetServices-tab" data-bs-toggle="pill" data-bs-target="#v-pills-internetServices" type="button" role="tab" aria-controls="v-pills-internetServices" aria-selected="false">Internet</button>
-          <button class="nav-link" id="v-pills-resolutions-tab" data-bs-toggle="pill" data-bs-target="#v-pills-resolutions" type="button" role="tab" aria-controls="v-pills-resolutions" aria-selected="false">Resolutions</button>
-          <button class="nav-link" id="v-pills-panelTypes-tab" data-bs-toggle="pill" data-bs-target="#v-pills-panelTypes" type="button" role="tab" aria-controls="v-pills-panelTypes" aria-selected="false">Panel</button>
-          <button class="nav-link" id="v-pills-connectivityOptions-tab" data-bs-toggle="pill" data-bs-target="#v-pills-connectivityOptions" type="button" role="tab" aria-controls="v-pills-connectivityOptions" aria-selected="false">Connectivity</button>
-          <button class="nav-link" id="v-pills-screenSizes-tab" data-bs-toggle="pill" data-bs-target="#v-pills-screenSizes" type="button" role="tab" aria-controls="v-pills-screenSizes" aria-selected="false">Scree size</button>
+    <div class="card-header">
+        Manage Product Specifications
+        <div *ngIf="isLoading()" class="spinner-border spinner-border-sm ms-3" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
-      </div>
-      <div class="col-9">
-        <div class="tab-content" id="v-pills-tabContent">
-          <div class="tab-pane fade show active" id="v-pills-brands" role="tabpanel" aria-labelledby="v-pills-brands-tab">
-            <div class="table-responsive">
-              <div class="text-end">
-                <button class="mb-2 me-2 btn btn-primary btn-sm" (click) = "handleCreateModalBrand()">+ Create New
-                </button>
-              </div>
-              <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
-                <thead>
-                <tr>
-                  <th class="text-center">#</th>
-                  <th class="text-center">Name</th>
-                  <th class="text-center">Description</th>
-                  <th class="text-center">Due Date</th>
-                  <th class="text-center">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                @for (item of brands(); track item.id; let sn = $index) {
-                  <tr>
-                    <td class="text-center text-muted" style="width: 80px;">
-                      {{ sn + 1 }}
-                    </td>
-                    <td class="text-start"><a [routerLink]="">{{ item.name }}</a></td>
-                    <td class="text-justify"><a [routerLink]="">{{ item.description }}</a> </td>
-
-                    <!-- Date/Time -->
-                    <td class="text-center">
-                      <span class="pe-2 opacity-6">
-                          <i class="fa fa-business-time"></i>
-                      </span>
-                      {{ item.created_at | date: 'MMM dd, yyyy hh:mm a' }}
-                    </td>
-
-                    <!-- Actions -->
-                    <td class="text-center">
-                      <div role="group" class="btn-group-sm btn-group">
-                        <!-- <button class="btn-shadow btn btn-primary" (click)="handleEditModal(item.id!)">Edit</button>
-                        <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal(item.id!)">Delete</button> -->
-                      </div>
-                    </td>
-                  </tr>
-                } @empty {
-                  <!-- Empty State -->
-                  <tr>
-                    <td colspan="7" class="text-center p-5 text-muted">
-                      <i class="fa fa-info-circle me-2"></i> No datan in a table.
-                    </td>
-                  </tr>
-                }
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="v-pills-internetServices" role="tabpanel" aria-labelledby="v-pills-internetServices-tab">
-              <div class="table-responsive">
-                <div class="text-end">
-                  <button class="mb-2 me-2 btn btn-secondary btn-sm">+ Create New
-                  </button>
-                </div>
-                <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
-                  <thead>
-                  <tr>
-                    <th class="text-center">#</th>
-                    <th class="text-center">Name</th>
-                    <th class="text-center">Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  @for (item of internetServices(); track item.id; let sn = $index) {
-                    <tr>
-                      <td class="text-center text-muted" style="width: 80px;">
-                        {{ sn + 1 }}
-                      </td>
-                      <td class="text-start"><a [routerLink]="">{{ item.name }}</a></td>
-                      <!-- Actions -->
-                      <td class="text-center">
-                        <div role="group" class="btn-group-sm btn-group">
-                          <!-- <button class="btn-shadow btn btn-primary" (click)="handleEditModal(item.id!)">Edit</button>
-                          <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal(item.id!)">Delete</button> -->
-                        </div>
-                      </td>
-                    </tr>
-                  } @empty {
-                    <!-- Empty State -->
-                    <tr>
-                      <td colspan="7" class="text-center p-5 text-muted">
-                        <i class="fa fa-info-circle me-2"></i> No datan in a table.
-                      </td>
-                    </tr>
-                  }
-                  </tbody>
-                </table>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="v-pills-resolutions" role="tabpanel" aria-labelledby="v-pills-resolutions-tab">
-              <div class="table-responsive">
-                <div class="text-end">
-                  <button class="mb-2 me-2 btn btn-success btn-sm">+ Create New
-                  </button>
-                </div>
-                <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
-                  <thead>
-                  <tr>
-                    <th class="text-center">#</th>
-                    <th class="text-center">Name</th>
-                    <th class="text-center">Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  @for (item of resolutions(); track item.id; let sn = $index) {
-                    <tr>
-                      <td class="text-center text-muted" style="width: 80px;">
-                        {{ sn + 1 }}
-                      </td>
-                      <td class="text-start"><a [routerLink]="">{{ item.name }}</a></td>
-                      <!-- Actions -->
-                      <td class="text-center">
-                        <div role="group" class="btn-group-sm btn-group">
-                          <!-- <button class="btn-shadow btn btn-primary" (click)="handleEditModal(item.id!)">Edit</button>
-                          <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal(item.id!)">Delete</button> -->
-                        </div>
-                      </td>
-                    </tr>
-                  } @empty {
-                    <!-- Empty State -->
-                    <tr>
-                      <td colspan="7" class="text-center p-5 text-muted">
-                        <i class="fa fa-info-circle me-2"></i> No datan in a table.
-                      </td>
-                    </tr>
-                  }
-                  </tbody>
-                </table>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="v-pills-panelTypes" role="tabpanel" aria-labelledby="v-pills-panelTypes-tab">
-              <div class="table-responsive">
-                <div class="text-end">
-                  <button class="mb-2 me-2 btn btn-primary btn-sm">+ Create New
-                  </button>
-                </div>
-                <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
-                  <thead>
-                  <tr>
-                    <th class="text-center">#</th>
-                    <th class="text-center">Name</th>
-                    <th class="text-center">Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  @for (item of panelTypes(); track item.id; let sn = $index) {
-                    <tr>
-                      <td class="text-center text-muted" style="width: 80px;">
-                        {{ sn + 1 }}
-                      </td>
-                      <td class="text-start"><a [routerLink]="">{{ item.name }}</a></td>
-                      <!-- Actions -->
-                      <td class="text-center">
-                        <div role="group" class="btn-group-sm btn-group">
-                          <!-- <button class="btn-shadow btn btn-primary" (click)="handleEditModal(item.id!)">Edit</button>
-                          <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal(item.id!)">Delete</button> -->
-                        </div>
-                      </td>
-                    </tr>
-                  } @empty {
-                    <!-- Empty State -->
-                    <tr>
-                      <td colspan="7" class="text-center p-5 text-muted">
-                        <i class="fa fa-info-circle me-2"></i> No datan in a table.
-                      </td>
-                    </tr>
-                  }
-                  </tbody>
-                </table>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="v-pills-connectivityOptions" role="tabpanel" aria-labelledby="v-pills-connectivityOptions-tab">
-              <div class="table-responsive">
-                <div class="text-end">
-                  <button class="mb-2 me-2 btn btn-secondary btn-sm">+ Create New
-                  </button>
-                </div>
-                <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
-                  <thead>
-                  <tr>
-                    <th class="text-center">#</th>
-                    <th class="text-center">Name</th>
-                    <th class="text-center">Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  @for (item of connectivityOptions(); track item.id; let sn = $index) {
-                    <tr>
-                      <td class="text-center text-muted" style="width: 80px;">
-                        {{ sn + 1 }}
-                      </td>
-                      <td class="text-start"><a [routerLink]="">{{ item.name }}</a></td>
-                      <!-- Actions -->
-                      <td class="text-center">
-                        <div role="group" class="btn-group-sm btn-group">
-                          <!-- <button class="btn-shadow btn btn-primary" (click)="handleEditModal(item.id!)">Edit</button>
-                          <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal(item.id!)">Delete</button> -->
-                        </div>
-                      </td>
-                    </tr>
-                  } @empty {
-                    <!-- Empty State -->
-                    <tr>
-                      <td colspan="7" class="text-center p-5 text-muted">
-                        <i class="fa fa-info-circle me-2"></i> No datan in a table.
-                      </td>
-                    </tr>
-                  }
-                  </tbody>
-                </table>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="v-pills-screenSizes" role="tabpanel" aria-labelledby="v-pills-screenSizes-tab">
-              <div class="table-responsive">
-                <div class="text-end">
-                  <button class="mb-2 me-2 btn btn-success btn-sm">+ Create New
-                  </button>
-                </div>
-                <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
-                  <thead>
-                  <tr>
-                    <th class="text-center">#</th>
-                    <th class="text-center">Name</th>
-                    <th class="text-center">Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  @for (item of screenSizes(); track item.id; let sn = $index) {
-                    <tr>
-                      <td class="text-center text-muted" style="width: 80px;">
-                        {{ sn + 1 }}
-                      </td>
-                      <td class="text-start"><a [routerLink]="">{{ item.name }}</a></td>
-                      <!-- Actions -->
-                      <td class="text-center">
-                        <div role="group" class="btn-group-sm btn-group">
-                          <!-- <button class="btn-shadow btn btn-primary" (click)="handleEditModal(item.id!)">Edit</button>
-                          <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal(item.id!)">Delete</button> -->
-                        </div>
-                      </td>
-                    </tr>
-                  } @empty {
-                    <!-- Empty State -->
-                    <tr>
-                      <td colspan="7" class="text-center p-5 text-muted">
-                        <i class="fa fa-info-circle me-2"></i> No datan in a table.
-                      </td>
-                    </tr>
-                  }
-                  </tbody>
-                </table>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
+    <div class="card-body">
+        <div *ngIf="message()" class="alert alert-info">{{ message() }}</div>
+
+        <div class="row">
+            <div class="col-3">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <button class="nav-link active" id="v-pills-brands-tab" data-bs-toggle="pill" data-bs-target="#v-pills-brands" type="button" role="tab" aria-controls="v-pills-brands" aria-selected="true">Brands</button>
+                    <button class="nav-link" id="v-pills-internetServices-tab" data-bs-toggle="pill" data-bs-target="#v-pills-internetServices" type="button" role="tab" aria-controls="v-pills-internetServices" aria-selected="false">Internet Services</button>
+                    <button class="nav-link" id="v-pills-resolutions-tab" data-bs-toggle="pill" data-bs-target="#v-pills-resolutions" type="button" role="tab" aria-controls="v-pills-resolutions" aria-selected="false">Resolutions</button>
+                    <button class="nav-link" id="v-pills-panelTypes-tab" data-bs-toggle="pill" data-bs-target="#v-pills-panelTypes" type="button" role="tab" aria-controls="v-pills-panelTypes" aria-selected="false">Panel Types</button>
+                    <button class="nav-link" id="v-pills-connectivityOptions-tab" data-bs-toggle="pill" data-bs-target="#v-pills-connectivityOptions" type="button" role="tab" aria-controls="v-pills-connectivityOptions" aria-selected="false">Connectivity</button>
+                    <button class="nav-link" id="v-pills-screenSizes-tab" data-bs-toggle="pill" data-bs-target="#v-pills-screenSizes" type="button" role="tab" aria-controls="v-pills-screenSizes" aria-selected="false">Screen Sizes</button>
+                </div>
+            </div>
+
+            <div class="col-9">
+                <div class="tab-content" id="v-pills-tabContent">
+
+                    <div class="tab-pane fade show active" id="v-pills-brands" role="tabpanel" aria-labelledby="v-pills-brands-tab">
+                        <div class="table-responsive">
+                            <div class="text-end">
+                                <button class="mb-2 me-2 btn btn-primary btn-sm" (click)="handleCreateModal('Brand')">
+                                    <fa-icon [icon]="faPlus" class="me-1"></fa-icon> Create New Brand
+                                </button>
+                            </div>
+                            <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">#</th>
+                                        <th class="text-start">Name</th>
+                                        <th class="text-start">Description</th>
+                                        <th class="text-center">Created At</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of brands(); track item.id; let sn = $index) {
+                                        <tr>
+                                            <td class="text-center text-muted" style="width: 80px;">{{ sn + 1 }}</td>
+                                            <td class="text-start">{{ item.name }}</td>
+                                            <td class="text-start">{{ item.description }}</td>
+                                            <td class="text-center">
+                                                <span class="pe-2 opacity-6"><i class="fa fa-business-time"></i></span>
+                                                {{ item.created_at | date: 'MMM dd, yyyy' }}
+                                            </td>
+                                            <td class="text-center">
+                                                <div role="group" class="btn-group-sm btn-group">
+                                                    <button class="btn-shadow btn btn-primary" (click)="handleEditModal('Brand', item.id!)" title="Edit Brand">
+                                                        <fa-icon [icon]="faEdit"></fa-icon>
+                                                    </button>
+                                                    <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal('Brand', item.id!)" title="Delete Brand">
+                                                        <fa-icon [icon]="faTrash"></fa-icon>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    } @empty {
+                                        <tr>
+                                            <td colspan="5" class="text-center p-5 text-muted">
+                                                <i class="fa fa-info-circle me-2"></i> No brands found.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="v-pills-internetServices" role="tabpanel" aria-labelledby="v-pills-internetServices-tab">
+                        <div class="table-responsive">
+                            <div class="text-end">
+                                <button class="mb-2 me-2 btn btn-secondary btn-sm" (click)="handleCreateModal('InternetService')">
+                                    <fa-icon [icon]="faPlus" class="me-1"></fa-icon> Create New Service
+                                </button>
+                            </div>
+                            <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">#</th>
+                                        <th class="text-start">Name</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of internetServices(); track item.id; let sn = $index) {
+                                        <tr>
+                                            <td class="text-center text-muted" style="width: 80px;">{{ sn + 1 }}</td>
+                                            <td class="text-start">{{ item.name }}</td>
+                                            <td class="text-center">
+                                                <div role="group" class="btn-group-sm btn-group">
+                                                    <button class="btn-shadow btn btn-primary" (click)="handleEditModal('InternetService', item.id!)" title="Edit Service">
+                                                        <fa-icon [icon]="faEdit"></fa-icon>
+                                                    </button>
+                                                    <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal('InternetService', item.id!)" title="Delete Service">
+                                                        <fa-icon [icon]="faTrash"></fa-icon>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    } @empty {
+                                        <tr>
+                                            <td colspan="3" class="text-center p-5 text-muted">
+                                                <i class="fa fa-info-circle me-2"></i> No internet services found.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="v-pills-resolutions" role="tabpanel" aria-labelledby="v-pills-resolutions-tab">
+                        <div class="table-responsive">
+                            <div class="text-end">
+                                <button class="mb-2 me-2 btn btn-success btn-sm" (click)="handleCreateModal('Resolution')">
+                                    <fa-icon [icon]="faPlus" class="me-1"></fa-icon> Create New Resolution
+                                </button>
+                            </div>
+                            <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">#</th>
+                                        <th class="text-start">Name</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of resolutions(); track item.id; let sn = $index) {
+                                        <tr>
+                                            <td class="text-center text-muted" style="width: 80px;">{{ sn + 1 }}</td>
+                                            <td class="text-start">{{ item.name }}</td>
+                                            <td class="text-center">
+                                                <div role="group" class="btn-group-sm btn-group">
+                                                    <button class="btn-shadow btn btn-primary" (click)="handleEditModal('Resolution', item.id!)" title="Edit Resolution">
+                                                        <fa-icon [icon]="faEdit"></fa-icon>
+                                                    </button>
+                                                    <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal('Resolution', item.id!)" title="Delete Resolution">
+                                                        <fa-icon [icon]="faTrash"></fa-icon>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    } @empty {
+                                        <tr>
+                                            <td colspan="3" class="text-center p-5 text-muted">
+                                                <i class="fa fa-info-circle me-2"></i> No resolutions found.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="v-pills-panelTypes" role="tabpanel" aria-labelledby="v-pills-panelTypes-tab">
+                        <div class="table-responsive">
+                            <div class="text-end">
+                                <button class="mb-2 me-2 btn btn-primary btn-sm" (click)="handleCreateModal('PanelType')">
+                                    <fa-icon [icon]="faPlus" class="me-1"></fa-icon> Create New Panel Type
+                                </button>
+                            </div>
+                            <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">#</th>
+                                        <th class="text-start">Name</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of panelTypes(); track item.id; let sn = $index) {
+                                        <tr>
+                                            <td class="text-center text-muted" style="width: 80px;">{{ sn + 1 }}</td>
+                                            <td class="text-start">{{ item.name }}</td>
+                                            <td class="text-center">
+                                                <div role="group" class="btn-group-sm btn-group">
+                                                    <button class="btn-shadow btn btn-primary" (click)="handleEditModal('PanelType', item.id!)" title="Edit Panel Type">
+                                                        <fa-icon [icon]="faEdit"></fa-icon>
+                                                    </button>
+                                                    <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal('PanelType', item.id!)" title="Delete Panel Type">
+                                                        <fa-icon [icon]="faTrash"></fa-icon>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    } @empty {
+                                        <tr>
+                                            <td colspan="3" class="text-center p-5 text-muted">
+                                                <i class="fa fa-info-circle me-2"></i> No panel types found.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="v-pills-connectivityOptions" role="tabpanel" aria-labelledby="v-pills-connectivityOptions-tab">
+                        <div class="table-responsive">
+                            <div class="text-end">
+                                <button class="mb-2 me-2 btn btn-secondary btn-sm" (click)="handleCreateModal('Connectivity')">
+                                    <fa-icon [icon]="faPlus" class="me-1"></fa-icon> Create New Connectivity
+                                </button>
+                            </div>
+                            <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">#</th>
+                                        <th class="text-start">Name</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of connectivityOptions(); track item.id; let sn = $index) {
+                                        <tr>
+                                            <td class="text-center text-muted" style="width: 80px;">{{ sn + 1 }}</td>
+                                            <td class="text-start">{{ item.name }}</td>
+                                            <td class="text-center">
+                                                <div role="group" class="btn-group-sm btn-group">
+                                                    <button class="btn-shadow btn btn-primary" (click)="handleEditModal('Connectivity', item.id!)" title="Edit Connectivity">
+                                                        <fa-icon [icon]="faEdit"></fa-icon>
+                                                    </button>
+                                                    <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal('Connectivity', item.id!)" title="Delete Connectivity">
+                                                        <fa-icon [icon]="faTrash"></fa-icon>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    } @empty {
+                                        <tr>
+                                            <td colspan="3" class="text-center p-5 text-muted">
+                                                <i class="fa fa-info-circle me-2"></i> No connectivity options found.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="v-pills-screenSizes" role="tabpanel" aria-labelledby="v-pills-screenSizes-tab">
+                        <div class="table-responsive">
+                            <div class="text-end">
+                                <button class="mb-2 me-2 btn btn-success btn-sm" (click)="handleCreateModal('ScreenSize')">
+                                    <fa-icon [icon]="faPlus" class="me-1"></fa-icon> Create New Screen Size
+                                </button>
+                            </div>
+                            <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">#</th>
+                                        <th class="text-start">Name</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of screenSizes(); track item.id; let sn = $index) {
+                                        <tr>
+                                            <td class="text-center text-muted" style="width: 80px;">{{ sn + 1 }}</td>
+                                            <td class="text-start">{{ item.name }}</td>
+                                            <td class="text-center">
+                                                <div role="group" class="btn-group-sm btn-group">
+                                                    <button class="btn-shadow btn btn-primary" (click)="handleEditModal('ScreenSize', item.id!)" title="Edit Screen Size">
+                                                        <fa-icon [icon]="faEdit"></fa-icon>
+                                                    </button>
+                                                    <button class="btn-shadow btn btn-danger" (click)="handleDeleteModal('ScreenSize', item.id!)" title="Delete Screen Size">
+                                                        <fa-icon [icon]="faTrash"></fa-icon>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    } @empty {
+                                        <tr>
+                                            <td colspan="3" class="text-center p-5 text-muted">
+                                                <i class="fa fa-info-circle me-2"></i> No screen sizes found.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
 <div class="card-body">
-    <!-- 1. CREATE / EDIT MODAL (Brand) -->
-    <ng-template #brandModal let-c="close" let-d="dismiss">
+    <ng-template #editCreateModal let-c="close" let-d="dismiss">
         <div class="modal-header">
-            <!-- Dynamic Title based on modalMode -->
-            <h4 class="modal-title">{{ modalMode === 'edit' ? 'Edit Brand' : 'Add New Brand' }}</h4>
+            <h4 class="modal-title">{{ modalMode === 'edit' ? 'Edit ' : 'Add New ' }}{{ currentSpecType }}</h4>
             <button type="button" class="btn-close" aria-label="Close" (click)="d('Cross click')"></button>
         </div>
 
-        <!-- Use the newBrandForm and onAddBrand handler -->
-        <form [formGroup]="newBrandForm" (ngSubmit)="onAddBrand()">
+        <form [formGroup]="currentSpecType === 'Brand' ? newBrandForm : specMap[currentSpecType!]?.form" (ngSubmit)="onAddSpec()">
             <div class="modal-body">
                 <div class="space-y-4">
 
-                    <!-- Name -->
+                    <div *ngIf="message()" class="alert alert-danger">{{ message() }}</div>
+
                     <div class="mb-3">
-                        <label for="name" class="form-label font-semibold">Brand Name</label>
+                        <label for="name" class="form-label font-semibold">{{ currentSpecType }} Name</label>
                         <input
                             id="name"
                             type="text"
                             formControlName="name"
                             class="form-control"
-                            placeholder="e.g., Samsung, Sony"
-                            [class.is-invalid]="newBrandForm.get('name')?.invalid && newBrandForm.get('name')?.touched"
+                            [class.is-invalid]="(currentSpecType === 'Brand' ? newBrandForm : specMap[currentSpecType!]?.form)?.get('name')?.invalid && (currentSpecType === 'Brand' ? newBrandForm : specMap[currentSpecType!]?.form)?.get('name')?.touched"
                         >
-                        <div *ngIf="newBrandForm.get('name')?.invalid && newBrandForm.get('name')?.touched" class="text-danger mt-1 text-sm">
-                            Brand Name is required.
+                        <div *ngIf="(currentSpecType === 'Brand' ? newBrandForm : specMap[currentSpecType!]?.form)?.get('name')?.invalid && (currentSpecType === 'Brand' ? newBrandForm : specMap[currentSpecType!]?.form)?.get('name')?.touched" class="text-danger mt-1 text-sm">
+                            {{ currentSpecType }} Name is required.
                         </div>
                     </div>
 
-                    <!-- Description -->
-                    <div class="mb-3">
-                        <label for="description" class="form-label font-semibold">Description</label>
-                        <textarea
-                            id="description"
-                            formControlName="description"
-                            class="form-control"
-                            rows="3"
-                            placeholder="Brief description of this brand."
-                            [class.is-invalid]="newBrandForm.get('description')?.invalid && newBrandForm.get('description')?.touched"
-                        ></textarea>
-                        <div *ngIf="newBrandForm.get('description')?.invalid && newBrandForm.get('description')?.touched" class="text-danger mt-1 text-sm">
-                            Description is required.
+                    <ng-container *ngIf="currentSpecType === 'Brand'">
+                        <div class="mb-3" [formGroup]="newBrandForm">
+                            <label for="description" class="form-label font-semibold">Description</label>
+                            <textarea
+                                id="description"
+                                formControlName="description"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Brief description of this brand."
+                                [class.is-invalid]="newBrandForm.get('description')?.invalid && newBrandForm.get('description')?.touched"
+                            ></textarea>
+                            <div *ngIf="newBrandForm.get('description')?.invalid && newBrandForm.get('description')?.touched" class="text-danger mt-1 text-sm">
+                                Description is required.
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Status Field -->
-                    <div class="mb-3">
-                        <label for="status" class="form-label font-semibold">Brand Status</label>
-                        <select id="status" formControlName="status" class="form-select">
-                            <option value="true">Active</option>
-                            <option value="false">Inactive</option>
-                        </select>
-                        <div *ngIf="newBrandForm.get('status')?.invalid && newBrandForm.get('status')?.touched" class="text-danger mt-1 text-sm">
-                            Status is required.
-                        </div>
-                    </div>
+                        <div class="mb-3" [formGroup]="newBrandForm">
+                            <label for="status" class="form-label font-semibold">Brand Status</label>
+                            <select id="status" formControlName="status" class="form-select">
+                                <option [ngValue]="'true'">Active</option>
+                                <option [ngValue]="'false'">Inactive</option>
+                            </select>
+                            </div>
 
-                    <!-- Is Digital Field -->
-                    <div class="mb-3">
-                        <label for="is_digital" class="form-label font-semibold">Brand Type</label>
-                        <select id="is_digital" formControlName="is_digital" class="form-select">
-                            <option value="false">Physical Brand</option>
-                            <option value="true">Digital Brand</option>
-                        </select>
-                        <div *ngIf="newBrandForm.get('is_digital')?.invalid && newBrandForm.get('is_digital')?.touched" class="text-danger mt-1 text-sm">
-                            Brand type is required.
-                        </div>
-                    </div>
+                        <div class="mb-3" [formGroup]="newBrandForm">
+                            <label for="is_digital" class="form-label font-semibold">Brand Type</label>
+                            <select id="is_digital" formControlName="is_digital" class="form-select">
+                                <option [ngValue]="'false'">Physical Brand</option>
+                                <option [ngValue]="'true'">Digital Brand</option>
+                            </select>
+                            </div>
+                    </ng-container>
 
-                    <div *ngIf="message()" class="alert alert-danger">{{ message() }}</div>
                 </div>
             </div>
 
@@ -472,26 +473,24 @@
                 <button
                     type="submit"
                     class="btn btn-primary"
-                    [disabled]="newBrandForm.invalid || isLoading()"
+                    [disabled]="(currentSpecType === 'Brand' ? newBrandForm : specMap[currentSpecType!]?.form)?.invalid || isLoading()"
                 >
                     <span *ngIf="isLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    <!-- Dynamic Button Text based on modalMode -->
                     {{ isLoading() ? (modalMode === 'edit' ? 'Updating...' : 'Saving...') : (modalMode === 'edit' ? 'Update changes' : 'Save changes') }}
                 </button>
             </div>
         </form>
     </ng-template>
 
-    <!-- 2. DELETE CONFIRMATION MODAL (Brand) -->
-    <ng-template #deleteBrandConfirmationModal let-c="close" let-d="dismiss">
+    <ng-template #deleteConfirmationModal let-c="close" let-d="dismiss">
         <div class="modal-header bg-danger text-white">
-            <h4 class="modal-title">Confirm Brand Deletion</h4>
+            <h4 class="modal-title">Confirm {{ currentSpecType }} Deletion</h4>
             <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="d('Cross click')"></button>
         </div>
 
         <div class="modal-body">
             <p class="text-center font-semibold text-lg mb-4">
-                Are you sure you want to delete this **brand** (ID: {{ currentBrandId }})?
+                Are you sure you want to delete this **{{ currentSpecType }}** (ID: {{ currentSpecId }})? This action cannot be undone.
             </p>
             <div *ngIf="message()" class="alert alert-danger">{{ message() }}</div>
         </div>
@@ -499,15 +498,14 @@
         <div class="modal-footer justify-content-center">
             <button type="button" class="btn btn-secondary" (click)="d('Cancel')">Cancel</button>
 
-            <!-- Use the onDeleteBrand handler -->
             <button
                 type="button"
                 class="btn btn-danger"
-                (click)="onDeleteBrand()"
+                (click)="onDeleteSpec()"
                 [disabled]="isLoading()"
             >
                 <span *ngIf="isLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                {{ isLoading() ? 'Deleting...' : 'Yes, Delete Brand' }}
+                {{ isLoading() ? 'Deleting...' : 'Yes, Delete ' + currentSpecType }}
             </button>
         </div>
     </ng-template>

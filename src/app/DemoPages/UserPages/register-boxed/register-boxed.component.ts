@@ -1,4 +1,4 @@
-import { Component, signal, WritableSignal, inject } from '@angular/core';
+import { Component, signal, WritableSignal, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl, NonNullableFormBuilder } from '@angular/forms';
 import { HttpClient } from "@angular/common/http";
 import { Router } from '@angular/router';
@@ -19,12 +19,15 @@ interface RegisterForm {
   standalone: false,
   styles: []
 })
-export class RegisterBoxedComponent {
+export class RegisterBoxedComponent implements OnInit {
 
   http = inject(HttpClient);
   private formBuilder = inject(NonNullableFormBuilder);
   private router = inject(Router);
   private baseUrl = 'http://localhost:8000/api/auth';
+  readonly currentYear: number = new Date().getFullYear();
+  public Copyright: string = '';
+  public brand = "Daz Electronics";
 
   message: WritableSignal<string | null> = signal(null);
   isLoading: WritableSignal<boolean> = signal(false);
@@ -36,6 +39,15 @@ export class RegisterBoxedComponent {
     last_name: ['', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
+
+  ngOnInit(){
+    this.get_copyright_name();
+  }
+
+  get_copyright_name(){
+    this.Copyright = `${this.brand} ${this.currentYear}`;
+    return this.Copyright;
+  }
 
   onRegister(): void {
 

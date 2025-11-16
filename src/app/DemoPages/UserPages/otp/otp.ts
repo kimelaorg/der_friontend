@@ -19,17 +19,22 @@ interface OtpForm {
 export class Otp implements OnInit { // Renamed class from Otp to OtpComponent for consistency
 
   // Dependencies
+
   private router = inject(Router);
   private http = inject(HttpClient);
   private formBuilder = inject(NonNullableFormBuilder);
   private authService = inject(Auth); // Inject AuthService
   private baseUrl = 'http://localhost:8000/api/auth';
+  readonly currentYear: number = new Date().getFullYear();
+  public Copyright: string = '';
+  public brand = "Daz Electronics";
 
   // State Management using Signals
   phoneNumber: WritableSignal<string | null> = signal(null);
   password: WritableSignal<string | null> = signal(null);
   isLoginRequest: WritableSignal<string | null> = signal(null); // Tracks if data came from Login (requires email)
   message: WritableSignal<string | null> = signal(null);
+  success: WritableSignal<string | null> = signal(null);
   isLoading: WritableSignal<boolean> = signal(false);
   isResending: WritableSignal<boolean> = signal(false);
 
@@ -40,6 +45,13 @@ export class Otp implements OnInit { // Renamed class from Otp to OtpComponent f
 
   ngOnInit(): void {
     this.getAuthDataFromRouterState();
+    this.get_copyright_name();
+  }
+
+
+  get_copyright_name(){
+    this.Copyright = `${this.brand} ${this.currentYear}`;
+    return this.Copyright;
   }
 
   /**
@@ -57,7 +69,7 @@ export class Otp implements OnInit { // Renamed class from Otp to OtpComponent f
         this.password.set(state['password']);
       }
 
-      this.message.set(`A verification code was sent to ${this.phoneNumber()}.`);
+      // this.message.set(`A verification code was sent to ${this.phoneNumber()}.`);
 
     } else {
       console.error('Critical auth data missing from router state. Redirecting to login.');
@@ -124,6 +136,10 @@ export class Otp implements OnInit { // Renamed class from Otp to OtpComponent f
           if (!errors || Object.keys(errors).length === 0) {
             this.message.set('Verification failed. Please check the code and try again.');
           }
+          else{
+            this.message.set(errors.error);
+            this.success.set('false');
+          }
         }
       });
   }
@@ -155,7 +171,8 @@ export class Otp implements OnInit { // Renamed class from Otp to OtpComponent f
       .subscribe({
         next: (res: any) => {
           console.log('OTP resent successfully.');
-          this.message.set(res.message || 'New OTP code sent! Check your phone.');
+          this.success.set('New '+ res.message);
+          this.message.set('false');
         },
         error: err => {
           const errors = err?.error;

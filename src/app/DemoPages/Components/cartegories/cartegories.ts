@@ -225,7 +225,7 @@ export class Cartegories implements OnInit {
         this.loadAll();
         this.currentPage = 1; // Reset to page 1
 
-        this.router.navigate(['/dashboards/cartegories'], {});
+        this.router.navigate(['/der/dashboards/cartegories'], {});
         this.modalService.dismissAll('saved');
       },
       error: err => {
@@ -273,7 +273,7 @@ export class Cartegories implements OnInit {
           this.modalService.dismissAll('deleted');
         },
         error: (err) => {
-          this.message.set('Failed to delete the category. Please try again.');
+          this.message.set('Your not Authorized to perform this action.');
           console.error('Deletion error:', err);
         }
       });

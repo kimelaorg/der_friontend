@@ -1,9 +1,13 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import {ThemeOptions} from '../../../theme-options';
-import {Observable} from 'rxjs';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
+import { ThemeOptions } from '../../../theme-options';
+import { Observable } from 'rxjs';
 import { ConfigService } from '../../../ThemeOptions/store/config.service';
 import { ConfigState } from '../../../ThemeOptions/store/config.state';
-import {ActivatedRoute} from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { Navigation } from './controller/navigation';
+import { NavItem, NavGroup } from './controller/nav.config';
+import { Auth, UserDataPayload, User } from '../../../DemoPages/UserPages/login-boxed/service/auth';
+
 
 @Component({
   selector: 'app-sidebar',
@@ -18,34 +22,44 @@ import {ActivatedRoute} from '@angular/router';
       transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out !important;
       position: relative !important;
     }
-    
+
     .vsm-dropdown-show {
       max-height: 500px !important;
       opacity: 1 !important;
     }
-    
+
     /* Arrow rotation - override existing transform */
     .vsm-item.has-sub .vsm-arrow {
       transition: transform 0.3s ease !important;
       transform: rotate(270deg) !important;  /* Point right */
     }
-    
+
     .vsm-item.has-sub.vsm-open .vsm-arrow {
       transform: rotate(360deg) !important;  /* Point down */
     }
   `]
 })
 export class SidebarComponent implements OnInit {
+
+  private authService = inject(Auth);
+  private navService = inject(Navigation);
   public extraParameter: any;
   public openMenus: string[] = [];
-  
-  // Supported menu types: dashboardsMenu, pagesMenu, elementsMenu, componentsMenu, 
+  public groupedMenuItems: NavGroup[] = [];
+  // public openMenus: string[] = [];
+  public menuItems: NavItem[] = [];
+
+  public userDetails: User | null = null;
+  public userGroup: string = 'N/A';
+  public profileImageUrl: string = 'assets/default-profile.png';
+
+  // Supported menu types: dashboardsMenu, pagesMenu, elementsMenu, componentsMenu,
   // tablesMenu, formsMenu, chartsMenu, widgetsMenu
 
   public config$: Observable<ConfigState>;
 
   constructor(
-    public globals: ThemeOptions, 
+    public globals: ThemeOptions,
     private activatedRoute: ActivatedRoute,
     private configService: ConfigService
   ) {
@@ -78,7 +92,23 @@ export class SidebarComponent implements OnInit {
     }
   }
 
+
   ngOnInit() {
+
+    this.menuItems = this.navService.getDynamicMenu();
+
+    this.userDetails = this.authService.getAuthenticatedUser();
+
+    if (this.userDetails) {
+      // Assuming the user has only one primary group for display
+      this.userGroup = this.userDetails.groups.join(', ') || 'Standard User';
+
+      // If your user object included a 'profile_url' or 'avatar' field, you'd use it here.
+      // Example: this.profileImageUrl = this.userDetails.profile_url || this.profileImageUrl;
+    }
+
+    this.groupedMenuItems = this.navService.getGroupedMenu();
+
     setTimeout(() => {
       this.innerWidth = window.innerWidth;
       if (this.innerWidth < 1200) {
@@ -88,7 +118,7 @@ export class SidebarComponent implements OnInit {
 
     // Get the extraParameter from the route to determine which menu should be open
     this.extraParameter = this.activatedRoute.snapshot.firstChild?.data['extraParameter'];
-    
+
     // Initialize open menus based on current route
     if (this.extraParameter) {
       this.openMenus = [this.extraParameter];

@@ -1,8 +1,11 @@
-import { Component, signal, WritableSignal, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, WritableSignal, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup, Validators, NonNullableFormBuilder, FormControl } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { finalize } from 'rxjs/operators';
-import { Auth } from './service/auth'; // Import AuthService
+import { Auth } from './service/auth';
 
 // Define the type interface for the form structure
 interface LoginForm {
@@ -15,13 +18,18 @@ interface LoginForm {
   selector: 'app-login-boxed',
   templateUrl: './login-boxed.component.html',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styles: []
+
 })
 export class LoginBoxedComponent implements OnInit {
 
   private formBuilder = inject(NonNullableFormBuilder);
   private router = inject(Router);
   private authService = inject(Auth);
+  public brand = "Daz Electronics";
+  readonly currentYear: number = new Date().getFullYear();
+  public Copyright: string = '';
 
   // State Management using Signals
   message: WritableSignal<string | null> = signal(null);
@@ -29,6 +37,7 @@ export class LoginBoxedComponent implements OnInit {
 
   ngOnInit(): void {
     this.onLogin();
+    this.get_copyright_name();
   }
 
   // Reactive Form definition
@@ -37,6 +46,11 @@ export class LoginBoxedComponent implements OnInit {
     // email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
   });
+
+  get_copyright_name(){
+    this.Copyright = `${this.brand} ${this.currentYear}`;
+    return this.Copyright;
+  }
 
   // Handles Login Step 1: Request OTP
   onLogin(): void {

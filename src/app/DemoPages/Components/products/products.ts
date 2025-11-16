@@ -42,9 +42,10 @@ export interface DigitalProduct {
 /** Corresponds to ProductSpecificationSerializer */
 export interface ProductSpecification {
     id?: number;
-    sku: string;
+    model: string;
     product: number; // Foreign Key to Product ID
     screen_size: number;
+    brand: number;
     resolution: number;
     panel_type: number;
     original_price: number;
@@ -86,14 +87,15 @@ export interface Product {
 export interface ProductBaseForm {
     name: FormControl<string>;
     description: FormControl<string>;
-    brand: FormControl<number | null>;
+    // brand: FormControl<number | null>;
     category: FormControl<number | null>;
     is_active: FormControl<string>;
 }
 
 export interface ProductSpecForm {
     id: FormControl<number | null>;
-    sku: FormControl<string>;
+    model: FormControl<string>;
+    brand: FormControl<number | null>;
     screen_size: FormControl<number | null>;
     resolution: FormControl<number | null>;
     panel_type: FormControl<number | null>;
@@ -172,7 +174,6 @@ export class Products implements OnInit {
     productForm: FormGroup<ProductBaseForm> = this.formBuilder.group({
         name: ['', [Validators.required]],
         description: ['', [Validators.required]],
-        brand: [null as number | null, [Validators.required]],
         category: [null as number | null, [Validators.required]],
         is_active: ['true', [Validators.required]],
     });
@@ -180,13 +181,14 @@ export class Products implements OnInit {
     // Product Spec Form (Updated for nested fields)
     specForm: FormGroup<ProductSpecForm> = this.formBuilder.group({
         id: [null as number | null],
-        sku: ['', [Validators.required, Validators.maxLength(50)]],
+        model: ['', [Validators.required, Validators.maxLength(255)]],
         screen_size: [null as number | null, [Validators.required]],
         resolution: [null as number | null, [Validators.required]],
         panel_type: [null as number | null, [Validators.required]],
         original_price: [null as number | null, [Validators.required, Validators.min(0)]],
         sale_price: [null as number | null, [Validators.required, Validators.min(0)]],
         color: [null as string | null],
+        brand: [null as number | null, [Validators.required]],
         smart_features: ['false', [Validators.required]],
 
         // Electrical Specs (Optional fields)
@@ -214,21 +216,23 @@ export class Products implements OnInit {
         return product ? product.name : 'N/A';
     }
 
-    // public lookupSIServiceName(internetId: number): string {
-    //     const internet = this.internetServices().find(c => c.id === internetId);
-    //     return internet ? internet.name : 'N/A';
-    // }
+    public lookupSizeName(scSizeId: number): string {
+        const size = this.screenSizes().find(c => c.id === scSizeId);
+        return size ? size.name : 'N/A';
+    }
 
     public lookupResolutionName(resoId: number): string {
         const resolution = this.resolutions().find(c => c.id === resoId);
         return resolution ? resolution.name : 'N/A';
     }
 
-    // public lookupSizeName(internetId: number): string {
-    //     const internet = this.internetServices().find(c => c.id === internetId);
-    //     return internet ? internet.name : 'N/A';
-    // }
-    //
+    public lookupPanelTypeName(pttype: number): string {
+        const panel_type = this.panelTypes().find(c => c.id === pttype);
+        return panel_type ? panel_type.name : 'N/A';
+    }
+
+
+
     // public lookupSIServiceName(internetId: number): string {
     //     const internet = this.internetServices().find(c => c.id === internetId);
     //     return internet ? internet.name : 'N/A';
@@ -310,7 +314,7 @@ export class Products implements OnInit {
         this.modalMode = 'create';
         this.currentProductId = null;
         this.productForm.reset();
-        this.productForm.patchValue({ is_active: 'true', brand: null, category: null });
+        this.productForm.patchValue({ is_active: 'true', category: null });
         this.currentProduct.set(null);
         if (this.productModal) this.openModal(this.productModal, 'lg');
     }
@@ -331,7 +335,6 @@ export class Products implements OnInit {
                 this.productForm.patchValue({
                     name: data.name,
                     description: data.description,
-                    brand: data.brand,
                     category: data.category,
                     is_active: String(data.is_active),
                 });
@@ -361,7 +364,6 @@ export class Products implements OnInit {
       const payload = {
           name: rawValue.name,
           description: rawValue.description,
-          brand: Number(rawValue.brand),
           category: Number(rawValue.category),
           is_active: rawValue.is_active === 'true',
       };
@@ -439,6 +441,7 @@ export class Products implements OnInit {
         this.specForm.patchValue({
             smart_features: 'false',
             id: null,
+            brand: null,
             screen_size: null,
             resolution: null,
             panel_type: null,
@@ -485,7 +488,7 @@ export class Products implements OnInit {
     private patchSpecForm(specData: ProductSpecification): void {
         this.specForm.patchValue({
             id: specData.id || null,
-            sku: specData.sku,
+            model: specData.model,
             screen_size: specData.screen_size,
             resolution: specData.resolution,
             panel_type: specData.panel_type,
@@ -535,8 +538,9 @@ export class Products implements OnInit {
       const payload: any = {
           id: rawValue.id ?? undefined,
           product: parentId,
-          sku: rawValue.sku!,
+          model: rawValue.model!,
           color: rawValue.color,
+          brand: Number(rawValue.brand),
           smart_features: rawValue.smart_features === 'true',
           screen_size: Number(rawValue.screen_size),
           resolution: Number(rawValue.resolution),
@@ -566,7 +570,9 @@ export class Products implements OnInit {
           next: (response) => {
               this.modalService.dismissAll('saved');
               this.loadInitialData();
-              this.message.set(`Specification (SKU: ${response.sku}) saved successfully.`);
+              // this.message.set(`Specification (SKU: ${response.sku}) saved successfully.`);
+              this.message.set(`Specification saved successfully.`);
+
           },
           error: err => this.handleFormError(err, this.specForm)
       });
@@ -636,6 +642,7 @@ export class Products implements OnInit {
 
     handleCreateModal = () => {
         this.handleCreateProductModal();
+        this.loadInitialData();
     }
 
 

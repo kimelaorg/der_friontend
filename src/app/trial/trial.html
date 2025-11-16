@@ -1,0 +1,72 @@
+<main class="home-page">
+    <header class="top-nav">
+        <div class="nav-brand">Daz Electronics</div>
+        <nav class="nav-links-desktop">
+            <a *ngFor="let link of navLinks" [href]="link.link">{{ link.label }}</a>
+        </nav>
+        <div class="nav-actions">
+            <input type="text" placeholder="Search TVs & Accessories..." class="search-input">
+            <a href="/cart" class="cart-icon">🛒</a>
+            <button class="menu-toggle" (click)="toggleSideNav()">☰</button>
+        </div>
+    </header>
+
+    <aside class="side-nav" [class.open]="isSideNavOpen">
+        <button class="close-btn" (click)="toggleSideNav()">✕</button>
+        <h3>Browse & Filter</h3>
+        <div *ngFor="let filter of filterOptions" class="filter-group">
+            <h4>{{ filter.group }}</h4>
+            <label *ngFor="let value of filter.values" class="filter-option">
+                <input type="checkbox" [value]="value"> {{ value }}
+            </label>
+        </div>
+        <a href="/shop" class="apply-filter-btn">Apply Filters</a>
+    </aside>
+
+    <div class="overlay" [class.active]="isSideNavOpen" (click)="toggleSideNav()"></div>
+
+    <section class="hero-section" style="background-image: url('https://picsum.photos/id/157/1400/800')">
+        </section>
+
+    <section class="trust-bar">
+        <div *ngFor="let feature of trustFeatures" class="trust-item">
+            <span class="trust-icon">{{ feature.icon }}</span>
+            <div class="trust-text">
+                <strong>{{ feature.text }}</strong>
+                <span>{{ feature.detail }}</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="category-blocks">
+        <h2>Find Your Perfect View</h2>
+        <div class="category-grid">
+            <a *ngFor="let cat of categories" [href]="cat.link" class="category-card">
+                <img [src]="cat.image" [alt]="cat.name" loading="lazy">
+                <h3>{{ cat.name }}</h3>
+            </a>
+        </div>
+    </section>
+
+    <section class="featured-products">
+        <h2>Top Rated TVs & Accessories</h2>
+        <div class="product-grid">
+            <div *ngFor="let product of featuredProducts" class="product-card">
+                <img [src]="product.image" [alt]="product.name" loading="lazy">
+                <div class="product-info">
+                    <p class="name">{{ product.name }}</p>
+                    <div class="rating">⭐⭐⭐⭐<span> ({{ product.rating }})</span></div>
+                    <p class="price">${{ product.price | number:'1.2-2' }}</p>
+
+                    <div class="media-links">
+                        <a *ngIf="product.moreImages.length > 0" href="#" class="media-btn">🖼️ {{ product.moreImages.length }} Photos</a>
+                        <a *ngIf="product.videoLink" [href]="product.videoLink" target="_blank" class="media-btn video-btn">▶️ Video Review</a>
+                    </div>
+
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </main>

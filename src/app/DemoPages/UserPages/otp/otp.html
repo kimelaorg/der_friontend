@@ -26,14 +26,22 @@
               Error: Phone number not found. Please return to registration.
             </p>
 
+            <div *ngIf="message() && success() == 'false'" class="alert alert-danger text-center mt-3 p-2" role="alert">
+                  {{ message() }}
+            </div>
+
+            <div *ngIf="success() && message() == 'false'" class="alert alert-success text-center mt-3 p-2" role="alert">
+                  {{ success() }}
+            </div>
+
           </div>
 
-          <hr class="my-4">
+          <!-- <hr class="my-4"> -->
 
           <form [formGroup]="otpForm" (ngSubmit)="onOtpSubmit()">
 
             <!-- OTP Input Field -->
-            <div class="mb-3">
+            <div class="mb-2">
               <label for="otpInput" class="form-label visually-hidden">Verification Code</label>
               <input
                 id="otpInput"
@@ -91,7 +99,7 @@
 
       <div class="text-center text-white mt-4">
         <p class="mb-0 opacity-75 small">
-          Copyright © Daz Electronics Repair 2025
+          Copyright © {{ Copyright }}
         </p>
       </div>
     </div>

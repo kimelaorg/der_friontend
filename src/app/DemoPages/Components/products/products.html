@@ -74,103 +74,94 @@
       </ul>
       <div class="tab-content" id="justifiedTabContent">
         <div class="tab-pane mt-4 fade show active" id="just-tab1" role="tabpanel" aria-labelledby="just-tab1-tab">
-          <div class="main-card mb-3 card">
-            <div class="card-header">
-              <div class="card-header-title font-size-lg text-capitalize fw-normal">Product Details</div>
-            </div>
-            <div class="table-responsive">
-              <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
-                <thead>
-                <tr>
-                  <th class="text-center">#</th>
-                  <th class="text-center">Name</th>
-                  <th class="text-center">Description</th>
-                  <th class="text-center">Brand</th>
-                  <th class="text-center">Category</th>
-                  <th class="text-center">Status</th>
-                  <th class="text-center">Due Date</th>
-                  <th class="text-center">Last update</th>
-                  <th class="text-center">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr *ngFor="let product of products()">
-                  <td class="text-center text-muted" style="width: 80px;">00{{ product.id }}</td>
-                  <td class="text-center" style="width: 80px;">
-                    {{ product.name }}
-                  </td>
-                  <td class="text-center"><a [routerLink]="">{{ product.description }}</a></td>
-                  <td class="text-center"><a [routerLink]="">{{ lookupBrandName(product.brand) }}</a></td>
-                  <td class="text-center">{{ lookupCategoryName(product.category) }}</td>
-                  <td class="text-center">
-                    <span class="badge ms-2" [ngClass]="product.is_active ? 'bg-success' : 'bg-danger'">
-                        {{ product.is_active ? 'Active' : 'Inactive' }}
-                    </span>
-                  </td>
-                  <td class="text-center">{{ product.created_at | date: 'MMM dd, yyyy hh:mm a' }}</td>
-                  <td class="text-center" *ngIf = 'product.updated_at'> {{product.updated_at | date: 'MMM dd, yyyy hh:mm a'}}</td>
-                  <td class="text-center" *ngIf = '!product.updated_at'> N/A </td>
-                  <td class="text-center">
-                    <div role="group" class="btn-group-sm btn-group">
-                      <button class="btn-shadow btn btn-secondary" (click)="handleEditProductModal(product.id!)" title="Edit Base Product Details"><fa-icon [icon]="faEdit"></fa-icon> Edit</button>
-                      <button class="btn-shadow btn btn-primary" (click)="handleCreateSpecModal(product)" title="Add New Specification"><fa-icon [icon]="faPlus"></fa-icon> Add Spec</button>
-                      <button class="btn-shadow btn btn-danger" (click)="handleDeleteProductModal(product.id!)" title="Delete Product"><fa-icon [icon]="faTrash"></fa-icon> Delete</button>
-                    </div>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
+          <div class="table-responsive">
+            <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+              <thead>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Name</th>
+                <th class="text-center">Description</th>
+                <th class="text-center">Category</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Due Date</th>
+                <th class="text-center">Last update</th>
+                <th class="text-center">Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let product of products()">
+                <td class="text-center text-muted" style="width: 80px;">00{{ product.id }}</td>
+                <td class="text-center" style="width: 80px;">
+                  {{ product.name }}
+                </td>
+                <td class="text-center"><a [routerLink]="">{{ product.description }}</a></td>
+                <td class="text-center">{{ lookupCategoryName(product.category) }}</td>
+                <td class="text-center">
+                  <span class="badge ms-2" [ngClass]="product.is_active ? 'bg-success' : 'bg-danger'">
+                      {{ product.is_active ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="text-center">{{ product.created_at | date: 'MMM dd, yyyy hh:mm a' }}</td>
+                <td class="text-center" *ngIf = 'product.updated_at'> {{product.updated_at | date: 'MMM dd, yyyy hh:mm a'}}</td>
+                <td class="text-center" *ngIf = '!product.updated_at'> N/A </td>
+                <td class="text-center">
+                  <div role="group" class="btn-group-sm btn-group">
+                    <button class="btn-shadow btn btn-secondary" (click)="handleEditProductModal(product.id!)" title="Edit Base Product Details"><fa-icon [icon]="faEdit"></fa-icon> Edit</button>
+                    <button class="btn-shadow btn btn-primary" (click)="handleCreateSpecModal(product)" title="Add New Specification"><fa-icon [icon]="faPlus"></fa-icon> Add Spec</button>
+                    <button class="btn-shadow btn btn-danger" (click)="handleDeleteProductModal(product.id!)" title="Delete Product"><fa-icon [icon]="faTrash"></fa-icon> Delete</button>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </div>
         <div class="tab-pane fade" id="just-tab2" role="tabpanel" aria-labelledby="just-tab2-tab">
-          <div class="main-card mb-3 card">
-            <div class="card-header">
-              <div class="card-header-title font-size-lg text-capitalize fw-normal">Specifications Details</div>
-            </div>
-            <div class="table-responsive">
-              <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
-                <thead>
-                <tr>
-                  <th class="text-center">#</th>
-                  <th class="text-center">Name</th>
-                  <th class="text-center">Description</th>
-                  <th class="text-center">Brand</th>
-                  <th class="text-center">Category</th>
-                  <th class="text-center">Status</th>
-                  <th class="text-center">Due Date</th>
-                  <th class="text-center">Last update</th>
-                  <th class="text-center">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr *ngFor="let specification of specifications()">
-                  <td class="text-center text-muted" style="width: 80px;">{{ specification.sku }}</td>
-                  <td class="text-center" style="width: 80px;">
-                    {{ lookupProductName(specification.product) }}
-                  </td>
-                  <td class="text-center"><a [routerLink]="">{{ specification.original_price }}</a></td>
-                  <!-- <td class="text-center"><a [routerLink]="">{{ lookupBrandName(product.brand) }}</a></td> -->
-                  <!-- <td class="text-center">{{ lookupCategoryName(product.category) }}</td>
-                  <td class="text-center">
-                    <span class="badge ms-2" [ngClass]="product.is_active ? 'bg-success' : 'bg-danger'">
-                        {{ product.is_active ? 'Active' : 'Inactive' }}
-                    </span>
-                  </td>
-                  <td class="text-center">{{ product.created_at | date: 'MMM dd, yyyy hh:mm a' }}</td>
-                  <td class="text-center" *ngIf = 'product.updated_at'> {{product.updated_at | date: 'MMM dd, yyyy hh:mm a'}}</td>
-                  <td class="text-center" *ngIf = '!product.updated_at'> N/A </td> -->
-                  <td class="text-center">
-                    <div role="group" class="btn-group-sm btn-group">
-                      <!-- <button class="btn-shadow btn btn-secondary" (click)="handleEditProductModal(product.id!)" title="Edit Base Product Details"><fa-icon [icon]="faEdit"></fa-icon> Edit</button>
-                      <button class="btn-shadow btn btn-primary" (click)="handleCreateSpecModal(product)" title="Add New Specification"><fa-icon [icon]="faPlus"></fa-icon> Add Spec</button>
-                      <button class="btn-shadow btn btn-danger" (click)="handleDeleteProductModal(product.id!)" title="Delete Product"><fa-icon [icon]="faTrash"></fa-icon> Delete</button> -->
-                    </div>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
+          <div class="table-responsive mt-3">
+            <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+              <thead>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Name</th>
+                <th class="text-center">Brand</th>
+                <th class="text-center">Model No.</th>
+                <th class="text-center">Buying Price</th>
+                <th class="text-center">Selling Price</th>
+                <th class="text-center">Color</th>
+                <th class="text-center">Screen size</th>
+                <th class="text-center">Resolution</th>
+                <th class="text-center">Panel Type</th>
+                <!-- <th class="text-center">Connectivity</th>
+                <th class="text-center">Electrical specs</th> -->
+                <th class="text-center">Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let specification of specifications()">
+                <td class="text-center text-muted" style="width: 80px;">{{ specification.model }}</td>
+                <td class="text-center" style="width: 80px;">
+                  {{ lookupProductName(specification.product) }}
+                </td>
+                <td class="text-center"><a [routerLink]="">{{ lookupBrandName(specification.brand) }}</a></td>
+                <td class="text-center text-muted" style="width: 80px;">{{ specification.model }}</td>
+                <td class="text-center text-muted" style="width: 80px;">{{ specification.original_price }}</td>
+                <td class="text-center text-muted" style="width: 80px;">{{ specification.sale_price }}</td>
+                <td class="text-center text-muted" style="width: 80px;">{{ specification.color }}</td>
+                <td class="text-center text-muted" style="width: 80px;">{{ lookupSizeName(specification.screen_size) }}</td>
+                <td class="text-center text-muted" style="width: 80px;">{{ lookupResolutionName(specification.resolution) }}</td>
+                <td class="text-center text-muted" style="width: 80px;">{{ lookupPanelTypeName(specification.panel_type) }}</td>
+                <!-- <td class="text-center"><a [routerLink]="">{{ specification.original_price }}</a></td> -->
+                <!-- <td class="text-center" *ngIf = '!product.updated_at'> N/A </td> -->
+                <td class="text-center">
+                  <div role="group" class="btn-group-sm btn-group">
+                    <!-- <button class="btn-shadow btn btn-secondary" (click)="handleEditProductModal(product.id!)" title="Edit Base Product Details"><fa-icon [icon]="faEdit"></fa-icon> Edit</button>
+                    <button class="btn-shadow btn btn-primary" (click)="handleCreateSpecModal(product)" title="Add New Specification"><fa-icon [icon]="faPlus"></fa-icon> Add Spec</button>
+                    <button class="btn-shadow btn btn-danger" (click)="handleDeleteProductModal(product.id!)" title="Delete Product"><fa-icon [icon]="faTrash"></fa-icon> Delete</button> -->
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </div>
         <div class="tab-pane fade" id="just-tab3" role="tabpanel" aria-labelledby="just-tab3-tab">
@@ -244,16 +235,6 @@
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label for="brand" class="form-label">Brand</label>
-                        <select id="brand" formControlName="brand" class="form-select"
-                                [class.is-invalid]="productForm.get('brand')?.invalid && productForm.get('brand')?.touched">
-                            <option [ngValue]="null">Select Brand</option>
-                            <option *ngFor="let brand of brands()" [ngValue]="brand.id">{{ brand.name }}</option>
-                        </select>
-                        <div class="invalid-feedback" *ngIf="productForm.get('brand')?.errors?.['required']">Brand is required.</div>
-                    </div>
-
-                    <div class="col-md-4 mb-3">
                         <label for="category" class="form-label">Category</label>
                         <select id="category" formControlName="category" class="form-select"
                                 [class.is-invalid]="productForm.get('category')?.invalid && productForm.get('category')?.touched">
@@ -292,25 +273,25 @@
 
     <ng-template #specModal let-modal>
         <div class="modal-header">
-            <h4 class="modal-title">{{ modalMode === 'create-spec' ? 'Add New Specification (SKU)' : 'Edit Specification (SKU)' }}</h4>
+            <h4 class="modal-title">{{ modalMode === 'create-spec' ? 'Add New Specification' : 'Edit Specification (SKU)' }}</h4>
             <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')"></button>
         </div>
         <form [formGroup]="specForm" (ngSubmit)="onAddProductSpec()">
             <div class="modal-body">
-                <p class="text-info small">**Parent Product:** {{ currentProduct()?.name }} (ID: {{ currentSpecProductParentId }})</p>
+                <p class="text-info small">Product: {{ currentProduct()?.name }}</p>
                 <hr class="mt-2 mb-3">
 
-                <h5 class="mb-3 text-primary">Core Specification</h5>
+                <h5 class="mb-3 text-primary">Core Specifications</h5>
                 <div class="row">
                     <input type="hidden" formControlName="id">
 
                     <div class="col-md-6 mb-3">
-                        <label for="sku" class="form-label">SKU</label>
-                        <input id="sku" type="text" formControlName="sku" class="form-control"
-                                [class.is-invalid]="specForm.get('sku')?.invalid && specForm.get('sku')?.touched">
-                        <div class="invalid-feedback" *ngIf="specForm.get('sku')?.errors?.['required']">SKU is required.</div>
-                        <div class="invalid-feedback" *ngIf="specForm.get('sku')?.errors?.['serverError']">
-                            {{ specForm.get('sku')?.errors?.['serverError'] }}
+                        <label for="sku" class="form-label">Model number</label>
+                        <input id="sku" type="text" formControlName="model" class="form-control"
+                                [class.is-invalid]="specForm.get('model')?.invalid && specForm.get('model')?.touched">
+                        <div class="invalid-feedback" *ngIf="specForm.get('model')?.errors?.['required']">Model number is required.</div>
+                        <div class="invalid-feedback" *ngIf="specForm.get('model')?.errors?.['serverError']">
+                            {{ specForm.get('model')?.errors?.['serverError'] }}
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
@@ -320,6 +301,15 @@
                 </div>
 
                 <div class="row">
+                  <div class="col-md-4 mb-3">
+                      <label for="brand" class="form-label">Brand</label>
+                      <select id="brand" formControlName="brand" class="form-select"
+                              [class.is-invalid]="productForm.get('brand')?.invalid && productForm.get('brand')?.touched">
+                          <option [ngValue]="null">Select Brand</option>
+                          <option *ngFor="let brand of brands()" [ngValue]="brand.id">{{ brand.name }}</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="productForm.get('brand')?.errors?.['required']">Brand is required.</div>
+                  </div>
                     <div class="col-md-4 mb-3">
                         <label for="screen_size" class="form-label">Screen Size</label>
                         <select id="screen_size" formControlName="screen_size" class="form-select"
