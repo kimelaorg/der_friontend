@@ -20,6 +20,7 @@
           <!-- Login Form -->
           <form id="loginForm" [formGroup]="loginForm" (ngSubmit)="onLogin()">
             <!-- Email Input -->
+
             <div class="mb-3">
               <label for="phoneInput" class="form-label visually-hidden">Phone Number</label>
               <input
@@ -28,11 +29,20 @@
                 class="form-control form-control-lg"
                 placeholder="Enter phone number *"
                 formControlName="phone_number"
-                autocomplete="tel">
-              <div *ngIf="loginForm.get('phone_number')?.invalid && loginForm.get('phone_number')?.touched" class="text-danger small mt-1">
-                <!-- <span *ngIf="loginForm.get('phone_number')?.errors?.['required']">Phone number is required.</span> -->
-                <span *ngIf="loginForm.get('phone_number')?.errors?.['serverError']">{{ loginForm.get('phone_number')?.errors?.['serverError'] }}</span>
-              </div>
+                autocomplete="tel"
+                [class.is-invalid]="loginForm.get('phone_number')?.invalid && (loginForm.get('phone_number')?.touched || loginForm.get('phone_number')?.dirty)">
+
+                <div class="invalid-feedback">
+                    <ng-container *ngIf="loginForm.get('phone_number')?.hasError('server')">
+                        {{ loginForm.get('phone_number')?.getError('server') }}
+                    </ng-container>
+
+                    <ng-container *ngIf="!loginForm.get('phone_number')?.hasError('server') && loginForm.get('phone_number')?.hasError('required')">
+                        Phone number is required.
+                    </ng-container>
+
+                </div>
+
               <div class="form-text text-muted small">
                 We'll share verification code.
               </div>
@@ -47,12 +57,13 @@
                 class="form-control form-control-lg"
                 placeholder="Enter password *"
                 formControlName="password"
-                autocomplete="new-password">
-              <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-danger small mt-1">
-                <!-- <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required.</span> -->
-                <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters.</span>
-                <span *ngIf="loginForm.get('password')?.errors?.['serverError']">{{ loginForm.get('password')?.errors?.['serverError'] }}</span>
-              </div>
+                autocomplete="new-password"
+                [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+                <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-danger small mt-1">
+                  <span *ngIf="!loginForm.get('password')?.hasError('server') && loginForm.get('password')?.hasError('required')">
+                    Password is required.
+                  </span>
+                </div>
             </div>
 
             <div class="card-footer bg-transparent border-0 p-2 mt-4 pt-0">

@@ -20,8 +20,8 @@ import {
   ɵɵdefineNgModule,
   ɵɵinject
 } from "./chunk-N7BMLK4U.js";
-import "./chunk-HWYXSU2G.js";
 import "./chunk-JRFR6BLO.js";
+import "./chunk-HWYXSU2G.js";
 import "./chunk-MARUHEWW.js";
 import {
   __objRest,

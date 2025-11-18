@@ -29,7 +29,7 @@ interface NavLink {
                 </svg>
               }
             </button>
-            <a href="/" class="brand-logo">TechShop</a>
+            <a href="/" class="brand-logo">Daz Electronics</a>
           </div>
 
           <div class="search-container">
@@ -185,7 +185,7 @@ interface NavLink {
         </div>
       </div>
       <div class="footer-bottom">
-        &copy; 2025 TechShop. All rights reserved.
+        &copy; 2025 Daz Electronics. All rights reserved.
       </div>
     </footer>
   `,
@@ -234,7 +234,7 @@ interface NavLink {
     }
 
     .nav-container {
-      max-width: 80rem;
+      max-width: 100rem;
       margin-left: auto;
       margin-right: auto;
       padding-left: 1rem;
@@ -242,16 +242,10 @@ interface NavLink {
     }
 
     @media (min-width: 640px) {
-      .nav-container {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-      }
+        .nav-container { padding-left: 1.5rem; padding-right: 1.5rem; }
     }
     @media (min-width: 1024px) {
-      .nav-container {
-        padding-left: 2rem;
-        padding-right: 2rem;
-      }
+        .nav-container { padding-left: 2rem; padding-right: 2rem; }
     }
 
     .nav-header {
@@ -292,7 +286,7 @@ interface NavLink {
     }
 
     .brand-logo {
-      font-size: 1.25rem;
+      font-size: 0.8rem;
       font-weight: 900;
       color: var(--primary-color);
       letter-spacing: -0.025em;
@@ -301,7 +295,7 @@ interface NavLink {
 
     @media (min-width: 640px) {
       .brand-logo {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
       }
     }
 
@@ -861,12 +855,14 @@ interface NavLink {
 export class Trial implements OnInit {
   // Navigation Links array
   readonly navLinks: NavLink[] = [
-    { label: 'TVs', link: '/shop/tvs' },
+    { label: 'TV Screens', link: '/shop/tvs' },
+    { label: 'Motherboards', link: '/shop/tv-cards' },
+    { label: 'T-Con', link: '/shop/accessories' },
     { label: 'Accessories', link: '/shop/accessories' },
-    { label: 'TV Cards', link: '/shop/tv-cards' },
+    { label: 'Software', link: '/shop/tv-cards' },
     { label: 'Deals', link: '/sale' },
     { label: 'Support', link: '/support' },
-    { label: 'Sign in', link: '/login' },
+    { label: 'Sign in', link: '/der/account/login' },
     { label: 'Cart', link: '/cart' },
   ];
 

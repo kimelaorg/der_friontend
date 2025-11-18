@@ -55,4 +55,6 @@ export { ForgotPasswordBoxedComponent } from './DemoPages/UserPages/forgot-passw
 export { LoginBoxedComponent } from './DemoPages/UserPages/login-boxed/login-boxed.component';
 export { RegisterBoxedComponent } from './DemoPages/UserPages/register-boxed/register-boxed.component';
 export { Otp } from './DemoPages/UserPages/otp/otp';
+export { Stock } from './DemoPages/Components/stock/stock';
 export { Trial } from './trial/trial';
+export { Mega } from './mega/mega';

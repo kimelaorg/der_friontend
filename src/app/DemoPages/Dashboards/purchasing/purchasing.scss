@@ -40,3 +40,38 @@
     background-color: #f8f9fa !important;
   }
 }
+
+.or-separator {
+  display: flex; /* Use flexbox to align items horizontally */
+  align-items: center; /* Vertically align items in the middle */
+  margin: 20px 0; /* Add some vertical spacing */
+  width: 100%; /* Ensure it spans the available width */
+}
+
+.or-line {
+  flex-grow: 1; /* Make the lines grow to fill available space */
+  border: none; /* Remove default border */
+  border-top: 1px solid #ccc; /* Add a thin, light gray line */
+  margin: 0 10px; /* Space between the line and the text */
+}
+
+.or-text {
+  font-size: 1rem; /* Adjust font size as needed */
+  color: #666; /* Softer text color */
+  padding: 0 8px; /* Padding around the "Or" text to push lines away */
+  white-space: nowrap; /* Prevent "Or" from wrapping */
+}
+
+/* Optional: For better responsiveness on smaller screens */
+@media (max-width: 600px) {
+  .or-separator {
+    margin: 15px 0;
+  }
+  .or-line {
+    margin: 0 8px;
+  }
+  .or-text {
+    font-size: 0.9rem;
+    padding: 0 6px;
+  }
+}

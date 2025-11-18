@@ -1,0 +1,8 @@
+.autocomplete-container {
+    .list-group {
+        // Ensures the dropdown appears above other form elements
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+}

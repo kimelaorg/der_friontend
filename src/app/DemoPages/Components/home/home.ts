@@ -917,13 +917,13 @@ export class Home implements OnInit, OnDestroy {
   // --- NAVIGATION DATA ---
   readonly navLinks: NavLink[] = [
     { label: 'TV Screens', link: '/shop/tvs' },
-    { label: 'TV Cards', link: '/shop/tv-cards' },
+    { label: 'Motherboards', link: '/shop/tv-cards' },
     { label: 'T-Con', link: '/shop/accessories' },
-    { label: 'Converters', link: '/shop/accessories' },
-    { label: 'LVDS', link: '/shop/tv-cards' },
+    { label: 'Accessories', link: '/shop/accessories' },
+    { label: 'Software', link: '/shop/tv-cards' },
     { label: 'Deals', link: '/sale' },
     { label: 'Support', link: '/support' },
-    { label: 'Sign in', link: '/login' },
+    { label: 'Sign in', link: '/der/account/login' },
     { label: 'Cart', link: '/cart' },
   ];
   mainNavLinks: NavLink[] = [];

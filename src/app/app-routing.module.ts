@@ -157,26 +157,27 @@ import {
     Users,
     Orders,
     Shipping,
-
     Products,
-     Discounts,
-     Specifications,
-     Expenses,
-     Savings,
-     Cartegories,
-     StandardComponent,
-     DropdownsComponent,
-     CardsComponent,
-     ListGroupsComponent,
-     TimelineComponent,
-     IconsComponent,
+    Discounts,
+    Specifications,
+    Expenses,
+    Savings,
+    Cartegories,
+    StandardComponent,
+    DropdownsComponent,
+    CardsComponent,
+    ListGroupsComponent,
+    TimelineComponent,
+    IconsComponent,
     // ... (rest of your components) ...
     LoginBoxedComponent,
     RegisterBoxedComponent,
     ForgotPasswordBoxedComponent,
+    Stock,
     Otp,
     Home,
-    Trial
+    Trial,
+    Mega
 } from './components.barrel';
 
 
@@ -194,6 +195,7 @@ const routes: Routes = [
             { path: 'account/forgot-password', component: ForgotPasswordBoxedComponent, data: { extraParameter: '' } },
             { path: 'account/otp', component: Otp, data: { extraParameter: '' } },
             { path: 'trial', component: Trial, data: { extraParameter: '' } },
+            { path: 'mega', component: Mega, data: { extraParameter: '' } },
         ]
     },
 
@@ -300,10 +302,11 @@ const routes: Routes = [
             // ----------------------------------------------------
             { path: 'dashboards/products', component: Products, data: { extraParameter: 'elementsMenu' } },
             { path: 'dashboards/cartegories', component: Cartegories, data: { extraParameter: 'elementsMenu' } },
-            { path: 'dashboards/discounts', component: Discounts, data: { extraParameter: 'elementsMenu' } },
+            { path: 'dashboards/discounts&offers', component: Discounts, data: { extraParameter: 'elementsMenu' } },
             { path: 'dashboards/specifications', component: Specifications, data: { extraParameter: 'elementsMenu' } },
             { path: 'dashboards/expenses', component: Expenses, data: { extraParameter: 'elementsMenu' } },
             { path: 'dashboards/savings', component: Savings, data: { extraParameter: 'elementsMenu' } },
+            { path: 'dashboards/stock', component: Stock, data: { extraParameter: 'elementsMenu' } },
             // ... (rest of your routes, adding roles as needed) ...
 
             // Example of a route protected by only the parent guard (any authenticated user)

@@ -12,6 +12,7 @@ import {
  } from './purchasing-data';
 
 
+
 export function minLengthArray(min: number) {
     return (c: AbstractControl): {[key: string]: any} | null => {
         if (c instanceof FormArray) {
@@ -73,6 +74,7 @@ export class Purchasing implements OnInit {
     receptions: WritableSignal<ReceptionRecord[]> = signal([]);
     availableItems: WritableSignal<AvailableItemOption[]> = signal([]);
     isEditMode: WritableSignal<boolean> = signal(false);
+    fieldErrors: WritableSignal<Record<string, string[] | undefined>> = signal({});
 
     currentReception: WritableSignal<Partial<ReceptionRecord>> = signal({
       purchase_order_item: undefined,
@@ -126,27 +128,26 @@ export class Purchasing implements OnInit {
     }
 
     openModal(content: any, record?: ReceptionRecord): void {
+      // Clear previous errors when opening the modal
+      this.fieldErrors.set({});
+
       if (record) {
-        // Edit Mode
         this.isEditMode.set(true);
-        // Set the signal to the record data for editing
         this.currentReception.set({ ...record });
       } else {
-        // Create Mode
         this.isEditMode.set(false);
-        // Reset the signal to default values for creation
         this.currentReception.set({
           purchase_order_item: undefined,
           quantity_received: undefined,
           decayed_products: 0,
         });
       }
-
-      // Open the Ng-Bootstrap modal
       this.modalService.open(content, { centered: true });
     }
 
     closeModal(): void {
+      // Clear errors when closing the modal
+      this.fieldErrors.set({});
       this.modalService.dismissAll();
     }
 
@@ -155,38 +156,51 @@ export class Purchasing implements OnInit {
     saveReception(): void {
       const record = this.currentReception();
 
-      // Simple validation
+      // Clear previous errors
+      this.fieldErrors.set({});
+
+      // Simple client-side validation (optional, but good practice)
       if (!record.purchase_order_item || !record.quantity_received) {
         alert('Please select a PO Item and enter Quantity Received.');
         return;
       }
 
-      // Extract payload data
       const payload: ReceptionPayload = {
         purchase_order_item: record.purchase_order_item as number,
         quantity_received: record.quantity_received as number,
         decayed_products: record.decayed_products as number,
       };
 
-      if (this.isEditMode()) {
-        // UPDATE
-        this.purchasingService.updateReception(record.id as number, payload).subscribe({
-          next: () => {
-            this.loadReceptions();
-            this.closeModal();
-          },
-          error: (err) => console.error('Failed to update reception', err)
-        });
-      } else {
-        // CREATE
-        this.purchasingService.createReception(payload).subscribe({
-          next: () => {
-            this.loadReceptions();
-            this.closeModal();
-          },
-          error: (err) => console.error('Failed to create reception', err)
-        });
-      }
+      const operation$ = this.isEditMode()
+        ? this.purchasingService.updateReception(record.id as number, payload)
+        : this.purchasingService.createReception(payload);
+
+      operation$.subscribe({
+        next: () => {
+          this.loadReceptions();
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error('API Error:', err);
+
+          // CHECK 1: Ensure it's a validation error (HTTP 400 Bad Request)
+          if (err.status === 400 && err.error) {
+            // DRF returns errors in the format: { field_name: ["Error message 1", "Error message 2"], ... }
+
+            // CHECK 2: Handle Non-Field Errors (errors not tied to a specific field)
+            if (err.error.non_field_errors) {
+              // Store non-field errors under a special key for general display
+              this.fieldErrors.set({ ...err.error, non_field_errors: err.error.non_field_errors });
+            } else {
+              // Store field-level errors
+              this.fieldErrors.set(err.error);
+            }
+          } else {
+            // Handle other HTTP errors (500, 403, 404, etc.)
+            alert(`An unexpected error occurred: ${err.message}`);
+          }
+        }
+      });
     }
 
     deleteReception(id: number): void {
@@ -203,16 +217,16 @@ export class Purchasing implements OnInit {
    * Uses the panel ID (e.g., 'panel1', 'panel2') to track state.
    */
   openAccordionPanel(panelId: string): void {
-    const currentPanel = this.activePanel();
+      const currentPanel = this.activePanel();
 
-    if (currentPanel === panelId) {
-      // If the currently open panel is clicked, close it
-      this.activePanel.set(null);
-    } else {
-      // Open the new panel
-      this.activePanel.set(panelId);
+      if (currentPanel === panelId) {
+        // If the currently open panel is clicked, close it
+        this.activePanel.set(null);
+      } else {
+        // Open the new panel
+        this.activePanel.set(panelId);
+      }
     }
-  }
 
     loadSuppliers(): void {
         this.supplierLoading.set(true);
@@ -503,6 +517,8 @@ export class Purchasing implements OnInit {
     // --- Submission Logic (Existing PO/SR) ---
 
     // PO Creation / Update
+    // Assuming you are in an Angular component where 'this.poForm' is your FormGroup.
+
     onPoSubmit(): void {
         if (this.poForm.invalid || this.isSubmitting) {
             this.poForm.markAllAsTouched();
@@ -524,6 +540,30 @@ export class Purchasing implements OnInit {
             error: (error: any) => {
                 this.isSubmitting = false;
                 console.error('Error submitting Purchase Order:', error);
+
+                // Check for the 400 Bad Request status containing validation errors
+                if (error.status === 400 && error.error) {
+                    const errorDetail = error.error; // e.g., {"expected_delivery_date": ["error message"]}
+
+                    // Iterate through the field errors and map them to the form controls
+                    for (const fieldName in errorDetail) {
+                        if (errorDetail.hasOwnProperty(fieldName)) {
+                            const formControl = this.poForm.get(fieldName);
+
+                            if (formControl) {
+                                const serverErrors = errorDetail[fieldName]; // The array of error messages
+
+                                // Set the error on the form control using the first message
+                                formControl.setErrors({ 'server': serverErrors[0] });
+                            } else if (fieldName === 'non_field_errors') {
+                                // Handle general errors here (e.g., display a toast message)
+                                // Example: this.globalError = errorDetail[fieldName].join(' ');
+                                console.warn('General Error:', errorDetail[fieldName]);
+                            }
+                        }
+                    }
+                }
+                // Add any other necessary error handling logic here (e.g., logging non-400 errors)
             }
         });
     }

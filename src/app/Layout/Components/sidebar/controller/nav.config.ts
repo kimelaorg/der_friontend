@@ -20,9 +20,12 @@ export const MASTER_NAV_CONFIG: RoleMenu = {
     // --- System Administrator ---
     "System Administrator": [
         // This group will likely need custom routes not defined in your dashboards/ links
+        { path: "/der/dashboards/specifications", title: "Manage Specifications" },
+        { path: "/der/dashboards/cartegories", title: "Manage categories" },
         { path: "/der/dashboards/users", title: "Manage Staff" }, // Maps to Manage Staff from original HTML
         { path: "/der/admin/settings", title: "System Configuration" },
         { path: "/der/admin/audit", title: "Security & Audit Logs" },
+        { path: "/der/dashboards/expenses", title: "Manage Expenses" },
 
     ],
 
@@ -30,6 +33,7 @@ export const MASTER_NAV_CONFIG: RoleMenu = {
     "Executive Manager": [
         { path: "/der/dashboards", title: "Executive Dashboard" }, // AnalyticsComponent
         { path: "/der/dashboards/reports", title: "KPMs & Performance" },
+        { path: "/der/dashboards/expenses", title: "Add Expenses" },
         { path: "/der/dashboards/transactions", title: "Financial Summary" }, // TransactionsComponent
     ],
 
@@ -50,32 +54,37 @@ export const MASTER_NAV_CONFIG: RoleMenu = {
 
     // --- Sales Representative ---
     "Sales Representative": [
-        { path: "/der/dashboards/sales", title: "Sales Overview" },
+        { path: "/der/dashboards/sales", title: "Add sales" },
         { path: "/der/dashboards/orders", title: "Manage Orders" },
-        { path: "/der/dashboards/discounts", title: "Discounts & Offers" },
+        { path: "/der/dashboards/expenses", title: "Add Expenses" },
+        { path: "/der/dashboards/savings", title: "Add Savings" },
+        { path: "/der/dashboards/discounts&offers", title: "Discounts & Offers" },
     ],
 
     // --- Purchasing Agent ---
     "Purchasing Agent": [
-        { path: "/der/dashboards/purchasing", title: "Create Purchase Order" },
+        { path: "/der/dashboards/purchasing", title: "Manage   Purchase Order" },
         { path: "/der/dashboards/shipping", title: "Supplier Management" },
-        { path: "/der/dashboards/specifications", title: "Manage Specifications" }, // Using shipping route conceptually
         { path: "/der/dashboards/products", title: "Manage Products" },
-        { path: "/der/dashboards/cartegories", title: "Manage categories" },
+        { path: "/der/dashboards/stock", title: "Stock Levels" },
+        { path: "/der/dashboards/expenses", title: "Add Expenses" },
+
     ],
 
     // --- Warehouse/Logistics Manager ---
-    "Warehouse/Logistics Manager": [
+    "Logistics Manager": [
         { path: "/der/dashboards/shipping", title: "Shipping Queue" },
         { path: "/der/dashboards/products", title: "Stock Levels" },
         { path: "/der/dashboards/cartegories", title: "Receive Goods" }, // Using cartegories route conceptually
+        { path: "/der/dashboards/expenses", title: "Add Expenses" },
     ],
 
     // --- Front Desk / Service Agent (Combining into a generic service route) ---
-    "Front Desk / Service Agent": [
+    "Service Agent": [
         { path: "/der/components/tabs", title: "Log New Service Ticket" }, // Using generic component route
         { path: "/der/components/modals", title: "Search Tickets" },
         { path: "/der/components/accordions", title: "Appointment Scheduling" },
+        { path: "/der/dashboards/expenses", title: "Add Expenses" },
     ],
 
     // --- Repair Technician ---
@@ -83,6 +92,7 @@ export const MASTER_NAV_CONFIG: RoleMenu = {
         { path: "/der/components/tabs", title: "My Job Queue" },
         { path: "/der/components/modals", title: "Update Job Progress" },
         { path: "/der/components/accordions", title: "Parts Request" },
+        { path: "/der/dashboards/expenses", title: "Add Expenses" },
     ],
 
     // --- Service Manager ---
@@ -90,16 +100,22 @@ export const MASTER_NAV_CONFIG: RoleMenu = {
         { path: "/der/components/tabs", title: "All Service Tickets" },
         { path: "/der/components/modals", title: "Tech Performance" },
         { path: "/der/components/accordions", title: "Quote Approvals" },
+        { path: "/der/dashboards/expenses", title: "Add Expenses" },
     ],
 
     // --- Content Creator / Author & Content Editor / Reviewer (Retaining for future custom routes) ---
-    "Content Creator / Author": [
+    "Content Creator": [
         { path: "/der/forms/controls", title: "Create Content" },
         { path: "/der/forms/layouts", title: "View Drafts" },
+        { path: "/der/dashboards/expenses", title: "Upload Medias" },
+        { path: "/der/dashboards/expenses", title: "Add Expenses" },
     ],
-    "Content Editor / Reviewer": [
+
+    "Content Editor": [
         { path: "/der/forms/controls", title: "Content Review Queue" },
         { path: "/der/forms/layouts", title: "Manage Published Content" },
+        { path: "/der/dashboards/products", title: "Product Features" },
+        { path: "/der/dashboards/expenses", title: "Add Expenses" },
     ],
 
     // --- Customer ---

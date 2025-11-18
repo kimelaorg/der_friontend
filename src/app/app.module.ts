@@ -9,7 +9,7 @@ import { configReducer } from './ThemeOptions/store/config.reducer.ngrx';
 import { ConfigService } from './ThemeOptions/store/config.service';
 import { environment } from '../environments/environment';
 import {AppRoutingModule} from './app-routing.module';
-import {CommonModule} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 // Imported HTTP_INTERCEPTORS from Angular HTTP client library
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import {AppComponent} from './app.component';
@@ -81,6 +81,7 @@ import { roleGuard } from './DemoPages/UserPages/login-boxed/guard/role-guard';
     FooterComponent,
 
     // All page components are declared in feature modules
+
   ],
   imports: [
     BrowserModule,
@@ -112,6 +113,7 @@ import { roleGuard } from './DemoPages/UserPages/login-boxed/guard/role-guard';
   providers: [
     ConfigService,
     ThemeOptions,
+    
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthenticationInterceptor,

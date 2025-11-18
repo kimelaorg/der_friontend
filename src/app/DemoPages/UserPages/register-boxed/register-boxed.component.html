@@ -35,7 +35,8 @@
                     class="form-control form-control-lg"
                     placeholder="First Name *"
                     formControlName="first_name"
-                    autocomplete="given-name">
+                    autocomplete="given-name"
+                    [class.is-invalid]="registerForm.get('first_name')?.invalid && (registerForm.get('first_name')?.touched || registerForm.get('first_name')?.dirty)">
                   <div *ngIf="registerForm.get('first_name')?.invalid && registerForm.get('first_name')?.touched" class="text-danger small mt-1">
                       <span *ngIf="registerForm.get('first_name')?.errors?.['required']">First name is required.</span>
                       <span *ngIf="registerForm.get('first_name')?.errors?.['serverError']">{{ registerForm.get('first_name')?.errors?.['serverError'] }}</span>
@@ -52,7 +53,8 @@
                     class="form-control form-control-lg"
                     placeholder="Last Name *"
                     formControlName="last_name"
-                    autocomplete="family-name">
+                    autocomplete="family-name"
+                    [class.is-invalid]="registerForm.get('last_name')?.invalid && (registerForm.get('last_name')?.touched || registerForm.get('last_name')?.dirty)">
                   <div *ngIf="registerForm.get('last_name')?.invalid && registerForm.get('last_name')?.touched" class="text-danger small mt-1">
                       <span *ngIf="registerForm.get('last_name')?.errors?.['required']">Last name is required.</span>
                       <span *ngIf="registerForm.get('last_name')?.errors?.['serverError']">{{ registerForm.get('last_name')?.errors?.['serverError'] }}</span>
@@ -69,7 +71,8 @@
                 class="form-control form-control-lg"
                 placeholder="Enter email address"
                 formControlName="email"
-                autocomplete="email">
+                autocomplete="email"
+                [class.is-invalid]="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)">
               <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="text-danger small mt-1">
                 <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</span>
                 <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email.</span>
@@ -86,7 +89,8 @@
                 class="form-control form-control-lg"
                 placeholder="Enter phone number *"
                 formControlName="phone_number"
-                autocomplete="tel">
+                autocomplete="tel"
+                [class.is-invalid]="registerForm.get('phone_number')?.invalid && (registerForm.get('phone_number')?.touched || registerForm.get('phone_number')?.dirty)">
               <div *ngIf="registerForm.get('phone_number')?.invalid && registerForm.get('phone_number')?.touched" class="text-danger small mt-1">
                 <span *ngIf="registerForm.get('phone_number')?.errors?.['required']">Phone number is required.</span>
                 <span *ngIf="registerForm.get('phone_number')?.errors?.['serverError']">{{ registerForm.get('phone_number')?.errors?.['serverError'] }}</span>
@@ -104,7 +108,8 @@
                 class="form-control form-control-lg"
                 placeholder="Enter password *"
                 formControlName="password"
-                autocomplete="new-password">
+                autocomplete="new-password"
+                [class.is-invalid]="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)">
               <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="text-danger small mt-1">
                 <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required.</span>
                 <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters.</span>

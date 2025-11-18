@@ -120,9 +120,22 @@
 
                       <div class="col-md-6 mb-3">
                           <label for="expected_delivery_date" class="form-label">Expected Delivery Date <span class="text-danger">*</span></label>
-                          <input id="expected_delivery_date" type="date" formControlName="expected_delivery_date" class="form-control"
-                                 [class.is-invalid]="poForm.get('expected_delivery_date')?.invalid && poForm.get('expected_delivery_date')?.touched">
-                          <div class="invalid-feedback">Delivery date is required.</div>
+                          <input id="expected_delivery_date"
+                                 type="date"
+                                 formControlName="expected_delivery_date"
+                                 class="form-control"
+                                 [class.is-invalid]="poForm.get('expected_delivery_date')?.invalid && (poForm.get('expected_delivery_date')?.touched || poForm.get('expected_delivery_date')?.dirty)">
+
+                          <div class="invalid-feedback">
+                              <ng-container *ngIf="poForm.get('expected_delivery_date')?.hasError('server')">
+                                  {{ poForm.get('expected_delivery_date')?.getError('server') }}
+                              </ng-container>
+
+                              <ng-container *ngIf="!poForm.get('expected_delivery_date')?.hasError('server') && poForm.get('expected_delivery_date')?.hasError('required')">
+                                  Delivery date is required.
+                              </ng-container>
+
+                          </div>
                       </div>
                   </div>
 
@@ -188,180 +201,188 @@
           </div>
         </div>
 
+
         <div class="tab-pane fade" id="just-tab3" role="tabpanel" aria-labelledby="just-tab3-tab">
           <div class="container my-4">
+            @for (group of purchaseOrders() | group; track group.group) {
 
-            @for (po of purchaseOrders(); track po.id) {
+              <div class="or-separator">
+                <hr class="or-line">
+                <span class="or-text">{{ group.group }}</span>
+                <hr class="or-line">
+              </div>
 
-              <div class="card mt-3">
+              @for (po of group.data; track po.id) {
 
-                <div class="" [id]="'heading' + po.id">
-                  <h5 class="mb-0">
-                    <button class="btn btn-link"
-                            type="button"
-                            (click)="openAccordionPanel('panel' + po.id)"
-                            [attr.aria-expanded]="activePanel() === 'panel' + po.id"
-                            [attr.aria-controls]="'collapse' + po.id">
-                      <div class="row">
-                        <div class="col-sm-3">
-                          <b>Order: {{ po.po_number }}</b>
+                <div class="card mt-3">
+
+                  <div class="" [id]="'heading' + po.id">
+                    <h5 class="mb-0">
+                      <button class="btn btn-link"
+                              type="button"
+                              (click)="openAccordionPanel('panel' + po.id)"
+                              [attr.aria-expanded]="activePanel() === 'panel' + po.id"
+                              [attr.aria-controls]="'collapse' + po.id">
+                        <div class="row">
+                          <div class="col-sm-3">
+                            <b>Order: {{ po.po_number }}</b>
+                          </div>
+                          <div class="col-sm-6">
+                            <b>Supplier: {{ po.supplier_name }}</b>
+                          </div>
+                          <div class="col-sm-3">
+                            <b>Due Date: {{ po.po_date | date:'MMM d, y h:mm a' }}</b>
+                          </div>
                         </div>
-                        <div class="col-sm-6">
-                          <b>Supplier: {{ po.supplier_name }}</b>
-                        </div>
-                        <div class="col-sm-3">
-                          <b>Due Date: {{ po.po_date | date:'MMM d, y h:mm a' }}</b>
-                        </div>
-                      </div>
 
-                    </button>
-                  </h5>
-                </div>
+                      </button>
+                    </h5>
+                  </div>
 
-                <div [id]="'collapse' + po.id"
-                     [ngbCollapse]="activePanel() !== 'panel' + po.id"
-                     class="collapse"
-                     [attr.aria-labelledby]="'heading' + po.id">
+                  <div [id]="'collapse' + po.id"
+                       [ngbCollapse]="activePanel() !== 'panel' + po.id"
+                       class="collapse"
+                       [attr.aria-labelledby]="'heading' + po.id">
 
-                  <div class="card-body p-0">
-                    <div class="table-responsive">
-                      <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
-                        <thead>
-                          <tr>
-                            <th class="text-center">Item ID</th>
-                            <th class="text-center">Product Name</th>
-                            <th class="text-center">Qty Ordered</th>
-                            <th class="text-center">Unit Cost</th>
-                            <th class="text-center">Line Total</th>
-                            <th class="text-center">Total Received</th>
-                            <th class="text-center">Receptions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          @for (item of po.items; track item.id) {
+                    <div class="card-body p-0">
+                      <div class="table-responsive">
+                        <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                          <thead>
                             <tr>
-                              <td class="text-center text-muted" style="width: 80px;">#00{{ item.id }}</td>
-                              <td class="text-center">{{ item.product_name }}</td>
-                              <td class="text-center">{{ item.quantity_ordered }}</td>
-                              <td class="text-center">{{ item.unit_cost | currency: 'TZS': 'symbol' }}</td>
-                              <td class="text-center">{{ item.line_total | currency: 'TZS': 'symbol' }}</td>
-                              <td class="text-center">{{ item.quantity_received_sum }}</td>
-
-                              <td class="text-center" style="width: 150px;">
-                                <button class="btn btn-sm btn-outline-secondary"
-                                        type="button"
-                                        (click)="openAccordionPanel('item-reception-' + item.id)">
-                                  View Receptions ({{ item.receptions.length }})
-                                </button>
-                              </td>
+                              <th class="text-center">Item ID</th>
+                              <th class="text-center">Product Name</th>
+                              <th class="text-center">Qty Ordered</th>
+                              <th class="text-center">Unit Cost</th>
+                              <th class="text-center">Line Total</th>
+                              <th class="text-center">Total Received</th>
+                              <th class="text-center">Receptions</th>
                             </tr>
+                          </thead>
+                          <tbody>
+                            @for (item of po.items; track item.id) {
+                              <tr>
+                                <td class="text-center text-muted" style="width: 80px;">#00{{ item.id }}</td>
+                                <td class="text-center">{{ item.product_name }}</td>
+                                <td class="text-center">{{ item.quantity_ordered }}</td>
+                                <td class="text-center">{{ item.unit_cost | currency: 'TZS': 'symbol' }}</td>
+                                <td class="text-center">{{ item.line_total | currency: 'TZS': 'symbol' }}</td>
+                                <td class="text-center">{{ item.quantity_received_sum }}</td>
 
-                            <tr [ngbCollapse]="activePanel() !== 'item-reception-' + item.id" class="collapse-row">
-                              <td colspan="7" class="p-0 border-top-0">
-                                <div class="p-3 bg-light border-top">
-                                  <h6>Reception Details for {{ item.product_name }}</h6>
-                                  <table class="table table-striped table-sm mb-0">
-                                    <thead>
-                                      <tr class="text-muted">
-                                        <th>Date</th>
-                                        <th>Received Qty</th>
-                                        <th>Decayed Qty</th>
-                                        <th>Received By</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      @for (reception of item.receptions; track reception.id) {
-                                        <tr>
-                                          <td>{{ reception.reception_date }}</td>
-                                          <td>{{ reception.quantity_received }}</td>
-                                          <td>{{ reception.decayed_products }}</td>
-                                          <td>{{ reception.received_by_name }}</td>
+                                <td class="text-center" style="width: 150px;">
+                                  <!-- <button class="btn btn-sm btn-outline-secondary"
+                                          type="button"
+                                          (click)="openAccordionPanel('item-reception-' + item.id)">
+                                    View Receptions ({{ item.receptions.length }})
+                                  </button> -->
+                                </td>
+                              </tr>
+
+                              <!-- <tr [ngbCollapse]="activePanel() !== 'item-reception-' + item.id" class="collapse-row">
+                                <td colspan="7" class="p-0 border-top-0">
+                                  <div class="p-3 bg-light border-top">
+                                    <h6>Reception Details for {{ item.product_name }}</h6>
+                                    <table class="table table-striped table-sm mb-0">
+                                      <thead>
+                                        <tr class="text-muted">
+                                          <th>Date</th>
+                                          <th>Received Qty</th>
+                                          <th>Decayed Qty</th>
+                                          <th>Received By</th>
                                         </tr>
-                                      } @empty {
-                                        <tr><td colspan="4" class="text-center">No reception history.</td></tr>
-                                      }
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </td>
-                            </tr>
-                          } @empty {
-                            <tr><td colspan="7" class="text-center">This order contains no items.</td></tr>
-                          }
-                        </tbody>
-                        <tfoot>
-                            <tr class="text-muted table-secondary fw-bold">
-                              <td colspan="5" class="text-start">Total Amount:</td>
-                              <td colspan="8" class="text-center">{{ po.order_total | currency: 'TZS': 'symbol'}}</td>
-                            </tr>
-                          </tfoot>
-                      </table>
+                                      </thead>
+                                      <tbody>
+                                        @for (reception of item.receptions; track reception.id) {
+                                          <tr>
+                                            <td>{{ reception.reception_date }}</td>
+                                            <td>{{ reception.quantity_received }}</td>
+                                            <td>{{ reception.decayed_products }}</td>
+                                            <td>{{ reception.received_by_name }}</td>
+                                          </tr>
+                                        } @empty {
+                                          <tr><td colspan="4" class="text-center">No reception history.</td></tr>
+                                        }
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </td>
+                              </tr> -->
+                            } @empty {
+                              <tr><td colspan="7" class="text-center">This order contains no items.</td></tr>
+                            }
+                          </tbody>
+                          <tfoot>
+                              <tr class="text-muted table-secondary fw-bold">
+                                <td colspan="6" class="text-start">Total Amount:</td>
+                                <td colspan="7" class="text-center">{{ po.order_total | currency: 'TZS': 'symbol'}}</td>
+                              </tr>
+                            </tfoot>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
+              } @empty {
+                <div class="alert alert-info mt-3" role="alert">
+                  There are no purchase orders to display.
+                </div>
+              }
             } @empty {
-              <div class="alert alert-info mt-3" role="alert">
-                There are no purchase orders to display.
-              </div>
+            <div class="alert alert-info mt-3" role="alert">
+              There are no purchase orders to display.
+            </div>
             }
           </div>
 
         </div>
 
         <div class="tab-pane fade" id="just-tab4" role="tabpanel" aria-labelledby="just-tab4-tab">
-          <div *ngIf="!isLoading && mode === 'receive-stock' && currentPo" class="card shadow-sm p-4">
-              <div *ngIf="currentPo.po_status === 'RECEIVED_FULL'" class="alert alert-success">
-                  This Purchase Order has been **fully received**. No further reception entries are required.
+
+            <div class="text-end mt-3">
+                <button class="me-2 btn btn-primary btn-sm" (click)="openModal(receptionModal)">
+                    <i class="fa fa-plus me-1"></i> Create New Supplier
+                </button>
+            </div>
+
+              <div class="table-responsive mt-2">
+                <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th class="text-center">PO Item</th>
+                      <th class="text-center">Received Qty</th>
+                      <th class="text-center">Decayed Qty</th>
+                      <th class="text-center">Date</th>
+                      <th class="text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (record of receptions(); track record.id) {
+                      <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ record.product_name }}</td>
+                        <td class="text-center">{{ record.quantity_received }}</td>
+                        <td class="text-center text-danger">{{ record.decayed_products }}</td>
+                        <td class="text-center">{{ record.reception_date | date: 'MMM dd, yyyy hh:mm a' }}</td>
+                        <td class="text-center">
+                            <div role="group" class="btn-group-sm btn-group">
+                                <button class="btn-shadow btn btn-info" (click)="openModal(receptionModal, record)">
+                                    <i class="fa fa-pen"></i> Edit
+                                </button>
+                                <button class="btn-shadow btn btn-danger" (click)="deleteReception(record.id)">
+                                    <i class="fa fa-trash-alt"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr>
+                        <td colspan="7" class="text-center text-muted">No reception records found.</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
               </div>
-
-              <form [formGroup]="srForm" (ngSubmit)="onSrSubmit()" *ngIf="currentPo.po_status !== 'RECEIVED_FULL'">
-                  <h4 class="text-primary mb-3">Items to Receive (PO #{{ poId }})</h4>
-                  <p class="text-info small">Record the quantity received for each line item below.</p>
-
-                  <div class="table-responsive">
-                      <table class="table table-bordered table-striped align-middle">
-                          <thead>
-                              <tr class="table-light">
-                                  <th style="width: 30%;">Product</th>
-                                  <th style="width: 20%;" class="text-center">Ordered</th>
-                                  <th style="width: 20%;" class="text-center">Previously Received</th>
-                                  <th style="width: 15%;">New Quantity Received <span class="text-danger">*</span></th>
-                                  <th style="width: 15%;">Decayed/Damaged</th>
-                              </tr>
-                          </thead>
-                          <tbody formArrayName="receptions">
-                              <tr *ngFor="let srGroup of srItems.controls; let i = index" [formGroupName]="i">
-                                  <td class="fw-bold">{{ srGroup.get('product_name')?.value }}</td>
-                                  <td class="text-center">{{ srGroup.get('quantity_ordered')?.value }}</td>
-                                  <td class="text-center">{{ srGroup.get('quantity_received_sum')?.value }}</td>
-
-                                  <td>
-                                      <input type="number" formControlName="quantity_received" class="form-control form-control-sm" min="0"
-                                             [max]="srGroup.get('max_receivable')?.value"
-                                             [class.is-invalid]="srGroup.get('quantity_received')?.invalid && srGroup.get('quantity_received')?.touched">
-                                      <div class="invalid-feedback small" *ngIf="srGroup.get('quantity_received')?.errors?.['max']">
-                                          Max: {{ srGroup.get('max_receivable')?.value }}
-                                      </div>
-                                  </td>
-
-                                  <td>
-                                      <input type="number" formControlName="decayed_products" class="form-control form-control-sm" min="0">
-                                  </td>
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-
-                  <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-                      <button type="submit" class="btn btn-lg btn-success" [disabled]="srForm.invalid || isSubmitting">
-                          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-                          <i class="pe-7s-box1 me-1"></i> Confirm Stock Reception
-                      </button>
-                  </div>
-              </form>
-          </div>
         </div>
       </div>
 
@@ -491,55 +512,17 @@
 </ng-template>
 
 
-<div class="container my-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>🚚 Stock Reception Records</h2>
-    <button class="btn btn-primary" (click)="openModal(receptionModal)">
-      <i class="bi bi-plus-circle me-2"></i> Add Stock Reception Record
-    </button>
-  </div>
-
-  <div class="table-responsive">
-    <table class="table table-striped table-hover align-middle">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>PO Item</th>
-          <th class="text-end">Received Qty</th>
-          <th class="text-end">Decayed Qty</th>
-          <th>Received By</th>
-          <th>Date</th>
-          <th class="text-center">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (record of receptions(); track record.id) {
-          <tr>
-            <td>{{ record.id }}</td>
-            <td>{{ record.product_name }}</td>
-            <td class="text-end fw-bold">{{ record.quantity_received }}</td>
-            <td class="text-end text-danger">{{ record.decayed_products }}</td>
-            <td>{{ record.received_by_name }}</td>
-            <td>{{ record.reception_date | date:'short' }}</td>
-            <td class="text-center">
-              <button class="btn btn-sm btn-info me-2" (click)="openModal(receptionModal, record)">Edit</button>
-              <button class="btn btn-sm btn-danger" (click)="deleteReception(record.id)">Delete</button>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="7" class="text-center text-muted">No reception records found.</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-</div>
-
-
 <ng-template #receptionModal let-modal>
   <div class="modal-body">
     <form (ngSubmit)="saveReception()">
+
+      @if (fieldErrors()['non_field_errors']) {
+        <div class="alert alert-danger mb-3" role="alert">
+          @for (error of fieldErrors()['non_field_errors']; track $index) {
+            <div>{{ error }}</div>
+          }
+        </div>
+      }
 
       <div class="mb-3">
         <label for="poItem" class="form-label">Purchase order item:</label>
@@ -548,9 +531,8 @@
           class="form-select"
           name="purchase_order_item"
           required
-          [(ngModel)]="currentReception().purchase_order_item">
-
-          <option [ngValue]="undefined" disabled>----------</option>
+          [(ngModel)]="currentReception().purchase_order_item"
+          [class.is-invalid]="fieldErrors()['purchase_order_item']"> <option [ngValue]="undefined" disabled>----------</option>
           @for (item of availableItems(); track item.id) {
             <option [ngValue]="item.id">
               {{ item.display }}
@@ -561,6 +543,14 @@
           }
         </select>
         <div class="form-text text-muted">Select the specific PO line item being received.</div>
+
+        @if (fieldErrors()['purchase_order_item']) {
+          <div class="invalid-feedback d-block">
+            @for (error of fieldErrors()['purchase_order_item']; track $index) {
+              <div>{{ error }}</div>
+            }
+          </div>
+        }
       </div>
 
       <div class="mb-3">
@@ -572,7 +562,14 @@
           name="quantity_received"
           required
           min="1"
-          [(ngModel)]="currentReception().quantity_received">
+          [(ngModel)]="currentReception().quantity_received"
+          [class.is-invalid]="fieldErrors()['quantity_received']"> @if (fieldErrors()['quantity_received']) {
+          <div class="invalid-feedback d-block">
+            @for (error of fieldErrors()['quantity_received']; track $index) {
+              <div>{{ error }}</div>
+            }
+          </div>
+        }
       </div>
 
       <div class="mb-3">
@@ -583,7 +580,14 @@
           class="form-control"
           name="decayed_products"
           min="0"
-          [(ngModel)]="currentReception().decayed_products">
+          [(ngModel)]="currentReception().decayed_products"
+          [class.is-invalid]="fieldErrors()['decayed_products']"> @if (fieldErrors()['decayed_products']) {
+          <div class="invalid-feedback d-block">
+            @for (error of fieldErrors()['decayed_products']; track $index) {
+              <div>{{ error }}</div>
+            }
+          </div>
+        }
       </div>
     </form>
   </div>
@@ -595,4 +599,4 @@
     </button>
   </div>
 
-  </ng-template>
+</ng-template>

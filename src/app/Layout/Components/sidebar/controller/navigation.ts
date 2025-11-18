@@ -18,7 +18,7 @@ export class Navigation {
         if (path.startsWith('/admin') || path.includes('/users')) return { key: 'adminMenu', title: 'System Administration', icon: 'pe-7s-config' };
         if (path.startsWith('/reports') || path.includes('/dashboard/executive')) return { key: 'reportsMenu', title: 'Reporting & Analytics', icon: 'pe-7s-graph' };
         if (path.startsWith('/finance') || path.includes('/pnl')) return { key: 'financeMenu', title: 'Financial Management', icon: 'pe-7s-cash' };
-        if (path.startsWith('/sales') || path.includes('/orders')) return { key: 'salesMenu', title: 'Sales & Orders', icon: 'pe-7s-shopbag' };
+        if (path.startsWith('/sales') || path.includes('/orders') || path.includes('/sales')) return { key: 'salesMenu', title: 'Sales & Orders', icon: 'pe-7s-shopbag' };
         if (path.includes('/inventory') || path.includes('/suppliers')) return { key: 'inventoryMenu', title: 'Inventory & Supply', icon: 'pe-7s-box2' };
         if (path.startsWith('/service')) return { key: 'serviceMenu', title: 'Service Desk', icon: 'pe-7s-tools' };
         if (path.startsWith('/content')) return { key: 'contentMenu', title: 'Content Management', icon: 'pe-7s-video' };

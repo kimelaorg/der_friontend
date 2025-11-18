@@ -1,6 +1,7 @@
 // Define the specific status types used in the PO model
 export type PoStatus = 'DRAFT' | 'SENT' | 'RECEIVED_PARTIAL' | 'RECEIVED_FULL' | 'CANCELLED';
 
+
 /**
  * Interface for a single item within a Purchase Order.
  * Maps to the Django PurchaseOrderItem model.
@@ -122,4 +123,10 @@ export interface AvailableItemOption {
    * Used for generating the display string.
    */
   po_number: string;
+}
+
+
+export interface OrderGroup {
+    group: string; // e.g., "Current Month" or "September 2025"
+    data: PurchaseOrder[];
 }

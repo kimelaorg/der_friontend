@@ -272,142 +272,189 @@
 
 
     <ng-template #specModal let-modal>
-        <div class="modal-header">
-            <h4 class="modal-title">{{ modalMode === 'create-spec' ? 'Add New Specification' : 'Edit Specification (SKU)' }}</h4>
-            <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')"></button>
+    <div class="modal-header">
+        <h4 class="modal-title">{{ modalMode === 'create-spec' ? 'Add New Specification' : 'Edit Specification (SKU)' }}</h4>
+        <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form [formGroup]="specForm" (ngSubmit)="onAddProductSpec()">
+        <div class="modal-body">
+            <p class="text-info small">Product: {{ currentProduct()?.name }}</p>
+            <hr class="mt-2 mb-3">
+
+            <h5 class="mb-3 text-primary">Core Specifications</h5>
+            <div class="row">
+                <input type="hidden" formControlName="id">
+
+                <div class="col-md-6 mb-3">
+                    <label for="sku" class="form-label">Model number</label>
+                    <input id="sku" type="text" formControlName="model" class="form-control"
+                        [class.is-invalid]="specForm.get('model')?.invalid && specForm.get('model')?.touched">
+                    <div class="invalid-feedback" *ngIf="specForm.get('model')?.errors?.['required']">Model number is required.</div>
+                    <div class="invalid-feedback" *ngIf="specForm.get('model')?.errors?.['serverError']">
+                        {{ specForm.get('model')?.errors?.['serverError'] }}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="color" class="form-label">Color (Optional)</label>
+                    <input id="color" type="text" formControlName="color" class="form-control">
+                </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                  <label for="brand" class="form-label">Brand</label>
+                  <select id="brand" formControlName="brand" class="form-select"
+                          [class.is-invalid]="specForm.get('brand')?.invalid && specForm.get('brand')?.touched">
+                      <option [ngValue]="null">Select Brand</option>
+                      <option *ngFor="let brand of brands()" [ngValue]="brand.id">{{ brand.name }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="specForm.get('brand')?.errors?.['required']">Brand is required.</div>
+              </div>
+                <div class="col-md-4 mb-3">
+                    <label for="screen_size" class="form-label">Screen Size</label>
+                    <select id="screen_size" formControlName="screen_size" class="form-select"
+                        [class.is-invalid]="specForm.get('screen_size')?.invalid && specForm.get('screen_size')?.touched">
+                        <option [ngValue]="null">Select Size</option>
+                        <option *ngFor="let size of screenSizes()" [ngValue]="size.id">{{ size.name }}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="specForm.get('screen_size')?.errors?.['required']">Required.</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="resolution" class="form-label">Resolution</label>
+                    <select id="resolution" formControlName="resolution" class="form-select"
+                        [class.is-invalid]="specForm.get('resolution')?.invalid && specForm.get('resolution')?.touched">
+                        <option [ngValue]="null">Select Resolution</option>
+                        <option *ngFor="let res of resolutions()" [ngValue]="res.id">{{ res.name }}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="specForm.get('resolution')?.errors?.['required']">Required.</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="panel_type" class="form-label">Panel Type</label>
+                    <select id="panel_type" formControlName="panel_type" class="form-select"
+                        [class.is-invalid]="specForm.get('panel_type')?.invalid && specForm.get('panel_type')?.touched">
+                        <option [ngValue]="null">Select Panel</option>
+                        <option *ngFor="let panel of panelTypes()" [ngValue]="panel.id">{{ panel.name }}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="specForm.get('panel_type')?.errors?.['required']">Required.</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-5 mb-3">
+                    <label for="original_price" class="form-label">Original Price</label>
+                    <input id="original_price" type="number" formControlName="original_price" class="form-control"
+                        [class.is-invalid]="specForm.get('original_price')?.invalid && specForm.get('original_price')?.touched">
+                    <div class="invalid-feedback" *ngIf="specForm.get('original_price')?.errors?.['required']">Required.</div>
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label for="sale_price" class="form-label">Sale Price</label>
+                    <input id="sale_price" type="number" formControlName="sale_price" class="form-control"
+                        [class.is-invalid]="specForm.get('sale_price')?.invalid && specForm.get('sale_price')?.touched">
+                    <div class="invalid-feedback" *ngIf="specForm.get('sale_price')?.errors?.['required']">Required.</div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Smart?</label>
+                    <div class="d-flex align-items-center h-50">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="smartTrue" [value]="true" formControlName="smart_features">
+                            <label class="form-check-label" for="smartTrue">Y</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="smartFalse" [value]="false" formControlName="smart_features">
+                            <label class="form-check-label" for="smartFalse">N</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mt-2 mb-3">
+            <h5 class="mb-3 text-secondary">Product Connectivity Ports</h5>
+
+            <div class="mb-3">
+                <label class="form-label d-block small">Available Ports (Select Type)</label>
+                <div class="d-flex flex-wrap border rounded p-2 bg-white">
+                    <div *ngFor="let conn of availableConnectivities()" class="form-check form-check-inline">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            [id]="'conn-spec-' + conn.id"
+                            [checked]="selectedConnectivities().includes(conn.id!)"
+                            (change)="toggleConnectivitySelection(conn.id!)">
+                        <label class="form-check-label" [for]="'conn-spec-' + conn.id">{{ conn.name }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div [formArrayName]="'product_connectivity_array'">
+    <p class="text-muted small mt-2 mb-2" *ngIf="productConnectivityArray.length === 0">No connectivity types selected.</p>
+
+    <div *ngFor="let control of productConnectivityArray.controls; let i = index" [formGroupName]="i" class="row align-items-center mb-2">
+
+        <ng-container *ngIf="getConnectivityDetail(control.value.connectivity) as selectedConn">
+
+            <div class="col-md-6">
+                <label class="form-label small">Count for **{{ selectedConn.name }}**:</label>
+            </div>
+            <div class="col-md-6">
+                <input
+                    type="number"
+                    formControlName="connectivity_count"
+                    class="form-control form-control-sm"
+                    min="1"
+                    [class.is-invalid]="control.get('connectivity_count')?.invalid && control.get('connectivity_count')?.touched">
+                <div class="invalid-feedback" *ngIf="control.get('connectivity_count')?.errors?.['required']">Count is required.</div>
+                <div class="invalid-feedback" *ngIf="control.get('connectivity_count')?.errors?.['min']">Minimum count is 1.</div>
+
+                <input type="hidden" formControlName="connectivity">
+            </div>
+        </ng-container>
+    </div>
+</div>
+
+            <hr class="mt-4 mb-3">
+
+            <h5 class="mb-3 mt-4 text-secondary">Electrical Specifications (Optional)</h5>
+            <div formGroupName="electrical_specs" class="row border rounded p-3 mb-3 bg-light">
+                <div class="col-md-4 mb-3">
+                    <label for="voltage" class="form-label small">Voltage (V)</label>
+                    <input id="voltage" type="text" formControlName="voltage" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="wattage" class="form-label small">Wattage (W)</label>
+                    <input id="wattage" type="number" formControlName="wattage" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="power_supply_type" class="form-label small">Power Supply Type</label>
+                    <input id="power_supply_type" type="text" formControlName="power_supply_type" class="form-control form-control-sm">
+                </div>
+            </div>
+
+            <div class="mb-3 mt-3">
+                <label class="form-label d-block text-secondary">Supported Internet Services</label>
+                <div class="d-flex flex-wrap border rounded p-2 bg-white">
+                    <div *ngFor="let service of availableInternetServices()" class="form-check form-check-inline">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            [id]="'service-spec-' + service.id"
+                            [checked]="selectedInternetServices().includes(service.id!)"
+                            (change)="toggleInternetServiceSelection(service.id!)">
+                        <label class="form-check-label" [for]="'service-spec-' + service.id">{{ service.name }}</label>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        <form [formGroup]="specForm" (ngSubmit)="onAddProductSpec()">
-            <div class="modal-body">
-                <p class="text-info small">Product: {{ currentProduct()?.name }}</p>
-                <hr class="mt-2 mb-3">
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Cancel click')">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="specForm.invalid || isLoading()">
+                <span *ngIf="isLoading()" class="spinner-border spinner-border-sm me-2"></span>
+                {{ modalMode === 'create-spec' ? 'Save Specification' : 'Update Specification' }}
+            </button>
+        </div>
+    </form>
+</ng-template>
 
-                <h5 class="mb-3 text-primary">Core Specifications</h5>
-                <div class="row">
-                    <input type="hidden" formControlName="id">
-
-                    <div class="col-md-6 mb-3">
-                        <label for="sku" class="form-label">Model number</label>
-                        <input id="sku" type="text" formControlName="model" class="form-control"
-                                [class.is-invalid]="specForm.get('model')?.invalid && specForm.get('model')?.touched">
-                        <div class="invalid-feedback" *ngIf="specForm.get('model')?.errors?.['required']">Model number is required.</div>
-                        <div class="invalid-feedback" *ngIf="specForm.get('model')?.errors?.['serverError']">
-                            {{ specForm.get('model')?.errors?.['serverError'] }}
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="color" class="form-label">Color (Optional)</label>
-                        <input id="color" type="text" formControlName="color" class="form-control">
-                    </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-4 mb-3">
-                      <label for="brand" class="form-label">Brand</label>
-                      <select id="brand" formControlName="brand" class="form-select"
-                              [class.is-invalid]="productForm.get('brand')?.invalid && productForm.get('brand')?.touched">
-                          <option [ngValue]="null">Select Brand</option>
-                          <option *ngFor="let brand of brands()" [ngValue]="brand.id">{{ brand.name }}</option>
-                      </select>
-                      <div class="invalid-feedback" *ngIf="productForm.get('brand')?.errors?.['required']">Brand is required.</div>
-                  </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="screen_size" class="form-label">Screen Size</label>
-                        <select id="screen_size" formControlName="screen_size" class="form-select"
-                                [class.is-invalid]="specForm.get('screen_size')?.invalid && specForm.get('screen_size')?.touched">
-                            <option [ngValue]="null">Select Size</option>
-                            <option *ngFor="let size of screenSizes()" [ngValue]="size.id">{{ size.name }}</option>
-                        </select>
-                        <div class="invalid-feedback" *ngIf="specForm.get('screen_size')?.errors?.['required']">Required.</div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="resolution" class="form-label">Resolution</label>
-                        <select id="resolution" formControlName="resolution" class="form-select"
-                                [class.is-invalid]="specForm.get('resolution')?.invalid && specForm.get('resolution')?.touched">
-                            <option [ngValue]="null">Select Resolution</option>
-                            <option *ngFor="let res of resolutions()" [ngValue]="res.id">{{ res.name }}</option>
-                        </select>
-                        <div class="invalid-feedback" *ngIf="specForm.get('resolution')?.errors?.['required']">Required.</div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="panel_type" class="form-label">Panel Type</label>
-                        <select id="panel_type" formControlName="panel_type" class="form-select"
-                                [class.is-invalid]="specForm.get('panel_type')?.invalid && specForm.get('panel_type')?.touched">
-                            <option [ngValue]="null">Select Panel</option>
-                            <option *ngFor="let panel of panelTypes()" [ngValue]="panel.id">{{ panel.name }}</option>
-                        </select>
-                        <div class="invalid-feedback" *ngIf="specForm.get('panel_type')?.errors?.['required']">Required.</div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-5 mb-3">
-                        <label for="original_price" class="form-label">Original Price</label>
-                        <input id="original_price" type="number" formControlName="original_price" class="form-control"
-                                [class.is-invalid]="specForm.get('original_price')?.invalid && specForm.get('original_price')?.touched">
-                        <div class="invalid-feedback" *ngIf="specForm.get('original_price')?.errors?.['required']">Required.</div>
-                    </div>
-                    <div class="col-md-5 mb-3">
-                        <label for="sale_price" class="form-label">Sale Price</label>
-                        <input id="sale_price" type="number" formControlName="sale_price" class="form-control"
-                                [class.is-invalid]="specForm.get('sale_price')?.invalid && specForm.get('sale_price')?.touched">
-                        <div class="invalid-feedback" *ngIf="specForm.get('sale_price')?.errors?.['required']">Required.</div>
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label">Smart?</label>
-                        <div class="d-flex align-items-center h-50">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" id="smartTrue" [value]="'true'" formControlName="smart_features">
-                                <label class="form-check-label" for="smartTrue">Y</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" id="smartFalse" [value]="'false'" formControlName="smart_features">
-                                <label class="form-check-label" for="smartFalse">N</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <h5 class="mb-3 mt-4 text-secondary">Electrical Specifications (Optional)</h5>
-                <div class="row border rounded p-3 mb-3 bg-light">
-                    <div class="col-md-4 mb-3">
-                        <label for="electrical_specs_voltage" class="form-label small">Voltage (V)</label>
-                        <input id="electrical_specs_voltage" type="text" formControlName="electrical_specs_voltage" class="form-control form-control-sm">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="electrical_specs_wattage" class="form-label small">Wattage (W)</label>
-                        <input id="electrical_specs_wattage" type="number" formControlName="electrical_specs_wattage" class="form-control form-control-sm">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="electrical_specs_power_supply_type" class="form-label small">Power Supply Type</label>
-                        <input id="electrical_specs_power_supply_type" type="text" formControlName="electrical_specs_power_supply_type" class="form-control form-control-sm">
-                    </div>
-                </div>
-
-                <div class="mb-3 mt-3">
-                    <label class="form-label d-block text-secondary">Supported Internet Services</label>
-                    <div class="d-flex flex-wrap border rounded p-2 bg-white">
-                        <div *ngFor="let service of availableInternetServices()" class="form-check form-check-inline">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                [id]="'service-spec-' + service.id"
-                                [checked]="selectedInternetServices().includes(service.id!)"
-                                (change)="toggleInternetServiceSelection(service.id!)">
-                            <label class="form-check-label" [for]="'service-spec-' + service.id">{{ service.name }}</label>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Cancel click')">Cancel</button>
-                <button type="submit" class="btn btn-primary" [disabled]="specForm.invalid || isLoading()">
-                    <span *ngIf="isLoading()" class="spinner-border spinner-border-sm me-2"></span>
-                    {{ modalMode === 'create-spec' ? 'Save Specification' : 'Update Specification' }}
-                </button>
-            </div>
-        </form>
-    </ng-template>
 
     <ng-template #deleteProductModal let-modal>
         <div class="modal-header">
