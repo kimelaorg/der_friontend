@@ -1,237 +1,250 @@
-<div class="container py-4">
-    <h1 class="mb-4 text-primary fw-bold">Office POS Checkout System</h1>
+<app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon"></app-page-title>
 
-    <ul class="nav nav-pills nav-justified mb-4">
-        <li class="nav-item" *ngFor="let stage of stages; let i = index">
-            <a class="nav-link"
-               [class.active]="currentStage() === i + 1"
-               [class.disabled]="currentStage() < i + 1"
-               (click)="goToStage(i + 1)">
-                <span class="badge rounded-pill me-2" [class.bg-primary]="currentStage() >= i + 1" [class.bg-secondary]="currentStage() < i + 1">{{ i + 1 }}</span>
-                {{ stage }}
-            </a>
-        </li>
-    </ul>
+      <!-- <h1 class="mb-4 text-primary fw-bold">Office POS Checkout System</h1> -->
 
-    <div *ngIf="errorMessage()" class="alert alert-danger" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
-    </div>
+      <ul class="nav nav-pills nav-justified mb-4">
+          <li class="nav-item" *ngFor="let stage of stages; let i = index">
+              <a class="nav-link"
+                 [class.active]="currentStage() === i + 1"
+                 [class.disabled]="currentStage() < i + 1"
+                 (click)="goToStage(i + 1)">
+                  <span class="badge rounded-pill me-2" [class.bg-primary]="currentStage() >= i + 1" [class.bg-secondary]="currentStage() < i + 1">{{ i + 1 }}</span>
+                  {{ stage }}
+              </a>
+          </li>
+      </ul>
 
-    <div class="card shadow-lg p-4">
+      <div *ngIf="errorMessage()" class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
+      </div>
 
-        <div *ngIf="currentStage() === 1">
-            <h2 class="card-title text-success mb-4">1. Customer Details (Optional)</h2>
-            <form [formGroup]="customerForm" (ngSubmit)="submitNewCustomer()" class="row g-3">
-                <div class="col-md-6">
-                    <label for="firstName" class="form-label">First Name</label>
-                    <input type="text" id="firstName" formControlName="firstName" class="form-control" placeholder="Jane">
-                </div>
-                <div class="col-md-6">
-                    <label for="lastName" class="form-label">Last Name</label>
-                    <input type="text" id="lastName" formControlName="lastName" class="form-control" placeholder="Doe">
-                </div>
-                <div class="col-12">
-                    <label for="phone" class="form-label">Phone/Contact</label>
-                    <input type="text" id="phone" formControlName="phone" class="form-control" placeholder="e.g., +1234567890">
-                </div>
-                <div class="col-12 mt-4 d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary" (click)="skipCustomer()">
-                        Skip Customer & Continue <i class="bi bi-arrow-right"></i>
-                    </button>
-                    <button type="submit" class="btn btn-success">
-                        Capture Customer Details & Continue <i class="bi bi-person-plus"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
+      <div class="card p-4">
 
-        <div *ngIf="currentStage() === 2">
-            <h2 class="card-title text-success mb-4">2. Add Sales Items ({{ totalItems() }} in cart)</h2>
-            <p *ngIf="customerForm.value.firstName || customerForm.value.lastName || customerForm.value.phone" class="text-success small">✅ Customer details captured locally. Creation pending.</p>
-            <p *ngIf="!customerForm.value.firstName && !customerForm.value.lastName && !customerForm.value.phone" class="text-secondary small">Customer details skipped (will be anonymous sale).</p>
+          <div *ngIf="currentStage() === 1">
+              <h4 class="card-title text-success mb-4">Customer Details (Optional)</h4>
+              <form [formGroup]="customerForm" (ngSubmit)="submitNewCustomer()" class="row g-3">
+                  <div class="col-md-6">
+                      <label for="firstName" class="form-label">First Name</label>
+                      <input type="text" id="firstName" formControlName="firstName" class="form-control" placeholder="Jane">
+                  </div>
+                  <div class="col-md-6">
+                      <label for="lastName" class="form-label">Last Name</label>
+                      <input type="text" id="lastName" formControlName="lastName" class="form-control" placeholder="Doe">
+                  </div>
+                  <div class="col-12">
+                      <label for="phone" class="form-label">Phone/Contact</label>
+                      <input type="text" id="phone" formControlName="phone" class="form-control" placeholder="e.g., +1234567890">
+                  </div>
+                  <div class="col-12 mt-4 d-flex justify-content-between">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="skipCustomer()">
+                          Skip Customer & Continue <i class="bi bi-arrow-right"></i>
+                      </button>
+                      <button type="submit" class="btn btn-sm btn-success">
+                          Capture Customer Details & Continue <i class="bi bi-person-plus"></i>
+                      </button>
+                  </div>
+              </form>
+          </div>
 
-            <form [formGroup]="salesForm" class="mb-4">
-                <div class="input-group">
-                    <div class="autocomplete-container flex-grow-1 position-relative me-2">
-                        <input type="text" formControlName="searchQuery" class="form-control" placeholder="Search by SKU or Product Name">
-                        <ul class="list-group position-absolute w-100 z-100 shadow-sm" *ngIf="autocompleteResults.length > 0">
-                            <li class="list-group-item list-group-item-action py-2 small"
-                                *ngFor="let product of autocompleteResults"
-                                (click)="selectProduct(product)">
-                                **{{ product.sku }}** - {{ product.name }} (**${{ product.sale_price }}**)
-                            </li>
-                        </ul>
-                    </div>
-                    <input type="number" formControlName="quantity" class="form-control text-center" style="width: 80px;" min="1" value="1">
-                    <span class="input-group-text">Qty</span>
-                </div>
-            </form>
+          <div *ngIf="currentStage() === 2">
+              <h4 class="card-title text-success mb-4">Add Sales Items ({{ totalItems() }} in cart)</h4>
+              <p *ngIf="customerForm.value.firstName || customerForm.value.lastName || customerForm.value.phone" class="text-success small">Customer details captured locally. Creation pending.</p>
+              <p *ngIf="!customerForm.value.firstName && !customerForm.value.lastName && !customerForm.value.phone" class="text-secondary small">Customer details skipped (will be anonymous sale).</p>
 
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Product</th>
-                            <th class="text-center">Qty</th>
-                            <th class="text-end">Sale Price</th>
-                            <th class="text-end">Subtotal</th>
-                            <th class="text-center"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngIf="totalItems() === 0">
-                            <td colspan="5" class="text-center text-muted py-3">No items in the cart. Use the search bar to add products.</td>
-                        </tr>
-                        <tr *ngFor="let item of cartItems(); index as i">
-                            <td>
-                                <div class="fw-bold">{{ item.name }}</div>
-                                <div class="small text-muted">SKU: {{ item.sku }}</div>
-                            </td>
-                            <td class="text-center">
-                                <input type="number" [value]="item.quantity" (change)="updateItemQuantity(i, $event)" min="1" class="form-control form-control-sm text-center mx-auto" style="width: 70px;">
-                            </td>
-                            <td class="text-end">${{ item.unit_price }}</td>
-                            <td class="text-end fw-bold">${{ item.subtotal | number:'1.2-2' }}</td>
-                            <td class="text-center">
-                                <button (click)="removeItem(i)" class="btn btn-sm btn-outline-danger p-1" aria-label="Remove item">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="3" class="text-end h5">GRAND TOTAL:</th>
-                            <th class="text-end h5 text-primary">${{ subTotal() | number:'1.2-2' }}</th>
-                            <th></th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+              <form [formGroup]="salesForm" class="mb-4">
+                  <div class="input-group">
+                      <div class="autocomplete-container flex-grow-1 position-relative me-2">
+                          <input type="text" formControlName="searchQuery" class="form-control" placeholder="Search by SKU or Product Name">
+                          <ul class="list-group position-absolute w-100 z-100 shadow-sm" *ngIf="autocompleteResults.length > 0">
+                              <li class="list-group-item list-group-item-action py-2 small"
+                                  *ngFor="let product of autocompleteResults"
+                                  (click)="selectProduct(product)">
+                                  **{{ product.sku }}** - {{ product.name }} (**${{ product.sale_price }}**)
+                              </li>
+                          </ul>
+                      </div>
+                      <input type="number" formControlName="quantity" class="form-control text-center" style="width: 80px;" min="1" value="1">
+                      <span class="input-group-text">Qty</span>
+                  </div>
+              </form>
 
-            <div class="d-flex justify-content-between mt-4">
-                <button class="btn btn-secondary" (click)="goToStage(1)">
-                    <i class="bi bi-arrow-left"></i> Back to Customer
-                </button>
-                <button class="btn btn-primary" (click)="nextStage()" [disabled]="totalItems() === 0">
-                    Next: Payment Details <i class="bi bi-arrow-right"></i>
-                </button>
-            </div>
-        </div>
+              <div class="table-responsive mt-2">
+                  <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                      <thead class="table-light">
+                          <tr>
+                              <th>Product</th>
+                              <th class="text-center">Qty</th>
+                              <th class="text-end">Sale Price</th>
+                              <th class="text-end">Subtotal</th>
+                              <th class="text-center">Action</th>
+                          </tr>
+                      </thead>
+                      <tbody class="table-group-divider">
+                          <tr *ngIf="totalItems() === 0">
+                              <td colspan="5" class="text-center text-muted py-3">No Product being selected. Select one to proceed</td>
+                          </tr>
+                          <tr *ngFor="let item of cartItems(); index as i">
+                              <td>
+                                  <div class="fw-bold">{{ item.name }}</div>
+                                  <div class="small text-muted">SKU: {{ item.sku }}</div>
+                              </td>
+                              <td class="text-center">
+                                  <input type="number" [value]="item.quantity" (change)="updateItemQuantity(i, $event)" min="1" class="form-control form-control-sm text-center mx-auto" style="width: 70px;">
+                              </td>
+                              <td class="text-end">{{ item.unit_price | currency: 'TZS': 'symbol'}}</td>
+                              <td class="text-end fw-bold">{{ item.subtotal | number:'1.2-2' }}</td>
+                              <td class="text-center">
+                                  <button (click)="removeItem(i)" class="btn btn-sm btn-outline-danger p-1" aria-label="Remove item">
+                                    <i class="fa-solid fa-trash"></i>
+                                  </button>
+                              </td>
+                          </tr>
+                      </tbody>
+                      <tfoot>
+                          <tr>
+                              <th colspan="3" class="text-end bg-light h6">GRAND TOTAL:</th>
+                              <th class="text-end h6 text-success bg-light">{{ subTotal() | currency: 'TZS': 'symbol' }}</th>
+                              <th></th>
+                          </tr>
+                      </tfoot>
+                  </table>
+              </div>
 
-        <div *ngIf="currentStage() === 3">
-            <h2 class="card-title text-success mb-4">3. Payment Details</h2>
-            <form [formGroup]="paymentForm" class="row g-3">
-                <div class="col-md-6">
-                    <label for="payment_method" class="form-label">Payment Method</label>
-                    <select id="payment_method" formControlName="payment_method" class="form-select">
-                        <option value="CARD">Credit/Debit Card</option>
-                        <option value="CASH">Cash</option>
-                        <option value="TRANSFER">Bank Transfer</option>
-                        <option value="MOMO">Mobile Money</option>
-                        <option value="OTHER">Other</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label for="payment_status" class="form-label">Payment Status</label>
-                    <select id="payment_status" formControlName="payment_status" class="form-select">
-                        <option value="Completed">Completed</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Failed">Failed</option>
-                    </select>
-                </div>
+              <div class="d-flex justify-content-between mt-4">
+                  <button class="btn btn-sm btn-secondary" (click)="goToStage(1)">
+                      <i class="bi bi-arrow-left"></i> Back to Customer
+                  </button>
+                  <button class="btn btn-sm btn-primary" (click)="nextStage()" [disabled]="totalItems() === 0">
+                      Next: Payment Details <i class="bi bi-arrow-right"></i>
+                  </button>
+              </div>
+          </div>
 
-                <div class="col-12 mt-4 d-flex justify-content-between">
-                    <button type="button" class="btn btn-secondary" (click)="prevStage()">
-                        <i class="bi bi-arrow-left"></i> Back to Items
-                    </button>
-                    <button type="button" class="btn btn-primary" (click)="nextStage()" [disabled]="paymentForm.invalid">
-                        Next: Review & Complete <i class="bi bi-check-circle"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
+          <div *ngIf="currentStage() === 3">
+              <h4 class="card-title text-success mb-4">Payment Details</h4>
+              <form [formGroup]="paymentForm" class="row g-3">
+                  <div class="col-md-6">
+                      <label for="payment_method" class="form-label">Payment Method</label>
+                      <select id="payment_method" formControlName="payment_method" class="form-select">
+                          <option value="CASH">Cash</option>
+                          <option value="CARD">Credit/Debit Card</option>
+                          <option value="TRANSFER">Bank Transfer</option>
+                          <option value="MOMO">Mobile Money</option>
+                          <option value="OTHER">Other</option>
+                      </select>
+                  </div>
+                  <div class="col-md-6">
+                      <label for="payment_status" class="form-label">Payment Status</label>
+                      <select id="payment_status" formControlName="payment_status" class="form-select">
+                          <option value="Completed">Completed</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Failed">Failed</option>
+                      </select>
+                  </div>
 
-        <div *ngIf="currentStage() === 4">
-            <h2 class="card-title text-success mb-4">4. Review & Complete Sale</h2>
+                  <div class="col-12 mt-4 d-flex justify-content-between">
+                      <button type="button" class="btn btn-sm btn-secondary" (click)="prevStage()">
+                          <i class="bi bi-arrow-left"></i> Back to Items
+                      </button>
+                      <button type="button" class="btn btn-sm btn-primary" (click)="nextStage()" [disabled]="paymentForm.invalid">
+                          Next: Review & Complete <i class="bi bi-check-circle"></i>
+                      </button>
+                  </div>
+              </form>
+          </div>
 
-            <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="card bg-light shadow-sm">
-                        <div class="card-header bg-primary text-white fw-bold">Transaction Data</div>
-                        <div class="card-body">
-                            <dl class="row mb-0">
-                                <dt class="col-sm-5">Customer Status</dt>
-                                <dd class="col-sm-7 fw-bold text-truncate">
-                                    {{ (customerForm.value.firstName || customerForm.value.lastName || customerForm.value.phone) ? 'New/Captured' : 'Anonymous' }}
-                                </dd>
+          <div *ngIf="currentStage() === 4">
+              <h4 class="card-title text-success mb-4">Review & Complete Sale</h4>
 
-                                <dt class="col-sm-5">Location</dt>
-                                <dd class="col-sm-7 fw-bold text-success">Auto-set by User (Backend)</dd>
+              <div class="row g-4">
+                  <div class="col-lg-6">
+                      <div class="card bg-light">
+                          <div class="card-header bg-light  lead">Transaction Data</div>
+                          <div class="card-body">
+                              <dl class="row mb-0">
+                                  <ng-container *ngIf="customerForm.value.firstName || customerForm.value.lastName">
+                                      <dt class="col-sm-5">Customer Name:</dt>
+                                      <dd class="col-sm-7 text-truncate">
+                                          {{ customerForm.value.firstName }} {{ customerForm.value.lastName }}
+                                      </dd>
+                                  </ng-container>
 
-                                <dt class="col-sm-5">Payment Method</dt>
-                                <dd class="col-sm-7">{{ paymentForm.get('payment_method')?.value }}</dd>
+                                  <ng-container *ngIf="customerForm.value.phone">
+                                      <dt class="col-sm-5">Phone Number:</dt>
+                                      <dd class="col-sm-7 text-truncate">
+                                          {{ customerForm.value.phone }}
+                                      </dd>
+                                  </ng-container>
 
-                                <dt class="col-sm-5">Payment Status</dt>
-                                <dd class="col-sm-7"><span class="badge bg-success">{{ paymentForm.get('payment_status')?.value }}</span></dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
+                                  <dt class="col-sm-5">Payment Method</dt>
+                                  <dd class="col-sm-7">{{ paymentForm.get('payment_method')?.value }}</dd>
 
-                <div class="col-lg-6">
-                    <div class="card bg-light shadow-sm">
-                        <div class="card-header bg-success text-white fw-bold">Financial Summary</div>
-                        <div class="card-body">
-                            <dl class="row mb-0">
-                                <dt class="col-sm-5">Items Count</dt>
-                                <dd class="col-sm-7">{{ totalItems() }}</dd>
+                                  <dt class="col-sm-5">Payment Status</dt>
+                                  <dd class="col-sm-7">
+                                      <span class="badge"
+                                            [class.bg-success]="paymentForm.get('payment_status')?.value === 'Completed'"
+                                            [class.bg-danger]="paymentForm.get('payment_status')?.value === 'Failed'"
+                                            [class.bg-warning]="paymentForm.get('payment_status')?.value === 'Pending'">
+                                          {{ paymentForm.get('payment_status')?.value }}
+                                      </span>
+                                  </dd>
+                              </dl>
+                          </div>
+                      </div>
+                  </div>
 
-                                <dt class="col-sm-5 h4 text-success">TOTAL</dt>
-                                <dd class="col-sm-7 h4 text-success fw-bold">${{ subTotal() | number:'1.2-2' }}</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                  <div class="col-lg-6">
+                      <div class="card bg-light">
+                          <div class="card-header lead">Financial Summary</div>
+                          <div class="card-body">
+                              <dl class="row mb-0">
+                                  <dt class="col-sm-5">Items Count</dt>
+                                  <dd class="col-sm-7">{{ totalItems() }}</dd>
 
-            <h5 class="mt-4 mb-3">Items Review</h5>
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered">
-                    <thead>
-                        <tr class="table-secondary">
-                            <th>Product</th>
-                            <th class="text-center">Sale Price</th>
-                            <th class="text-center">Qty</th>
-                            <th class="text-end">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let item of cartItems()">
-                            <td>{{ item.name }} ({{ item.sku }})</td>
-                            <td class="text-center">${{ item.unit_price }}</td>
-                            <td class="text-center">{{ item.quantity }}</td>
-                            <td class="text-end">${{ item.subtotal | number:'1.2-2' }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                                  <dt class="col-sm-5 h5 text-success">TOTAL</dt>
+                                  <dd class="col-sm-7 h5 text-success fw-bold">{{ subTotal() | currency: 'TZS': 'symbol' }}</dd>
+                              </dl>
+                          </div>
+                      </div>
+                  </div>
+              </div>
 
-            <div class="mt-4 d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary" (click)="prevStage()">
-                    <i class="bi bi-arrow-left"></i> Return to Payment
-                </button>
-                <button type="button" class="btn btn-success btn-lg" (click)="completeSale()" [disabled]="submissionLoading()">
-                    <span *ngIf="submissionLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    <i *ngIf="!submissionLoading()" class="bi bi-check-all"></i>
-                    {{ submissionLoading() ? 'Processing...' : 'CONFIRM & COMPLETE SALE' }}
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+              <h5 class="mt-4 mb-3">Items Review</h5>
+              <div class="table-responsive">
+                  <table class="table table-lg">
+                      <thead>
+                          <tr class="table">
+                              <th>Product</th>
+                              <th class="text-center">Sale Price</th>
+                              <th class="text-center">Qty</th>
+                              <th class="text-end">Subtotal</th>
+                          </tr>
+                      </thead>
+                      <tbody class="table-group-divider">
+                          <tr *ngFor="let item of cartItems()">
+                              <td>{{ item.name }} ({{ item.sku }})</td>
+                              <td class="text-center">{{ item.unit_price | currency: 'TZS': 'symbol' }}</td>
+                              <td class="text-center">{{ item.quantity }} pc</td>
+                              <td class="text-end">{{ item.subtotal | currency: 'TZS': 'symbol' }}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
 
-<div *ngIf="successMessage()" class="alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-4 shadow-lg z-3" role="alert">
-    <i class="bi bi-check-circle-fill me-2"></i> Sale Recorded! Transaction ID: **{{ successMessage() }}**
-    <button type="button" class="btn-close" (click)="successMessage.set(null)" aria-label="Close"></button>
-</div>
+              <div class="mt-4 d-flex justify-content-between">
+                  <button type="button" class="btn btn-secondary btn-sm" (click)="prevStage()">
+                      <i class="bi bi-arrow-left"></i> Return to Payment
+                  </button>
+                  <button type="button" class="btn btn-success btn-sm" (click)="completeSale()" [disabled]="submissionLoading()">
+                      <span *ngIf="submissionLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <i *ngIf="!submissionLoading()" class="bi bi-check-all"></i>
+                      {{ submissionLoading() ? 'Processing...' : 'Confirm & Complete sale' }}
+                  </button>
+              </div>
+          </div>
+      </div>
+
+  <div *ngIf="successMessage()" class="alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-4 shadow-lg z-3" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i> Sale Recorded! Transaction ID: **{{ successMessage() }}**
+      <button type="button" class="btn-close" (click)="successMessage.set(null)" aria-label="Close"></button>
+  </div>
