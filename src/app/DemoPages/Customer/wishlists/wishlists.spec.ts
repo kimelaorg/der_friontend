@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Mega } from './mega';
+import { Wishlists } from './wishlists';
 
-describe('Mega', () => {
-  let component: Mega;
-  let fixture: ComponentFixture<Mega>;
+describe('Wishlists', () => {
+  let component: Wishlists;
+  let fixture: ComponentFixture<Wishlists>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [Mega]
+      declarations: [Wishlists]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Mega);
+    fixture = TestBed.createComponent(Wishlists);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

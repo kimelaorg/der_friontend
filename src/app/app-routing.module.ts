@@ -155,7 +155,6 @@ import {
     Purchasing,
     Reports,
     Users,
-    Orders,
     Shipping,
     Products,
     Discounts,
@@ -169,15 +168,21 @@ import {
     ListGroupsComponent,
     TimelineComponent,
     IconsComponent,
+    ModalsComponent,
     // ... (rest of your components) ...
     LoginBoxedComponent,
     RegisterBoxedComponent,
     ForgotPasswordBoxedComponent,
     Stock,
     Otp,
+    SalesView,
     Home,
+    Wishlists,
+    Reviews,
+    Purchased,
+    Orders,
+    Profile,
     Trial,
-    Mega
 } from './components.barrel';
 
 
@@ -195,7 +200,7 @@ const routes: Routes = [
             { path: 'account/forgot-password', component: ForgotPasswordBoxedComponent, data: { extraParameter: '' } },
             { path: 'account/otp', component: Otp, data: { extraParameter: '' } },
             { path: 'trial', component: Trial, data: { extraParameter: '' } },
-            { path: 'mega', component: Mega, data: { extraParameter: '' } },
+            { path: 'components/modals', component: ModalsComponent, data: { extraParameter: 'componentsMenu' } },
         ]
     },
 
@@ -253,6 +258,14 @@ const routes: Routes = [
                 }
             },
             {
+                path: 'dashboards/view-sales',
+                component: SalesView,
+                data: {
+                    extraParameter: 'elementsMenu',
+                    allowedRoles: ['Sales Representative', 'Executive Manager', 'Reporting Analyst']
+                }
+            },
+            {
                 path: 'dashboards/purchasing',
                 component: Purchasing,
                 data: {
@@ -266,14 +279,6 @@ const routes: Routes = [
                 data: {
                     extraParameter: 'elementsMenu',
                     allowedRoles: ['Warehouse/Logistics Manager']
-                }
-            },
-            {
-                path: 'dashboards/orders',
-                component: Orders,
-                data: {
-                    extraParameter: 'elementsMenu',
-                    allowedRoles: ['Sales Representative', 'Warehouse/Logistics Manager', 'Customer']
                 }
             },
 
@@ -307,6 +312,11 @@ const routes: Routes = [
             { path: 'dashboards/expenses', component: Expenses, data: { extraParameter: 'elementsMenu' } },
             { path: 'dashboards/savings', component: Savings, data: { extraParameter: 'elementsMenu' } },
             { path: 'dashboards/stock', component: Stock, data: { extraParameter: 'elementsMenu' } },
+            { path: 'dashboards/orders&Tracking', component: Orders, data: { extraParameter: 'elementsMenu' } },
+            { path: 'dashboards/purchased', component: Purchased, data: { extraParameter: 'elementsMenu' } },
+            { path: 'dashboards/reviews', component: Reviews, data: { extraParameter: 'elementsMenu' } },
+            { path: 'dashboards/wishlists', component: Wishlists, data: { extraParameter: 'elementsMenu' } },
+            { path: 'dashboards/wishlists', component: Profile, data: { extraParameter: 'elementsMenu' } },
             // ... (rest of your routes, adding roles as needed) ...
 
             // Example of a route protected by only the parent guard (any authenticated user)

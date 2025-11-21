@@ -39,6 +39,7 @@ interface CustomerData {
   firstName: string;
   lastName: string;
   phone: string;
+  email: string;
 }
 
 
@@ -91,6 +92,7 @@ export class Sales implements OnInit {
     this.customerForm = this.fb.group({
       firstName: ['', Validators.minLength(2)],
       lastName: ['', Validators.minLength(2)],
+      email: ['', null],
       phone: ['', [Validators.minLength(8), Validators.maxLength(15)]],
     });
 
@@ -100,7 +102,7 @@ export class Sales implements OnInit {
     });
 
     this.paymentForm = this.fb.group({
-      payment_method: ['CARD', Validators.required],
+      payment_method: ['CASH', Validators.required],
       payment_status: ['Completed', Validators.required],
     });
   }
@@ -319,8 +321,19 @@ export class Sales implements OnInit {
         finalize(() => this.submissionLoading.set(false)),
         catchError(err => {
             console.error('Sale Submission Failed:', err);
-            const apiError = JSON.stringify(err.error) || 'Server error';
-            this.errorMessage.set(`Sale failed. API Error: ${apiError}`);
+
+            let apiErrorMessage = 'Server error'; // Default error message
+
+            // Check if err.error is a valid object and has an 'items' array
+            if (err.error && err.error.items && err.error.items.length > 0) {
+                // Extract the specific error string from the first item in the array
+                apiErrorMessage = err.error.items[0];
+            } else if (err.error) {
+                // Fallback for other potential errors in err.error
+                apiErrorMessage = JSON.stringify(err.error);
+            }
+
+            this.errorMessage.set(`${apiErrorMessage}`);
             return of(null);
         })
       )
@@ -368,6 +381,6 @@ export class Sales implements OnInit {
     this.backendCustomerId.set(null);
     this.customerForm.reset();
     this.salesForm.reset({ quantity: 1, searchQuery: '' });
-    this.paymentForm.reset({ payment_method: 'CARD', payment_status: 'Completed' });
+    this.paymentForm.reset({ payment_method: 'CASH', payment_status: 'Completed' });
   }
 }

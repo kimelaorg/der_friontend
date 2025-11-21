@@ -1,0 +1,36 @@
+.card-header {
+    // Optional: Add a slight gradient for modern look
+    background-image: linear-gradient(to right, #007bff, #0056b3);
+}
+
+.form-label {
+    font-weight: 500; // Slightly bolder labels
+}
+
+// Style for the container card when showing optional groups
+.card-body .card-body {
+    border: 1px solid #dee2e6; // Lighter border for nested card
+}
+
+// Highlight required fields subtly
+.text-danger {
+    font-weight: 600;
+}
+
+// Adjust button group appearance for choice fields
+.btn-group {
+    label.btn-outline-info {
+        border-color: var(--bs-info);
+        &.active {
+            background-color: var(--bs-info);
+            color: white;
+        }
+    }
+    label.btn-outline-secondary {
+        border-color: var(--bs-secondary);
+        &.active {
+            background-color: var(--bs-secondary);
+            color: white;
+        }
+    }
+}

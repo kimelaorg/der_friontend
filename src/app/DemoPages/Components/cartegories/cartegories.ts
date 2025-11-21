@@ -30,7 +30,7 @@ interface CartegoryForm {
   name: FormControl<string>;
   description: FormControl<string>;
   is_digital: FormControl<string>;
-  status: FormControl<string>; // ADDED: Status field to form group
+  status: FormControl<string>;
 }
 
 
@@ -75,7 +75,7 @@ export class Cartegories implements OnInit {
     name: ['', [Validators.required]],
     description: ['', [Validators.required]],
     is_digital: ['', [Validators.required]],
-    status: ['true', [Validators.required]], // ADDED: Default status to 'true' for creation
+    status: ['true', [Validators.required]],
   });
 
   ngOnInit(): void {
@@ -99,7 +99,6 @@ export class Cartegories implements OnInit {
       this.closeResult = `Closed with: ${result}`;
 
       if (result === 'saved' || result === 'deleted') {
-        // Reload data from the first page after a successful operation
         this.loadAll();
       }
       console.log(this.closeResult);
@@ -124,8 +123,8 @@ export class Cartegories implements OnInit {
     this.modalMode = 'create';
     this.currentCategoryId = null;
     this.newCartegoryForm.reset();
-    this.newCartegoryForm.patchValue({ status: 'true' }); // Set default status for new entry
-    this.currentCategoryData.set(null); // Clear data when creating
+    this.newCartegoryForm.patchValue({ status: 'true' });
+    this.currentCategoryData.set(null);
     if (this.modalContent) {
       this.open(this.modalContent);
     } else {
@@ -133,9 +132,6 @@ export class Cartegories implements OnInit {
     }
   }
 
-  /**
-   * Fetches a single category by ID and patches the form.
-   */
   private fetchCategoryData(categoryId: number): void {
     this.isLoading.set(true);
     this.http.get<ProductCategory>(`${this.categoryUrl}${categoryId}/`)
@@ -145,16 +141,13 @@ export class Cartegories implements OnInit {
       .subscribe({
         next: (data) => {
           this.currentCategoryData.set(data);
-          // Patch the form. Boolean values must be converted to string 'true'/'false'
-          // because the HTML select input expects string values.
           this.newCartegoryForm.patchValue({
             name: data.name,
             description: data.description,
             is_digital: String(data.is_digital),
-            status: String(data.status), // ADDED: Patch status
+            status: String(data.status),
           });
 
-          // Open the modal after data is successfully loaded and patched
           if (this.modalContent) {
             this.open(this.modalContent);
           }
@@ -162,7 +155,7 @@ export class Cartegories implements OnInit {
         error: (err) => {
           this.message.set('Failed to load category data for editing.');
           console.error('Error fetching category:', err);
-          this.isLoading.set(false); // Stop loading indicator
+          this.isLoading.set(false); 
         }
       });
   }

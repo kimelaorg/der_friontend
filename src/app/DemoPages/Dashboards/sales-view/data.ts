@@ -15,4 +15,5 @@ export class Data {
   getSalesRecords(): Observable<SaleRecord[]> {
     return this.http.get<SaleRecord[]>(this.apiUrl);
   }
+
 }

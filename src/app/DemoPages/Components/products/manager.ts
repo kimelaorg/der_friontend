@@ -1,3 +1,11 @@
+export interface Slide {
+  title: string;
+  subtitle: string;
+  cta: string;
+  link: string;
+  imgClass: string; // Used for custom background styling
+}
+
 export interface BaseItem {
     id: number;
     product: number; // ProductSpecification ID

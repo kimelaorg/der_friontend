@@ -212,7 +212,7 @@ export class Specifications implements OnInit {
      * Initializes the modal for Create mode.
      * @param type The type of specification (e.g., 'Brand', 'Resolution').
      */
-    handleCreateModal(type: SpecType): void {
+    handleCreateModal(type: SpecType, content): void {
         this.currentSpecType = type;
         this.currentSpecId = null;
         this.modalMode = 'create';

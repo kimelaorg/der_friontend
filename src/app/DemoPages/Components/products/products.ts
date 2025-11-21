@@ -11,7 +11,7 @@ import { ActionButton } from '../../../Layout/Components/page-title/page-title.c
 import {
     ProductImage, ProductVideo, ConnectivityItem, ElectricalSpecs, ConnectivityPayload,
     BaseSetupItem, Brand, ProductCategory, ScreenSize, SupportedResolution, PanelType, Connectivity,
-    SupportedInternetService, ElectricalSpecification, DigitalProduct, ProductSpecification, Product
+    SupportedInternetService, ElectricalSpecification, DigitalProduct, ProductSpecification, Product, Slide
 } from './manager';
 import { Productspecificationmanager } from './productspecificationmanager';
 
@@ -869,6 +869,47 @@ export class Products implements OnInit {
         this.loadInitialData();
     }
 
+
+
+    // SLide show in madia section
+    slides = signal<Slide[]>([
+      { title: 'The Future of Sound', subtitle: 'New Audio Series - Up to 40% Off.', cta: 'Shop Now', link: '/sale/audio', imgClass: 'slide-1' },
+      { title: 'Big Screen, Bigger Deals', subtitle: '4K QLED TVs starting at $499.', cta: 'Explore TVs', link: '/shop/tvs', imgClass: 'slide-2' },
+      { title: 'Smart Home Essentials', subtitle: 'Control your life with our automation kits.', cta: 'See Kits', link: '/shop/smarthome', imgClass: 'slide-3' },
+    ]);
+    currentSlide = signal(0);
+    private slideInterval: any;
+
+
+    startSlideshow(): void {
+      this.slideInterval = setInterval(() => {
+        this.nextSlide();
+      }, 5000); // Change slide every 5 seconds
+    }
+
+    resetSlideshowTimer(): void {
+      clearInterval(this.slideInterval);
+      this.startSlideshow();
+    }
+
+    nextSlide(): void {
+      this.currentSlide.update(current =>
+        (current + 1) % this.slides().length
+      );
+      this.resetSlideshowTimer();
+    }
+
+    prevSlide(): void {
+      this.currentSlide.update(current =>
+        (current - 1 + this.slides().length) % this.slides().length
+      );
+      this.resetSlideshowTimer();
+    }
+
+    setCurrentSlide(index: number): void {
+      this.currentSlide.set(index);
+      this.resetSlideshowTimer();
+    }
 
     actionButtons: ActionButton[] = [
         {

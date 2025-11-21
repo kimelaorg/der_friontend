@@ -165,10 +165,70 @@
           </div>
         </div>
         <div class="tab-pane fade" id="just-tab3" role="tabpanel" aria-labelledby="just-tab3-tab">
-          <p class="mt-3">Sed commodo, leo at suscipit dictum, quam est porttitor sapien, eget sodales nibh elit id diam.
-            Nulla facilisi. Donec egestas ligula vitae odio interdum aliquet. Duis lectus turpis, luctus eget
-            tincidunt eu, congue et odio. Duis pharetra et nisl at faucibus. Quisque luctus pulvinar arcu, et
-            molestie lectus ultrices et. Sed diam urna, egestas ut ipsum vel, volutpat volutpat neque.</p>
+
+
+            <div class="table-responsive">
+                <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th class="text-justify">Product</th>
+                      <th class="text-center">Media</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>001</td>
+                      <td class="text-justify">Here we gooo</td>
+                      <td class="text-center">
+
+                        <section class="slideshow-section">
+                          <div class="slideshow-container">
+                            @for (slide of slides(); track $index) {
+                              <div class="slide-item" [class]="slide.imgClass" [class.active]="currentSlide() === $index">
+                                <div class="slide-content">
+                                  <h2 class="slide-subtitle">{{ slide.subtitle }}</h2>
+                                  <h1 class="slide-title">{{ slide.title }}</h1>
+                                  <a [href]="slide.link" class="slide-cta-button">{{ slide.cta }}</a>
+                                </div>
+                              </div>
+                            }
+
+                            <!-- Slider Controls -->
+                            <button (click)="prevSlide()" class="slide-control prev-control" aria-label="Previous Slide">
+                              <svg class="icon-24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                            </button>
+                            <button (click)="nextSlide()" class="slide-control next-control" aria-label="Next Slide">
+                              <svg class="icon-24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                            </button>
+
+                            <!-- Slide Indicators -->
+                            <div class="slide-indicators">
+                              @for (slide of slides(); track $index) {
+                                <button (click)="setCurrentSlide($index)" [class.active]="currentSlide() === $index"
+                                        class="indicator-dot" [attr.aria-label]="'Go to slide ' + ($index + 1)"></button>
+                              }
+                            </div>
+                          </div>
+                        </section>
+
+                        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                          <button type="button" class="btn btn-danger">Left</button>
+                          <button type="button" class="btn btn-warning">Middle</button>
+                          <button type="button" class="btn btn-success">Right</button>
+                        </div>
+
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>002</td>
+                      <td class="text-justify">Here we gooo</td>
+                      <td class="text-center">Boom Boom</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
         </div>
       </div>
 

@@ -16,7 +16,6 @@ import { TooltipsPopoversComponent } from './DemoPages/Components/tooltips-popov
 import { Products } from './DemoPages/Components/products/products';
 import { Discounts } from './DemoPages/Components/discounts/discounts';
 import { Users } from './DemoPages/Components/users/users';
-import { Orders } from './DemoPages/Components/orders/orders';
 import { Shipping } from './DemoPages/Components/shipping/shipping';
 import { Cartegories } from './DemoPages/Components/cartegories/cartegories';
 import { Specifications } from './DemoPages/Components/specifications/specifications';
@@ -24,7 +23,6 @@ import { Savings } from './DemoPages/Components/savings/savings';
 import { Expenses } from './DemoPages/Components/expenses/expenses';
 import { Home } from './DemoPages/Components/home/home';
 import { Trial } from './trial/trial';
-import { Mega } from './mega/mega';
 import { Stock } from './DemoPages/Components/stock/stock';
 
 @NgModule({
@@ -39,7 +37,6 @@ import { Stock } from './DemoPages/Components/stock/stock';
     Products,
     Discounts,
     Users,
-    Orders,
     Shipping,
     Cartegories,
     Specifications,
@@ -47,7 +44,6 @@ import { Stock } from './DemoPages/Components/stock/stock';
     Expenses,
     Home,
     Trial,
-    Mega,
     Stock,
   ],
   imports: [

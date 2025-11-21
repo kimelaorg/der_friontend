@@ -25,16 +25,21 @@
               <form [formGroup]="customerForm" (ngSubmit)="submitNewCustomer()" class="row g-3">
                   <div class="col-md-6">
                       <label for="firstName" class="form-label">First Name</label>
-                      <input type="text" id="firstName" formControlName="firstName" class="form-control" placeholder="Jane">
+                      <input type="text" id="firstName" formControlName="firstName" class="form-control" placeholder="kidaz">
                   </div>
                   <div class="col-md-6">
                       <label for="lastName" class="form-label">Last Name</label>
-                      <input type="text" id="lastName" formControlName="lastName" class="form-control" placeholder="Doe">
+                      <input type="text" id="lastName" formControlName="lastName" class="form-control" placeholder="boy">
                   </div>
                   <div class="col-12">
-                      <label for="phone" class="form-label">Phone/Contact</label>
-                      <input type="text" id="phone" formControlName="phone" class="form-control" placeholder="e.g., +1234567890">
+                      <label for="phone" class="form-label">Phone number</label>
+                      <input type="text" id="phone" formControlName="phone" class="form-control" placeholder="e.g., 0710203040">
                   </div>
+                  <div class="col-12">
+                      <label for="email" class="form-label">Email address</label>
+                      <input type="text" id="phone" formControlName="email" class="form-control" placeholder="e.g., customer@gmail.com">
+                  </div>
+
                   <div class="col-12 mt-4 d-flex justify-content-between">
                       <button type="button" class="btn btn-sm btn-outline-secondary" (click)="skipCustomer()">
                           Skip Customer & Continue <i class="bi bi-arrow-right"></i>
