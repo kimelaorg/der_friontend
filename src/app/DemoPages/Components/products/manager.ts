@@ -6,6 +6,17 @@ export interface Slide {
   imgClass: string; // Used for custom background styling
 }
 
+
+export interface ProImage {
+  id: number;
+  productName: string;
+  productDescription: string;
+  productDiscountedPrice: number;
+  productActualPrice: number;
+  images: string[];
+}
+
+
 export interface BaseItem {
     id: number;
     product: number; // ProductSpecification ID
@@ -89,8 +100,8 @@ export interface ProductSpecification {
     brand: number;
     resolution: number;
     panel_type: number;
-    original_price: number;
-    sale_price: number;
+    actual_price: number;
+    discounted_price: number;
     color: string | null;
     smart_features: boolean;
     supported_internet_services: number[]; // PrimaryKeyRelatedField (M2M IDs)

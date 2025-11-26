@@ -144,8 +144,8 @@
                 </td>
                 <td class="text-center"><a [routerLink]="">{{ lookupBrandName(specification.brand) }}</a></td>
                 <td class="text-center text-muted" style="width: 80px;">{{ specification.model }}</td>
-                <td class="text-center text-muted" style="width: 80px;">{{ specification.original_price }}</td>
-                <td class="text-center text-muted" style="width: 80px;">{{ specification.sale_price }}</td>
+                <td class="text-center text-muted" style="width: 80px;">{{ specification.actual_price }}</td>
+                <td class="text-center text-muted" style="width: 80px;">{{ specification.discounted_price }}</td>
                 <td class="text-center text-muted" style="width: 80px;">{{ specification.color }}</td>
                 <td class="text-center text-muted" style="width: 80px;">{{ lookupSizeName(specification.screen_size) }}</td>
                 <td class="text-center text-muted" style="width: 80px;">{{ lookupResolutionName(specification.resolution) }}</td>
@@ -166,68 +166,9 @@
         </div>
         <div class="tab-pane fade" id="just-tab3" role="tabpanel" aria-labelledby="just-tab3-tab">
 
-
-            <div class="table-responsive">
-                <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th class="text-justify">Product</th>
-                      <th class="text-center">Media</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>001</td>
-                      <td class="text-justify">Here we gooo</td>
-                      <td class="text-center">
-
-                        <section class="slideshow-section">
-                          <div class="slideshow-container">
-                            @for (slide of slides(); track $index) {
-                              <div class="slide-item" [class]="slide.imgClass" [class.active]="currentSlide() === $index">
-                                <div class="slide-content">
-                                  <h2 class="slide-subtitle">{{ slide.subtitle }}</h2>
-                                  <h1 class="slide-title">{{ slide.title }}</h1>
-                                  <a [href]="slide.link" class="slide-cta-button">{{ slide.cta }}</a>
-                                </div>
-                              </div>
-                            }
-
-                            <!-- Slider Controls -->
-                            <button (click)="prevSlide()" class="slide-control prev-control" aria-label="Previous Slide">
-                              <svg class="icon-24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                            </button>
-                            <button (click)="nextSlide()" class="slide-control next-control" aria-label="Next Slide">
-                              <svg class="icon-24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                            </button>
-
-                            <!-- Slide Indicators -->
-                            <div class="slide-indicators">
-                              @for (slide of slides(); track $index) {
-                                <button (click)="setCurrentSlide($index)" [class.active]="currentSlide() === $index"
-                                        class="indicator-dot" [attr.aria-label]="'Go to slide ' + ($index + 1)"></button>
-                              }
-                            </div>
-                          </div>
-                        </section>
-
-                        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                          <button type="button" class="btn btn-danger">Left</button>
-                          <button type="button" class="btn btn-warning">Middle</button>
-                          <button type="button" class="btn btn-success">Right</button>
-                        </div>
-
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>002</td>
-                      <td class="text-justify">Here we gooo</td>
-                      <td class="text-center">Boom Boom</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+            <div class="mt-4">
+              <app-product-image/>
+            </div>
 
         </div>
       </div>
@@ -346,8 +287,8 @@
                 <input type="hidden" formControlName="id">
 
                 <div class="col-md-6 mb-3">
-                    <label for="sku" class="form-label">Model number</label>
-                    <input id="sku" type="text" formControlName="model" class="form-control"
+                    <label for="model" class="form-label">Model number</label>
+                    <input id="model" type="text" formControlName="model" class="form-control"
                         [class.is-invalid]="specForm.get('model')?.invalid && specForm.get('model')?.touched">
                     <div class="invalid-feedback" *ngIf="specForm.get('model')?.errors?.['required']">Model number is required.</div>
                     <div class="invalid-feedback" *ngIf="specForm.get('model')?.errors?.['serverError']">
@@ -363,39 +304,35 @@
             <div class="row">
               <div class="col-md-4 mb-3">
                   <label for="brand" class="form-label">Brand</label>
-                  <select id="brand" formControlName="brand" class="form-select"
-                          [class.is-invalid]="specForm.get('brand')?.invalid && specForm.get('brand')?.touched">
+                  <select id="brand" formControlName="brand" class="form-select">
                       <option [ngValue]="null">Select Brand</option>
                       <option *ngFor="let brand of brands()" [ngValue]="brand.id">{{ brand.name }}</option>
                   </select>
-                  <div class="invalid-feedback" *ngIf="specForm.get('brand')?.errors?.['required']">Brand is required.</div>
+                  <!-- <div class="invalid-feedback" *ngIf="specForm.get('brand')?.errors?.['required']">Brand is required.</div> -->
               </div>
                 <div class="col-md-4 mb-3">
                     <label for="screen_size" class="form-label">Screen Size</label>
-                    <select id="screen_size" formControlName="screen_size" class="form-select"
-                        [class.is-invalid]="specForm.get('screen_size')?.invalid && specForm.get('screen_size')?.touched">
+                    <select id="screen_size" formControlName="screen_size" class="form-select">
                         <option [ngValue]="null">Select Size</option>
                         <option *ngFor="let size of screenSizes()" [ngValue]="size.id">{{ size.name }}</option>
                     </select>
-                    <div class="invalid-feedback" *ngIf="specForm.get('screen_size')?.errors?.['required']">Required.</div>
+                    <!-- <div class="invalid-feedback" *ngIf="specForm.get('screen_size')?.errors?.['required']">Required.</div> -->
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="resolution" class="form-label">Resolution</label>
-                    <select id="resolution" formControlName="resolution" class="form-select"
-                        [class.is-invalid]="specForm.get('resolution')?.invalid && specForm.get('resolution')?.touched">
+                    <select id="resolution" formControlName="resolution" class="form-select">
                         <option [ngValue]="null">Select Resolution</option>
                         <option *ngFor="let res of resolutions()" [ngValue]="res.id">{{ res.name }}</option>
                     </select>
-                    <div class="invalid-feedback" *ngIf="specForm.get('resolution')?.errors?.['required']">Required.</div>
+                    <!-- <div class="invalid-feedback" *ngIf="specForm.get('resolution')?.errors?.['required']">Required.</div> -->
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="panel_type" class="form-label">Panel Type</label>
-                    <select id="panel_type" formControlName="panel_type" class="form-select"
-                        [class.is-invalid]="specForm.get('panel_type')?.invalid && specForm.get('panel_type')?.touched">
+                    <select id="panel_type" formControlName="panel_type" class="form-select">
                         <option [ngValue]="null">Select Panel</option>
                         <option *ngFor="let panel of panelTypes()" [ngValue]="panel.id">{{ panel.name }}</option>
                     </select>
-                    <div class="invalid-feedback" *ngIf="specForm.get('panel_type')?.errors?.['required']">Required.</div>
+                    <!-- <div class="invalid-feedback" *ngIf="specForm.get('panel_type')?.errors?.['required']">Required.</div> -->
                 </div>
             </div>
 

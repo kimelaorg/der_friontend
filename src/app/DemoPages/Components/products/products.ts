@@ -9,9 +9,9 @@ import { faStar, faPlus, faEdit, faTrash, IconDefinition } from '@fortawesome/fr
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ActionButton } from '../../../Layout/Components/page-title/page-title.component';
 import {
-    ProductImage, ProductVideo, ConnectivityItem, ElectricalSpecs, ConnectivityPayload,
+    ProductVideo, ConnectivityItem, ElectricalSpecs, ConnectivityPayload,
     BaseSetupItem, Brand, ProductCategory, ScreenSize, SupportedResolution, PanelType, Connectivity,
-    SupportedInternetService, ElectricalSpecification, DigitalProduct, ProductSpecification, Product, Slide
+    SupportedInternetService, ProImage, ElectricalSpecification, DigitalProduct, ProductSpecification, Product, Slide
 } from './manager';
 import { Productspecificationmanager } from './productspecificationmanager';
 
@@ -34,8 +34,8 @@ export interface ElectricalSpecForm {
 
 // NEW INTERFACE for the connectivity FormArray elements
 export interface ConnectivityItemForm extends FormGroup<{
-    connectivity: FormControl<number>; // The ID of the connectivity type
-    connectivity_count: FormControl<number>; // The count/number of ports
+    connectivity: FormControl<number | null>; // The ID of the connectivity type
+    connectivity_count: FormControl<number | null>; // The count/number of ports
 }> {}
 
 export interface ProductSpecForm {
@@ -48,7 +48,7 @@ export interface ProductSpecForm {
     original_price: FormControl<number | null>;
     sale_price: FormControl<number | null>;
     color: FormControl<string | null>;
-    smart_features: FormControl<string>;
+    smart_features: FormControl<string | null>;
 
     // Nested ElectricalSpecification fields
     electrical_specs: FormGroup<ElectricalSpecForm>;
@@ -84,7 +84,6 @@ export class Products implements OnInit {
     private fb = inject(FormBuilder); // Used for FormArray helpers
 
     // Data containers
-    images$: BehaviorSubject<ProductImage[]> = new BehaviorSubject<ProductImage[]>([]);
     videos$: BehaviorSubject<ProductVideo[]> = new BehaviorSubject<ProductVideo[]>([]);
     connectivity$: BehaviorSubject<ConnectivityItem[]> = new BehaviorSubject<ConnectivityItem[]>([]);
     electricalSpecs$: BehaviorSubject<ElectricalSpecs | null> = new BehaviorSubject<ElectricalSpecs | null>(null);
@@ -131,7 +130,8 @@ export class Products implements OnInit {
     screenSizes: WritableSignal<ScreenSize[]> = signal([]);
     resolutions: WritableSignal<SupportedResolution[]> = signal([]);
     panelTypes: WritableSignal<PanelType[]> = signal([]);
-    selectedConnectivities = signal<number[]>([])
+    proimage: WritableSignal<ProImage[]> = signal([]);
+    selectedConnectivities = signal<number[]>([]);
 
     // Product Base Form (Unchanged)
     productForm: FormGroup<ProductBaseForm> = this.formBuilder.group({
@@ -145,15 +145,15 @@ export class Products implements OnInit {
     specForm: FormGroup<any> = this.formBuilder.group({ // Use 'any' here for flexibility with FormArray
         id: [null as number | null],
         model: ['', [Validators.required, Validators.maxLength(255)]],
-        screen_size: [null as number | null, [Validators.required]],
-        resolution: [null as number | null, [Validators.required]],
-        panel_type: [null as number | null, [Validators.required]],
+        screen_size: [null as string | null],
+        resolution: [null as string | null],
+        panel_type: [null as string | null],
         // NOTE: Keeping as Number in form but converting to String in payload if required by API
         original_price: [null as number | null, [Validators.required, Validators.min(0)]],
         sale_price: [null as number | null, [Validators.required, Validators.min(0)]],
         color: [null as string | null],
-        brand: [null as number | null, [Validators.required]],
-        smart_features: ['false', [Validators.required]],
+        brand: [null as string | null],
+        smart_features: ['false'],
 
         // Electrical Specs (Optional fields)
         electrical_specs: this.formBuilder.group({
@@ -249,9 +249,7 @@ export class Products implements OnInit {
     // --- Data Loading and Tab Navigation ---
     loadData(tab: string): void {
         switch (tab) {
-            case 'images':
-                this.specService.getImages(this.productId).subscribe(data => this.images$.next(data));
-                break;
+
             case 'videos':
                 this.specService.getVideos(this.productId).subscribe(data => this.videos$.next(data));
                 break;
@@ -416,7 +414,7 @@ export class Products implements OnInit {
         const resolutions$ = this.http.get<SupportedResolution[]>(`${this.setupUrl}/resolutions/`);
         const panels$ = this.http.get<PanelType[]>(`${this.setupUrl}/panel-types/`);
         const internetServices$ = this.http.get<SupportedInternetService[]>(`${this.setupUrl}/internet-services/`);
-        const connectivities$ = this.http.get<BaseSetupItem[]>(`${this.setupUrl}/connectivity/`); // NEW setup data load
+        const connectivities$ = this.http.get<BaseSetupItem[]>(`${this.setupUrl}/connectivity/`);
 
         forkJoin({
             products: products$,
@@ -427,7 +425,7 @@ export class Products implements OnInit {
             resolutions: resolutions$,
             panelTypes: panels$,
             internetServices: internetServices$,
-            connectivities: connectivities$, // NEW: Add connectivity setup data
+            connectivities: connectivities$,
         })
         .pipe(
             finalize(() => this.isLoading.set(false))
@@ -442,7 +440,7 @@ export class Products implements OnInit {
                 this.resolutions.set(results.resolutions);
                 this.panelTypes.set(results.panelTypes);
                 this.availableInternetServices.set(results.internetServices);
-                this.availableConnectivities.set(results.connectivities); // NEW: Set connectivity setup data
+                this.availableConnectivities.set(results.connectivities);
             },
             error: (err) => {
                 this.message.set('Failed to load initial data.');
@@ -663,8 +661,8 @@ export class Products implements OnInit {
             resolution: specData.resolution,
             panel_type: specData.panel_type,
             // NOTE: Assuming prices in specData are numbers or strings convertible to number
-            original_price: Number(specData.original_price),
-            sale_price: Number(specData.sale_price),
+            actual_price: Number(specData.actual_price),
+            discounted_price: Number(specData.discounted_price),
             color: specData.color,
             brand: specData.brand,
             smart_features: String(specData.smart_features),
@@ -870,47 +868,6 @@ export class Products implements OnInit {
     }
 
 
-
-    // SLide show in madia section
-    slides = signal<Slide[]>([
-      { title: 'The Future of Sound', subtitle: 'New Audio Series - Up to 40% Off.', cta: 'Shop Now', link: '/sale/audio', imgClass: 'slide-1' },
-      { title: 'Big Screen, Bigger Deals', subtitle: '4K QLED TVs starting at $499.', cta: 'Explore TVs', link: '/shop/tvs', imgClass: 'slide-2' },
-      { title: 'Smart Home Essentials', subtitle: 'Control your life with our automation kits.', cta: 'See Kits', link: '/shop/smarthome', imgClass: 'slide-3' },
-    ]);
-    currentSlide = signal(0);
-    private slideInterval: any;
-
-
-    startSlideshow(): void {
-      this.slideInterval = setInterval(() => {
-        this.nextSlide();
-      }, 5000); // Change slide every 5 seconds
-    }
-
-    resetSlideshowTimer(): void {
-      clearInterval(this.slideInterval);
-      this.startSlideshow();
-    }
-
-    nextSlide(): void {
-      this.currentSlide.update(current =>
-        (current + 1) % this.slides().length
-      );
-      this.resetSlideshowTimer();
-    }
-
-    prevSlide(): void {
-      this.currentSlide.update(current =>
-        (current - 1 + this.slides().length) % this.slides().length
-      );
-      this.resetSlideshowTimer();
-    }
-
-    setCurrentSlide(index: number): void {
-      this.currentSlide.set(index);
-      this.resetSlideshowTimer();
-    }
-
     actionButtons: ActionButton[] = [
         {
             text: 'Create New Product',
@@ -919,4 +876,5 @@ export class Products implements OnInit {
             onClick: this.handleCreateModal
         }
     ];
+
 }

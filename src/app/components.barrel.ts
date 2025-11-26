@@ -24,7 +24,6 @@ export { Cartegories } from './DemoPages/Components/cartegories/cartegories';
 export { Specifications } from './DemoPages/Components/specifications/specifications';
 export { Expenses } from './DemoPages/Components/expenses/expenses';
 export { Savings } from './DemoPages/Components/savings/savings';
-export { Home } from './DemoPages/Components/home/home';
 
 // Components
 export { AccordionsComponent } from './DemoPages/Components/accordions/accordions.component';
@@ -57,9 +56,20 @@ export { Otp } from './DemoPages/UserPages/otp/otp';
 export { Stock } from './DemoPages/Components/stock/stock';
 export { SalesView } from './DemoPages/Dashboards/sales-view/sales-view';
 export { Trial } from './trial/trial';
-;
+
 export { Wishlists } from './DemoPages/Customer/wishlists/wishlists';
 export { Reviews } from './DemoPages/Customer/reviews/reviews';
 export { Purchased } from './DemoPages/Customer/purchased/purchased';
 export { Orders } from './DemoPages/Customer/orders/orders';
 export { Profile } from './DemoPages/Customer/profile/profile';
+export { Me } from './DemoPages/Customer/me/me';
+export { Screens } from './DemoPages/Welcome/screens/screens';
+export { Software } from './DemoPages/Welcome/software/software';
+export { Deals } from './DemoPages/Welcome/deals/deals';
+export { Search } from './DemoPages/Welcome/search/search';
+export { Motherboards } from './DemoPages/Welcome/motherboards/motherboards';
+export { TCoins } from './DemoPages/Welcome/t-coins/t-coins';
+export { Accessories } from './DemoPages/Welcome/accessories/accessories';
+export { Home } from './DemoPages/Welcome/home/home';
+export { SearchSpecific } from './DemoPages/Welcome/search-specific/search-specific';
+export { Test } from './test/test';

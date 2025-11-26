@@ -18,11 +18,11 @@ export class Navigation {
         if (path.includes('/users')) return { key: 'adminMenu', title: 'User Managements', icon: 'pe-7s-config' };
         if (path.startsWith('/reports') || path.includes('/transactions') || path.includes('/dashboards/reports')) return { key: 'reportsMenu', title: 'Reporting & Analytics', icon: 'pe-7s-graph' };
         if (path.startsWith('/finance') || path.includes('/pnl')) return { key: 'financeMenu', title: 'Financial Management', icon: 'pe-7s-cash' };
-        if (path.startsWith('/sales') || path.includes('/discounts&offers') || path.startsWith('/dashboards/orders') || path.includes('/sales') || path.includes('/view-sales')) return { key: 'salesMenu', title: 'Sales & Orders', icon: 'pe-7s-shopbag' };
+        if (path.startsWith('/sales') || path.includes('/discounts&offers') || path.includes('/dashboards/orders') || path.includes('/sales') || path.includes('/view-sales')) return { key: 'salesMenu', title: 'Sales & Orders', icon: 'pe-7s-shopbag' };
         if (path.includes('/products') || path.includes('/stock') || path.includes('/inventory') || path.includes('/inventory') || path.includes('/suppliers') || path.includes('/dashboards/purchasing')) return { key: 'inventoryMenu', title: 'Inventory & Supply', icon: 'pe-7s-box2' };
         if (path.startsWith('/service')) return { key: 'serviceMenu', title: 'Service Desk', icon: 'pe-7s-tools' };
         if (path.startsWith('/content')) return { key: 'contentMenu', title: 'Content Management', icon: 'pe-7s-video' };
-        if (path.startsWith('/dashboards/orders&Tracking')) return { key: 'contentMenu', title: 'My Orders', icon: 'pe-7s-shopbag' };
+        // if (path.startsWith('/dashboards/orders&Tracking')) return { key: 'contentMenu', title: 'My Orders', icon: 'pe-7s-shopbag' };
         if (path.startsWith('/my')) return { key: 'profileMenu', title: 'My data', icon: 'pe-7s-user' };
         if (path.includes('/expenses') || path.includes('/savings')) return { key: 'profileMenu', title: 'Expenses & Savings', icon: 'pe-7s-wallet' };
 

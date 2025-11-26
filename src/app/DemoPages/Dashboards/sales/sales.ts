@@ -1,8 +1,8 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { debounceTime, switchMap, catchError, finalize, tap } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { debounceTime, switchMap, catchError, finalize, tap, map } from 'rxjs/operators';
 
 
 // --- API Endpoints ---
@@ -36,9 +36,9 @@ interface CartItem {
 }
 
 interface CustomerData {
-  firstName: string;
-  lastName: string;
-  phone: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
   email: string;
 }
 
@@ -90,10 +90,10 @@ export class Sales implements OnInit {
 
   initializeForms(): void {
     this.customerForm = this.fb.group({
-      firstName: ['', Validators.minLength(2)],
-      lastName: ['', Validators.minLength(2)],
-      email: ['', null],
-      phone: ['', [Validators.minLength(8), Validators.maxLength(15)]],
+      first_name: ['', Validators.minLength(2)],
+      last_name: ['', Validators.minLength(2)],
+      email: ['', Validators.minLength(2)],
+      phone_number: ['', [Validators.minLength(8), Validators.maxLength(15)]],
     });
 
     this.salesForm = this.fb.group({
@@ -111,7 +111,7 @@ export class Sales implements OnInit {
 
   submitNewCustomer(): void {
     const customerData = this.customerForm.value;
-    const isFilled = customerData.firstName || customerData.lastName || customerData.phone;
+    const isFilled = customerData.first_name || customerData.last_name || customerData.phone_number || customerData.email;
 
     if (isFilled && this.customerForm.valid) {
       this.nextStage();
@@ -221,66 +221,80 @@ export class Sales implements OnInit {
 
   // --- Stage 4: Execution (Delayed API Calls) ---
 
-    private createCustomerIfNecessary(): Observable<string | null> {
-        const customerData = this.customerForm.value;
-        // Check if the user filled in ANY customer field
-        const customerFilled = customerData.firstName || customerData.lastName || customerData.phone;
+  private createCustomerIfNecessary(): Observable<string | null> {
+    const customerData = this.customerForm.value;
+    const customerFilled = customerData.first_name || customerData.last_name || customerData.phone_number || customerData.email;
 
-        if (!customerFilled || this.customerForm.invalid) {
-            // Customer intentionally skipped or form data is incomplete/invalid. Proceed anonymously.
-            return of(null);
-        }
-
-        // This POST request handles both finding the customer by phone_number
-        // or creating them if they don't exist (as per the corrected Django view).
-        return this.http.post<{ id: string }>(CUSTOMER_CREATE_API, customerData)
-            .pipe(
-                tap(response => console.log('Customer Retrieved/Created ID:', response.id)),
-                // CRITICAL: Ensure we return the ID as a STRING
-                switchMap(response => of(response.id)),
-                catchError(err => {
-                    console.error('Customer lookup/creation failed:', err);
-                    // Clear any temporary customer ID and allow the sale to continue anonymously.
-                    const errorMsg = err.error?.message || JSON.stringify(err.error) || 'Failed to process customer. Sale will proceed anonymously.';
-                    this.errorMessage.set(errorMsg);
-                    return of(null);
-                })
-            );
+    if (!customerFilled || this.customerForm.invalid) {
+        return of(null);
     }
 
-    private buildPayload(customerId: string | null): any {
+    return this.http.post<{ id: string }>(CUSTOMER_CREATE_API, customerData)
+        .pipe(
+            tap(response => console.log('Customer Retrieved/Created ID:', response.id)),
 
-        const paymentData = this.paymentForm.value;
+            // --- FIX: Use 'map' to transform the response object to the ID string ---
+            map(response => response.id),
+            // -----------------------------------------------------------------------
 
-        if (this.cartItems().length === 0) {
-            throw new Error("Cannot build payload: Cart is empty.");
-        }
+            // Note: The catchError logic below should use throwError to halt the process,
+            // as you previously requested. I've used the corrected version here.
+            catchError(err => {
+                console.error('Customer lookup/creation failed:', err);
 
-        const itemsPayload = this.cartItems().map(item => ({
-            // These fields are correctly named for the backend:
-            product_specification_id: item.product_specification_id,
-            quantity: item.quantity,
-            unit_price: item.unit_price,
-            unit_measure: item.unit_measure,
-        }));
+                const backendError = err.error;
+                let errorMsg = 'Failed to process customer.';
 
-        const finalPayload = {
+                if (typeof backendError === 'object' && backendError !== null) {
+                    const firstKey = Object.keys(backendError)[0];
+                    if (firstKey && Array.isArray(backendError[firstKey])) {
+                        errorMsg = `${firstKey}: ${backendError[firstKey].join(', ')}`;
+                    } else {
+                        errorMsg = JSON.stringify(backendError);
+                    }
+                } else if (err.message) {
+                    errorMsg = err.message;
+                }
 
-            customer_id: customerId,
-            sales_outlet: null,
-            payment_method: paymentData.payment_method,
-            payment_status: paymentData.payment_status,
-            items: itemsPayload
-        };
+                this.errorMessage.set(errorMsg);
+                return throwError(() => new Error(errorMsg));
+            })
+        );
+}
 
-        console.log('FINAL PAYLOAD TO SALES API:', finalPayload);
+  private buildPayload(customer_id: string | null): any {
 
-        return finalPayload;
-    }
+      const paymentData = this.paymentForm.value;
 
-  private postSaleRecord(customerId: string | null): Observable<any> {
+      if (this.cartItems().length === 0) {
+          throw new Error("Cannot build payload: Cart is empty.");
+      }
+
+      const itemsPayload = this.cartItems().map(item => ({
+          // These fields are correctly named for the backend:
+          product_specification_id: item.product_specification_id,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          unit_measure: item.unit_measure,
+      }));
+
+      const finalPayload = {
+
+          customer_id: customer_id,
+          sales_outlet: null,
+          payment_method: paymentData.payment_method,
+          payment_status: paymentData.payment_status,
+          items: itemsPayload
+      };
+
+      console.log('FINAL PAYLOAD TO SALES API:', finalPayload);
+
+      return finalPayload;
+  }
+
+  private postSaleRecord(customer_id: string | null): Observable<any> {
       try {
-          const payload = this.buildPayload(customerId);
+          const payload = this.buildPayload(customer_id);
           return this.http.post<any>(SALES_RECORD_API, payload);
       } catch (e: any) {
           this.errorMessage.set(e.message);
@@ -289,61 +303,68 @@ export class Sales implements OnInit {
   }
 
   completeSale(): void {
-    // === FIX: Guard clause to prevent duplicate submissions (race condition) ===
-    if (this.submissionLoading()) {
-        console.warn('Sale submission already in progress. Ignoring duplicate click.');
-        return;
-    }
-    // ===============================================
+      // === FIX: Guard clause to prevent duplicate submissions (race condition) ===
+      if (this.submissionLoading()) {
+          console.warn('Sale submission already in progress. Ignoring duplicate click.');
+          return;
+      }
+      // ===============================================
 
-    if (this.cartItems().length === 0) {
-      this.errorMessage.set("Cannot complete sale: The cart is empty.");
-      this.currentStage.set(2);
-      return;
-    }
-    if (this.paymentForm.invalid) {
-      this.errorMessage.set("Cannot complete sale: Payment details are incomplete.");
-      this.paymentForm.markAllAsTouched();
-      this.currentStage.set(3);
-      return;
-    }
+      if (this.cartItems().length === 0) {
+          this.errorMessage.set("Cannot complete sale: The cart is empty.");
+          this.currentStage.set(2);
+          return;
+      }
+      if (this.paymentForm.invalid) {
+          this.errorMessage.set("Cannot complete sale: Payment details are incomplete.");
+          this.paymentForm.markAllAsTouched();
+          this.currentStage.set(3);
+          return;
+      }
 
-    this.submissionLoading.set(true);
-    this.successMessage.set(null);
-    this.errorMessage.set(null);
+      this.submissionLoading.set(true);
+      this.successMessage.set(null);
+      this.errorMessage.set(null);
 
-    this.createCustomerIfNecessary()
-      .pipe(
-        switchMap(customerId => {
-          this.backendCustomerId.set(customerId);
-          return this.postSaleRecord(customerId);
-        }),
-        finalize(() => this.submissionLoading.set(false)),
-        catchError(err => {
-            console.error('Sale Submission Failed:', err);
+      this.createCustomerIfNecessary()
+          .pipe(
+              switchMap(customer_id => {
+                  // This block is skipped if createCustomerIfNecessary threw an error
+                  this.backendCustomerId.set(customer_id);
+                  return this.postSaleRecord(customer_id);
+              }),
+              finalize(() => this.submissionLoading.set(false)),
+              catchError(err => {
+                  console.error('Sale Submission Failed (or Customer Step Error):', err);
 
-            let apiErrorMessage = 'Server error'; // Default error message
+                  // If the error came from createCustomerIfNecessary, the error message is already set.
+                  // If the error came from postSaleRecord:
+                  if (!this.errorMessage()) {
+                      let apiErrorMessage = 'Server error during sale record.';
 
-            // Check if err.error is a valid object and has an 'items' array
-            if (err.error && err.error.items && err.error.items.length > 0) {
-                // Extract the specific error string from the first item in the array
-                apiErrorMessage = err.error.items[0];
-            } else if (err.error) {
-                // Fallback for other potential errors in err.error
-                apiErrorMessage = JSON.stringify(err.error);
-            }
+                      // Check if err.error is a valid object and has an 'items' array
+                      if (err.error && err.error.items && err.error.items.length > 0) {
+                          // Extract the specific error string from the first item in the array
+                          apiErrorMessage = err.error.items[0];
+                      } else if (err.error) {
+                          // Fallback for other potential errors in err.error
+                          apiErrorMessage = JSON.stringify(err.error);
+                      }
+                      this.errorMessage.set(apiErrorMessage);
+                  }
 
-            this.errorMessage.set(`${apiErrorMessage}`);
-            return of(null);
-        })
-      )
-      .subscribe(response => {
-        if (response) {
-          const transactionId = response.id || 'N/A';
-          this.successMessage.set(transactionId);
-          this.resetComponent();
-        }
-      });
+                  // Ensures the Observable chain terminates gracefully without a response
+                  return of(null);
+              })
+          )
+          .subscribe(response => {
+              if (response) {
+                  const transactionId = response.id || 'N/A';
+                  this.successMessage.set(transactionId);
+                  this.resetComponent();
+              }
+              // No need for an else block here, as the catchError handles the display of the error
+          });
   }
 
   // --- Navigation/Utility ---

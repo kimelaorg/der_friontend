@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {  BaseItem, ProductImage, ProductVideo, ConnectivityItem, ElectricalSpecs, ConnectivityPayload} from "./manager";
+import {  BaseItem, ProImage, ProductImage, ProductVideo, ConnectivityItem, ElectricalSpecs, ConnectivityPayload} from "./manager";
 
 @Injectable({
   providedIn: 'root',
@@ -29,8 +29,8 @@ export class Productspecificationmanager {
 
     // --- 1. Product Images CRUD ---
 
-    getImages(productId: number): Observable<ProductImage[]> {
-        return this.http.get<ProductImage[]>(`${this.apiUrl}/images/`);
+    getImages(productId: number): Observable<ProImage[]> {
+        return this.http.get<ProImage[]>(`${this.apiUrl}/images/`);
     }
 
     createImage(productId: number, data: ProductImage, file: File): Observable<ProductImage> {

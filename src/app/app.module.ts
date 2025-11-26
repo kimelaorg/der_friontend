@@ -113,7 +113,7 @@ import { roleGuard } from './DemoPages/UserPages/login-boxed/guard/role-guard';
   providers: [
     ConfigService,
     ThemeOptions,
-    
+
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthenticationInterceptor,

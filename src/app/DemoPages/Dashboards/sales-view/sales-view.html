@@ -1,1 +1,132 @@
 <app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon"></app-page-title>
+
+  <h2 class="lead">Sales Records ({{ salesRecords.length }} Total)</h2>
+
+  <div class="mb-3 d-flex align-items-center">
+    <label for="salesFilter" class="form-label me-2 fw-bold">Filter Sales By:</label>
+    <select
+      id="salesFilter"
+      class="form-select w-auto"
+      [(ngModel)]="selectedFilter"
+      (change)="onFilterChange()">
+
+      <option value="all">-- Show All Records --</option>
+
+      <optgroup label="Daily Sales">
+        <option value="today" selected>Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="day-before-yesterday">Day Before Yesterday</option>
+      </optgroup>
+
+      <optgroup label="Weekly Sales">
+        <option value="current-week">Current Week</option>
+      </optgroup>
+
+      <optgroup label="Monthly Sales">
+        <option value="current-month">Current Month</option>
+      </optgroup>
+
+    </select>
+  </div>
+  <div *ngIf="salesRecords.length === 0" class="alert alert-warning" role="alert">
+    No sales records found for the selected filter ({{ selectedFilter | titlecase }}).
+  </div>
+
+  <div class="table-responsive">
+    <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Sale Date</th>
+          <th>Customer</th>
+          <th>Agent</th>
+          <th>Total Items</th>
+          <th>Total Amount</th>
+          <th>Payment Status</th>
+          <th>Payment method</th>
+          <th>Details</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let record of salesRecords; let i = index">
+          <tr>
+            <td>{{ i + 1  }}</td>
+            <td>{{ record.sale_date | date:'MMM d, y h:mm a' }}</td>
+            <td>
+                @if(record.customer){
+                  {{ record.customer.first_name | titlecase}} {{ record.customer.last_name | titlecase }}
+                }@else{
+                  N/A
+                }
+            </td>
+            <td>{{ record.sales_agent_name }}</td>
+            <td>{{ record.items.length }}</td>
+            <td>
+              {{ record.total_amount | currency: 'TZS': 'symbol' }}
+            </td>
+            <td>
+              <span
+                [class]="{
+                  'badge': true,
+                  'bg-success': record.status === 'COMPLETED',
+                  'bg-warning': record.status === 'PENDING',
+                  'bg-danger': record.status !== 'COMPLETED' && record.status !== 'PENDING'
+                }">
+
+                {{ record.status === 'COMPLETED' ? 'PAID' : 'Not Paid' }}
+              </span>
+            </td>
+            <td>
+              {{ record.payment_method === 'MOMO' ? 'Mobile Money' : record.payment_method }}
+            <td>
+              <button
+                class="btn btn-sm btn-outline-info"
+                type="button"
+                data-bs-toggle="collapse"
+                [attr.data-bs-target]="'#details-' + i"
+                aria-expanded="false"
+                [attr.aria-controls]="'details-' + i">
+                Items ({{ record.items.length }})
+              </button>
+            </td>
+            <td>
+              <button type="button" class="btn btn-sm btn-secondary" name="button">Edit</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="8" class="p-0 border-0">
+              <div class="collapse" [id]="'details-' + i">
+                <div class="card card-body bg-light m-2">
+                  <h5>Items in Sale #{{ record.id }} ({{ record.items.length }})</h5>
+                  <table class="table table-sm table-bordered mb-0 bg-white">
+                    <thead>
+                      <tr>
+                        <th>Product Name</th>
+                        <th>SKU</th>
+                        <th>Model No.</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Line Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of record.items">
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.product_sku }}</td>
+                        <td>{{ item.model }}</td>
+                        <td>{{ item.quantity }} {{ item.unit_measure }}</td>
+                        <td>{{ item.unit_price | currency: 'TZS': 'symbol' }}</td>
+                        <td>{{ (item.quantity * (+item.unit_price)) | currency: 'TZS': 'symbol' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>

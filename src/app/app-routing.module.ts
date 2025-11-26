@@ -144,6 +144,7 @@ import { authenticityGuard } from './DemoPages/UserPages/login-boxed/guard/authe
 
 import { BaseLayoutComponent } from './Layout/base-layout/base-layout.component';
 import { PagesLayoutComponent } from './Layout/pages-layout/pages-layout.component';
+import { specificIdResolver } from './DemoPages/Welcome/search/specific-id-resolver';
 
 // ... (other imports remain the same) ...
 import {
@@ -182,7 +183,16 @@ import {
     Purchased,
     Orders,
     Profile,
+    Screens,
+    Software,
+    Deals,
+    Motherboards,
+    TCoins,
+    Accessories,
+    Search,
+    SearchSpecific,
     Trial,
+    Test
 } from './components.barrel';
 
 
@@ -199,7 +209,16 @@ const routes: Routes = [
             { path: 'account/register', component: RegisterBoxedComponent, data: { extraParameter: '' } },
             { path: 'account/forgot-password', component: ForgotPasswordBoxedComponent, data: { extraParameter: '' } },
             { path: 'account/otp', component: Otp, data: { extraParameter: '' } },
+            { path: 'motherboards', component: Motherboards, data: { extraParameter: '' } },
+            { path: 'screens', component: Screens, data: { extraParameter: '' } },
+            { path: 't-con', component: TCoins, data: { extraParameter: '' } },
+            { path: 'accessories', component: Accessories, data: { extraParameter: '' } },
+            { path: 'software', component: Software, data: { extraParameter: '' } },
+            { path: 'deals', component: Deals, data: { extraParameter: '' } },
             { path: 'trial', component: Trial, data: { extraParameter: '' } },
+            { path: 'test', component: Test, data: { extraParameter: '' } },
+            { path: 'search', component: Search, data: { extraParameter: '' } },
+            { path: 'product/:id', component: SearchSpecific, data: { extraParameter: '' }, resolve: {singleItem_resolve: specificIdResolver,}},
             { path: 'components/modals', component: ModalsComponent, data: { extraParameter: 'componentsMenu' } },
         ]
     },

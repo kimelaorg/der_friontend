@@ -21,9 +21,21 @@ import { Cartegories } from './DemoPages/Components/cartegories/cartegories';
 import { Specifications } from './DemoPages/Components/specifications/specifications';
 import { Savings } from './DemoPages/Components/savings/savings';
 import { Expenses } from './DemoPages/Components/expenses/expenses';
-import { Home } from './DemoPages/Components/home/home';
+import { Home } from './DemoPages/Welcome/home/home';
 import { Trial } from './trial/trial';
 import { Stock } from './DemoPages/Components/stock/stock';
+import { Screens } from './DemoPages/Welcome/screens/screens';
+import { Software } from './DemoPages/Welcome/software/software';
+import { Deals } from './DemoPages/Welcome/deals/deals';
+import { Search } from './DemoPages/Welcome/search/search';
+import { Motherboards } from './DemoPages/Welcome/motherboards/motherboards';
+import { TCoins } from './DemoPages/Welcome/t-coins/t-coins';
+import { Accessories } from './DemoPages/Welcome/accessories/accessories';
+import { Layout } from './DemoPages/Welcome/layout/layout';
+import { Base } from './DemoPages/Welcome/base/base';
+import { SearchSpecific } from './DemoPages/Welcome/search-specific/search-specific';
+import { Test } from './test/test';
+import { ProductImage } from './DemoPages/Components/products/product-image/product-image';
 
 @NgModule({
   declarations: [
@@ -45,6 +57,18 @@ import { Stock } from './DemoPages/Components/stock/stock';
     Home,
     Trial,
     Stock,
+    Screens,
+    Software,
+    Deals,
+    Search,
+    Motherboards,
+    TCoins,
+    Accessories,
+    Layout,
+    Base,
+    SearchSpecific,
+    Test,
+    ProductImage,
   ],
   imports: [
     SharedModule,

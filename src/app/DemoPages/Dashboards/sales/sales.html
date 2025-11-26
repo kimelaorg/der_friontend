@@ -25,15 +25,15 @@
               <form [formGroup]="customerForm" (ngSubmit)="submitNewCustomer()" class="row g-3">
                   <div class="col-md-6">
                       <label for="firstName" class="form-label">First Name</label>
-                      <input type="text" id="firstName" formControlName="firstName" class="form-control" placeholder="kidaz">
+                      <input type="text" id="firstName" formControlName="first_name" class="form-control" placeholder="kidaz">
                   </div>
                   <div class="col-md-6">
                       <label for="lastName" class="form-label">Last Name</label>
-                      <input type="text" id="lastName" formControlName="lastName" class="form-control" placeholder="boy">
+                      <input type="text" id="lastName" formControlName="last_name" class="form-control" placeholder="boy">
                   </div>
                   <div class="col-12">
                       <label for="phone" class="form-label">Phone number</label>
-                      <input type="text" id="phone" formControlName="phone" class="form-control" placeholder="e.g., 0710203040">
+                      <input type="text" id="phone" formControlName="phone_number" class="form-control" placeholder="e.g., 0710203040">
                   </div>
                   <div class="col-12">
                       <label for="email" class="form-label">Email address</label>
@@ -53,8 +53,8 @@
 
           <div *ngIf="currentStage() === 2">
               <h4 class="card-title text-success mb-4">Add Sales Items ({{ totalItems() }} in cart)</h4>
-              <p *ngIf="customerForm.value.firstName || customerForm.value.lastName || customerForm.value.phone" class="text-success small">Customer details captured locally. Creation pending.</p>
-              <p *ngIf="!customerForm.value.firstName && !customerForm.value.lastName && !customerForm.value.phone" class="text-secondary small">Customer details skipped (will be anonymous sale).</p>
+              <p *ngIf="customerForm.value.first_name || customerForm.value.last_name || customerForm.value.phone_number" class="text-success small">Customer details captured locally. Creation pending.</p>
+              <p *ngIf="!customerForm.value.first_name && !customerForm.value.last_name && !customerForm.value.phone_number" class="text-secondary small">Customer details skipped (will be anonymous sale).</p>
 
               <form [formGroup]="salesForm" class="mb-4">
                   <div class="input-group">
@@ -97,7 +97,7 @@
                                   <input type="number" [value]="item.quantity" (change)="updateItemQuantity(i, $event)" min="1" class="form-control form-control-sm text-center mx-auto" style="width: 70px;">
                               </td>
                               <td class="text-end">{{ item.unit_price | currency: 'TZS': 'symbol'}}</td>
-                              <td class="text-end fw-bold">{{ item.subtotal | number:'1.2-2' }}</td>
+                              <td class="text-end fw-bold">{{ item.subtotal | currency: 'TZS': 'symbol' }}</td>
                               <td class="text-center">
                                   <button (click)="removeItem(i)" class="btn btn-sm btn-outline-danger p-1" aria-label="Remove item">
                                     <i class="fa-solid fa-trash"></i>
@@ -167,17 +167,17 @@
                           <div class="card-header bg-light  lead">Transaction Data</div>
                           <div class="card-body">
                               <dl class="row mb-0">
-                                  <ng-container *ngIf="customerForm.value.firstName || customerForm.value.lastName">
+                                  <ng-container *ngIf="customerForm.value.first_name || customerForm.value.last_name">
                                       <dt class="col-sm-5">Customer Name:</dt>
                                       <dd class="col-sm-7 text-truncate">
-                                          {{ customerForm.value.firstName }} {{ customerForm.value.lastName }}
+                                          {{ customerForm.value.first_name }} {{ customerForm.value.last_name }}
                                       </dd>
                                   </ng-container>
 
-                                  <ng-container *ngIf="customerForm.value.phone">
+                                  <ng-container *ngIf="customerForm.value.phone_number">
                                       <dt class="col-sm-5">Phone Number:</dt>
                                       <dd class="col-sm-7 text-truncate">
-                                          {{ customerForm.value.phone }}
+                                          {{ customerForm.value.phone_number }}
                                       </dd>
                                   </ng-container>
 

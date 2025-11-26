@@ -1,0 +1,46 @@
+<div class="searchBox">
+  <form (submit)="submit($event)">
+    <input
+      [style]="{
+        width: '22rem',
+        overflow: 'hidden',
+        background: 'white',
+        color: 'black'
+      }"
+      type="text"
+      [formControl]="searchControl"
+      (focus)="showInput()"
+      (blur)="hideInput()"
+      #searchInput
+      placeholder="Search desired product"
+    />
+  </form>
+  <i
+    class="bi bi-search searchIcon"
+    (click)="submit($event)"
+    (mousedown)="onMouseDown($event)"
+  ></i>
+  <div
+    class="searchResults"
+    *ngIf="isVisible"
+    (mousedown)="onMouseDown($event)"
+  >
+    <div class="searchResult">
+      @for (item of foundItems; track $index) {
+      <a [routerLink]="['/product', item.id]" (click)="hideInput()">
+        <i class="bi bi-search"></i>
+        <span>
+          {{ item.name }}
+        </span>
+      </a>
+      }@empty {
+      <p class="placeHolderTxt">Nothing found.</p>
+      }
+    </div>
+  </div>
+</div>
+<div
+  class="overlay"
+  *ngIf="isVisible"
+  (click)="isVisible = false; searchService.bottomNavSearch.next(false)"
+></div>

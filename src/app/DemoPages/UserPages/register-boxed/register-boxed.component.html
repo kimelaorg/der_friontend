@@ -74,7 +74,7 @@
                 autocomplete="email"
                 [class.is-invalid]="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)">
               <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="text-danger small mt-1">
-                <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</span>
+                <!-- <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</span> -->
                 <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email.</span>
                 <span *ngIf="registerForm.get('email')?.errors?.['serverError']">{{ registerForm.get('email')?.errors?.['serverError'] }}</span>
               </div>

@@ -4,14 +4,16 @@ import { HttpClient } from "@angular/common/http";
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 
+
 // Define the type interface for the form structure
 interface RegisterForm {
   phone_number: FormControl<string>;
-  email: FormControl<string>;
+  email: FormControl<string | null>;
   first_name: FormControl<string>;
   last_name: FormControl<string>;
   password: FormControl<string>;
 }
+
 
 @Component({
   selector: 'app-register-boxed',
@@ -34,7 +36,7 @@ export class RegisterBoxedComponent implements OnInit {
 
   registerForm: FormGroup<RegisterForm> = this.formBuilder.group({
     phone_number: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', null],
     first_name: ['', [Validators.required]],
     last_name: ['', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(8)]],
