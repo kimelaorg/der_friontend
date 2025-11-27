@@ -63,3 +63,25 @@ export interface InventoryUpdatePayload {
     safety_stock_level?: number;
     location?: number;
 }
+
+
+export interface Product {
+  id: number;
+  name: string;
+  sku: string;
+}
+
+export interface Location {
+  id: number;
+  name: string;
+  warehouse_code: string;
+}
+
+
+export interface InventoryItem {
+  id: number;
+  product: string;
+  quantity_in_stock: number;
+  safety_stock_level: number;
+  location: string;
+}

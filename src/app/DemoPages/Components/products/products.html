@@ -167,7 +167,7 @@
         <div class="tab-pane fade" id="just-tab3" role="tabpanel" aria-labelledby="just-tab3-tab">
 
             <div class="mt-4">
-              <app-product-image/>
+              <app-product-media/>
             </div>
 
         </div>
@@ -338,16 +338,16 @@
 
             <div class="row">
                 <div class="col-md-5 mb-3">
-                    <label for="original_price" class="form-label">Original Price</label>
-                    <input id="original_price" type="number" formControlName="original_price" class="form-control"
-                        [class.is-invalid]="specForm.get('original_price')?.invalid && specForm.get('original_price')?.touched">
-                    <div class="invalid-feedback" *ngIf="specForm.get('original_price')?.errors?.['required']">Required.</div>
+                    <label for="actual_price" class="form-label">Actual Price</label>
+                    <input id="actual_price" type="number" formControlName="actual_price" class="form-control"
+                        [class.is-invalid]="specForm.get('actual_price')?.invalid && specForm.get('actual_price')?.touched">
+                    <div class="invalid-feedback" *ngIf="specForm.get('actual_price')?.errors?.['required']">Required.</div>
                 </div>
                 <div class="col-md-5 mb-3">
-                    <label for="sale_price" class="form-label">Sale Price</label>
-                    <input id="sale_price" type="number" formControlName="sale_price" class="form-control"
-                        [class.is-invalid]="specForm.get('sale_price')?.invalid && specForm.get('sale_price')?.touched">
-                    <div class="invalid-feedback" *ngIf="specForm.get('sale_price')?.errors?.['required']">Required.</div>
+                    <label for="discounted_price" class="form-label">Sale Price</label>
+                    <input id="sale_price" type="number" formControlName="discounted_price" class="form-control"
+                        [class.is-invalid]="specForm.get('discounted_price')?.invalid && specForm.get('discounted_price')?.touched">
+                    <div class="invalid-feedback" *ngIf="specForm.get('discounted_price')?.errors?.['required']">Required.</div>
                 </div>
                 <div class="col-md-2 mb-3">
                     <label class="form-label">Smart?</label>

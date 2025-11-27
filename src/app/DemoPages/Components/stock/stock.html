@@ -1,8 +1,10 @@
-<div class="inventory-manager p-4">
-    <h2 class="mb-4 text-primary">📦 Inventory Management</h2>
+<!-- <app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon"></app-page-title> -->
+<app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon" [actionButtons]="actionButtons"></app-page-title>
 
-    <div class="card mb-5 shadow-sm">
-        <div class="card-header bg-warning text-dark">
+<div class="inventory-manager">
+
+    <div class="card mb-3">
+        <div class="card-header bg-light text-dark">
             <h4 class="mb-0">Manual Stock Adjustment</h4>
             <p class="mb-0"><small>Creates an audit trail (StockMovement) and updates quantity.</small></p>
         </div>
@@ -43,10 +45,10 @@
         </div>
     </div>
 
-    <hr>
+    <!-- <hr> -->
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-info text-white">
+    <div class="card">
+        <div class="card-header bg-light text-dark">
             <h4 class="mb-0">Current Inventory & Settings</h4>
         </div>
         <div class="card-body">
@@ -55,63 +57,66 @@
                 <p class="mt-2">Loading Inventory Data...</p>
             </div>
 
-            <table *ngIf="!loading && inventoryItems.length > 0" class="table table-hover table-sm">
-                <thead>
-                    <tr>
-                        <th>SKU</th>
-                        <th>Product Name</th>
-                        <th>Location</th>
-                        <th>Stock Qty</th>
-                        <th>Safety Stock</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <ng-container *ngFor="let item of inventoryItems">
-                        <tr>
-                            <td>{{ item.sku }}</td>
-                            <td>{{ item.product_name }}</td>
-                            <td>{{ item.location_details?.name }} (ID: {{ item.location }})</td>
-                            <td>
-                                <strong>{{ item.quantity_in_stock }}</strong>
-                            </td>
-                            <td>{{ item.safety_stock_level }}</td>
-                            <td>
-                                <span class="badge" [ngClass]="{'bg-danger': item.is_low_stock, 'bg-success': !item.is_low_stock}">
-                                    {{ item.is_low_stock ? 'LOW STOCK' : 'OK' }}
-                                </span>
-                            </td>
-                            <td>
-                                <button class="btn btn-outline-secondary btn-sm" (click)="selectItemForUpdate(item)">Edit Settings</button>
-                            </td>
-                        </tr>
+            <div class="table-responsive">
+              <table *ngIf="!loading && inventoryItems.length > 0" class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                  <thead>
+                      <tr>
+                          <th>SKU</th>
+                          <th>Product Name</th>
+                          <th>Location</th>
+                          <th>Stock Qty</th>
+                          <th>Safety Stock</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <ng-container *ngFor="let item of inventoryItems">
+                          <tr>
+                              <td>{{ item.sku }}</td>
+                              <td>{{ item.product_name }}</td>
+                              <td>{{ item.location_details?.name }} (ID: {{ item.location }})</td>
+                              <td>
+                                  <strong>{{ item.quantity_in_stock }}</strong>
+                              </td>
+                              <td>{{ item.safety_stock_level }}</td>
+                              <td>
+                                  <span class="badge" [ngClass]="{'bg-danger': item.is_low_stock, 'bg-success': !item.is_low_stock}">
+                                      {{ item.is_low_stock ? 'LOW STOCK' : 'OK' }}
+                                  </span>
+                              </td>
+                              <td>
+                                  <button class="btn btn-outline-secondary btn-sm" (click)="selectItemForUpdate(item)">Edit Settings</button>
+                                  <button class="btn btn-sm btn-info me-2" (click)="openEditModal(item)">Edit</button>
+                              </td>
+                          </tr>
 
-                        <tr *ngIf="selectedInventoryItem?.id === item.id" class="bg-light">
-                            <td colspan="7" class="p-3">
-                                <form [formGroup]="safetyStockForm" (ngSubmit)="updateSafetyStock()" class="d-flex align-items-center">
-                                    <div class="me-4">
-                                        <label class="form-label small mb-0">New Safety Stock:</label>
-                                        <input type="number" formControlName="safety_stock_level" class="form-control form-control-sm w-auto" min="0">
-                                        <div *ngIf="safetyStockForm.get('safety_stock_level')?.invalid && safetyStockForm.get('safety_stock_level')?.touched" class="text-danger small">Must be >= 0.</div>
-                                    </div>
+                          <tr *ngIf="selectedInventoryItem?.id === item.id" class="bg-light">
+                              <td colspan="7" class="p-3">
+                                  <form [formGroup]="safetyStockForm" (ngSubmit)="updateSafetyStock()" class="d-flex align-items-center">
+                                      <div class="me-4">
+                                          <label class="form-label small mb-0">New Safety Stock:</label>
+                                          <input type="number" formControlName="safety_stock_level" class="form-control form-control-sm w-auto" min="0">
+                                          <div *ngIf="safetyStockForm.get('safety_stock_level')?.invalid && safetyStockForm.get('safety_stock_level')?.touched" class="text-danger small">Must be >= 0.</div>
+                                      </div>
 
-                                    <div class="me-4">
-                                        <label class="form-label small mb-0">New Location ID:</label>
-                                        <input type="number" formControlName="location" class="form-control form-control-sm w-auto" placeholder="Location ID">
-                                        <div *ngIf="safetyStockForm.get('location')?.invalid && safetyStockForm.get('location')?.touched" class="text-danger small">Location ID is required.</div>
-                                    </div>
+                                      <div class="me-4">
+                                          <label class="form-label small mb-0">New Location ID:</label>
+                                          <input type="number" formControlName="location" class="form-control form-control-sm w-auto" placeholder="Location ID">
+                                          <div *ngIf="safetyStockForm.get('location')?.invalid && safetyStockForm.get('location')?.touched" class="text-danger small">Location ID is required.</div>
+                                      </div>
 
-                                    <div class="mt-3">
-                                        <button type="submit" class="btn btn-success btn-sm me-2" [disabled]="safetyStockForm.invalid || safetyStockForm.pristine">Save Changes</button>
-                                        <button type="button" class="btn btn-secondary btn-sm" (click)="selectedInventoryItem = null">Cancel</button>
-                                    </div>
-                                </form>
-                            </td>
-                        </tr>
-                    </ng-container>
-                </tbody>
-            </table>
+                                      <div class="mt-3">
+                                          <button type="submit" class="btn btn-success btn-sm me-2" [disabled]="safetyStockForm.invalid || safetyStockForm.pristine">Save Changes</button>
+                                          <button type="button" class="btn btn-secondary btn-sm" (click)="selectedInventoryItem = null">Cancel</button>
+                                      </div>
+                                  </form>
+                              </td>
+                          </tr>
+                      </ng-container>
+                  </tbody>
+              </table>
+            </div>
 
             <div *ngIf="!loading && inventoryItems.length === 0" class="alert alert-info mt-3">
                 No inventory items found.
@@ -119,3 +124,234 @@
         </div>
     </div>
 </div>
+
+
+
+<ng-template #content let-modal>
+
+  <div class="modal-header bg-ligth text-dark">
+    <h4 class="modal-title" id="modal-basic-title">
+      {{ isEditing ? 'Edit Stock (ID: ' + currentItem.id + ')' : 'Add Stock Value' }}
+    </h4>
+    <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <form [formGroup]="inventoryForm" (ngSubmit)="onSubmit()">
+  <div class="modal-body">
+  <div class="row g-3">
+
+    <div class="col-md-6">
+      <label for="product" class="form-label">Product</label>
+      <input
+        type="text" class="form-control"
+        id="product"
+        formControlName="product"
+        placeholder="Start typing product name..."
+        required
+        [ngbTypeahead]="searchProduct"
+        [resultFormatter]="formatter"
+        [inputFormatter]="inputFormatter"
+      >
+      <div *ngIf="inventoryForm.get('product')?.invalid && (inventoryForm.get('product')?.dirty || inventoryForm.get('product')?.touched)" class="text-danger">
+        <div *ngIf="inventoryForm.get('product')?.errors?.['required']">
+          Product is required.
+        </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+      <label for="location" class="form-label">Location</label>
+      <input
+        type="text" class="form-control"
+        id="location"
+        formControlName="location"
+        placeholder="Start typing location..."
+        required
+        [ngbTypeahead]="searchLocation"
+        [resultFormatter]="formatter"
+        [inputFormatter]="inputFormatter"
+      >
+      <div *ngIf="inventoryForm.get('location')?.invalid && (inventoryForm.get('location')?.dirty || inventoryForm.get('location')?.touched)" class="text-danger">
+        <div *ngIf="inventoryForm.get('location')?.errors?.['required']">
+          Location is required.
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label for="quantity_in_stock" class="form-label">Quantity in Stock</label>
+      <input
+        type="number"
+        class="form-control"
+        id="quantity_in_stock"
+        formControlName="quantity_in_stock"
+        required
+        min="0">
+      <div *ngIf="inventoryForm.get('quantity_in_stock')?.invalid && (inventoryForm.get('quantity_in_stock')?.dirty || inventoryForm.get('quantity_in_stock')?.touched)" class="text-danger">
+        <div *ngIf="inventoryForm.get('quantity_in_stock')?.errors?.['required']">
+          Quantity is required.
+        </div>
+        <div *ngIf="inventoryForm.get('quantity_in_stock')?.errors?.['min']">
+          Quantity must be 0 or greater.
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label for="safety_stock_level" class="form-label">Safety Stock Level</label>
+      <input
+        type="number"
+        class="form-control"
+        id="safety_stock_level"
+        formControlName="safety_stock_level"
+        required
+        min="0">
+      <div *ngIf="inventoryForm.get('safety_stock_level')?.invalid && (inventoryForm.get('safety_stock_level')?.dirty || inventoryForm.get('safety_stock_level')?.touched)" class="text-danger">
+        <div *ngIf="inventoryForm.get('safety_stock_level')?.errors?.['required']">
+          Safety Stock Level is required.
+        </div>
+        <div *ngIf="inventoryForm.get('safety_stock_level')?.errors?.['min']">
+          Safety Stock Level must be 0 or greater.
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="modal.dismiss('Cancel click')">
+      Close
+    </button>
+    <button
+      type="submit"
+      class="btn btn-success"
+      [disabled]="inventoryForm.invalid">
+      <i class="bi bi-save"></i> {{ isEditing ? 'Update Item' : 'Add Value' }}
+    </button>
+  </div>
+  </form>
+</ng-template>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <ng-template #content let-modal>
+  <div class="modal-header bg-primary text-white">
+    <h4 class="modal-title" id="modal-basic-title">
+      {{ isEditing ? 'Edit Item (ID: ' + currentItem.id + ')' : 'Add New Item' }}
+    </h4>
+    <button
+      type="button"
+      class="btn-close btn-close-white"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <form #inventoryForm="ngForm" (ngSubmit)="onSubmit(inventoryForm)">
+    <div class="modal-body">
+      <div class="row g-3">
+
+        <div class="col-md-6">
+          <label for="product" class="form-label">Product ID/Name</label>
+          <input
+            id="product"
+            name="product"
+            class="form-control"
+
+            #productInput="ngModel"
+            [(ngModel)]="selectedProduct"
+
+            [ngbTypeahead]="searchProduct"
+            [resultFormatter]="formatterProduct"
+            [inputFormatter]="formatterProduct"
+
+            required
+            placeholder="Search by name or SKU">
+
+          <div *ngIf="productInput.invalid && (productInput.dirty || productInput.touched)" class="text-danger small mt-1">
+            <span *ngIf="productInput.errors?.required">Product selection is required.</span>
+          </div>
+          <small class="text-muted" *ngIf="selectedProduct?.id">Selected Product ID: {{ selectedProduct.id }}</small>
+        </div>
+
+        <div class="col-md-6">
+          <label for="location" class="form-label">Location ID/Code</label>
+          <input
+            id="location"
+            name="location"
+            class="form-control"
+
+            #locationInput="ngModel"
+            [(ngModel)]="selectedLocation"
+
+            [ngbTypeahead]="searchLocation"
+            [resultFormatter]="formatterLocation"
+            [inputFormatter]="formatterLocation"
+
+            required
+            placeholder="Search by name or code">
+
+          <div *ngIf="locationInput.invalid && (locationInput.dirty || locationInput.touched)" class="text-danger small mt-1">
+            <span *ngIf="locationInput.errors?.required">Location selection is required.</span>
+          </div>
+          <small class="text-muted" *ngIf="selectedLocation?.id">Selected Location ID: {{ selectedLocation.id }}</small>
+        </div>
+
+        <div class="col-md-6">
+          <label for="quantity_in_stock" class="form-label">Quantity in Stock</label>
+          <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock" [(ngModel)]="currentItem.quantity_in_stock" required min="0">
+          </div>
+
+        <div class="col-md-6">
+          <label for="safety_stock_level" class="form-label">Safety Stock Level</label>
+          <input type="number" class="form-control" id="safety_stock_level" name="safety_stock_level" [(ngModel)]="currentItem.safety_stock_level" required min="0">
+          </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="modal.dismiss('Cancel click')"
+        [disabled]="isLoading">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="inventoryForm.invalid || isLoading">
+        <i class="bi bi-save"></i> {{ isEditing ? 'Update Item' : 'Add Item' }}
+      </button>
+    </div>
+  </form>
+</ng-template> -->

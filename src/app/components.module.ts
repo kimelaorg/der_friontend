@@ -35,7 +35,8 @@ import { Layout } from './DemoPages/Welcome/layout/layout';
 import { Base } from './DemoPages/Welcome/base/base';
 import { SearchSpecific } from './DemoPages/Welcome/search-specific/search-specific';
 import { Test } from './test/test';
-import { ProductImage } from './DemoPages/Components/products/product-image/product-image';
+import { SoftwareProducts } from './DemoPages/Components/software-products/software-products';
+import { ProductMedia } from './DemoPages/Components/products/product-media/product-media';
 
 @NgModule({
   declarations: [
@@ -68,7 +69,8 @@ import { ProductImage } from './DemoPages/Components/products/product-image/prod
     Base,
     SearchSpecific,
     Test,
-    ProductImage,
+    SoftwareProducts,
+    ProductMedia
   ],
   imports: [
     SharedModule,

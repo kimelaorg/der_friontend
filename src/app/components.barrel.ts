@@ -73,3 +73,4 @@ export { Accessories } from './DemoPages/Welcome/accessories/accessories';
 export { Home } from './DemoPages/Welcome/home/home';
 export { SearchSpecific } from './DemoPages/Welcome/search-specific/search-specific';
 export { Test } from './test/test';
+export { SoftwareProducts } from './DemoPages/Components/software-products/software-products';

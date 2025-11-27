@@ -191,6 +191,7 @@ import {
     Accessories,
     Search,
     SearchSpecific,
+    SoftwareProducts,
     Trial,
     Test
 } from './components.barrel';
@@ -290,6 +291,14 @@ const routes: Routes = [
                 data: {
                     extraParameter: 'elementsMenu',
                     allowedRoles: ['Purchasing Agent', 'Warehouse/Logistics Manager']
+                }
+            },
+            {
+                path: 'dashboards/software-products',
+                component: SoftwareProducts,
+                data: {
+                    extraParameter: 'elementsMenu',
+                    // allowedRoles: ['Warehouse/Logistics Manager']
                 }
             },
             {

@@ -1,64 +1,45 @@
 import { Component, OnInit, TemplateRef, inject, signal, WritableSignal, ViewChild } from '@angular/core';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-// ⚠️ IMPORTANT: Added 'forkJoin' here to manage multiple simultaneous requests
+import { faEdit, faTrash, faImage, faVideo, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { catchError } from 'rxjs/operators';
 import { throwError, forkJoin } from 'rxjs';
-
-// --- INTERFACE DEFINITIONS ---
-interface ApiImage {
-    id: number;
-    image: string; // The URL as received from the API
-    product: number;
-}
-interface ApiProduct {
-    id: number;
-    productName: string;
-    productDescription: string;
-    productDiscountedPrice: string;
-    productActualPrice: string;
-    images: ApiImage[];
-}
-
-interface ImageData {
-    id: number;
-    url: string;
-}
-
-export interface Product {
-    id: number;
-    productName: string;
-    productDescription: string;
-    productDiscountedPrice: string;
-    productActualPrice: string;
-    images: ImageData[];
-}
-
-interface FieldErrors {
-    [key: string]: string[];
-}
-// --- END INTERFACE DEFINITIONS ---
+import { ApiMedia, ApiProduct, MediaData, Product, FieldErrors }from './data';
 
 
 @Component({
-    selector: 'app-product-image',
+    selector: 'app-product-media', // Component renamed
     standalone: false,
-    templateUrl: './product-image.html',
-    styleUrl: './product-image.scss',
+    templateUrl: './product-media.html', // Template renamed
+    styleUrl: './product-media.scss',   // Stylesheet renamed
 })
-export class ProductImage implements OnInit {
+export class ProductMedia implements OnInit { // Class renamed
 
     closeResult = '';
 
-    private newApiUrl = 'http://127.0.0.1:8000/api/products/images/';
-    private productApiUrl = 'http://127.0.0.1:8000/api/products/images-list/';
+    // Consolidated API Endpoints
+    private imageApiUrl = 'http://127.0.0.1:8000/api/products/images/';
+    private videoApiUrl = 'http://127.0.0.1:8000/api/products/videos/';
+    private productApiUrl = 'http://127.0.0.1:8000/api/products/media-list/';
     private imageDeleteUrl = 'http://127.0.0.1:8000/api/products/images-delete/';
+    private videoDeleteUrl = 'http://127.0.0.1:8000/api/products/videos-delete/';
 
     @ViewChild('confirmDeletion') confirmDeletionTemplate!: TemplateRef<any>;
+    @ViewChild('imageContent') imageContentTemplate!: TemplateRef<any>; // Need reference for modals
+    @ViewChild('videoContent') videoContentTemplate!: TemplateRef<any>; // Need reference for modals
 
     products: WritableSignal<Product[]> = signal([]);
     selectedProduct: Product | null = null;
     filesToUpload: File[] = [];
+
+    // Dedicated preview URLs
+    selectedImageUrl: string | null = null;
+    selectedVideoUrl: string | null = null;
+
+    faEdit = faEdit;
+    faVideo = faVideo;
+    faImage = faImage;
+    faTrash = faTrash;
 
     // Error State Management
     generalModalError: string | null = null;
@@ -73,37 +54,46 @@ export class ProductImage implements OnInit {
     }
 
     /**
-     * Fetches products and maps the nested ApiImage array to the flat ImageData array.
+     * Fetches products and maps the nested media arrays.
      */
     loadAll(): void {
         this.http.get<ApiProduct[]>(this.productApiUrl).subscribe({
             next: (apiResponse) => {
                 const mappedProducts: Product[] = apiResponse.map(apiProduct => {
-                    const imageObjects: ImageData[] = apiProduct.images.map(apiImage => ({
-                        id: apiImage.id,
-                        url: apiImage.image
+
+                    const imageObjects: MediaData[] = apiProduct.images.map(apiMedia => ({
+                        id: apiMedia.id,
+                        url: apiMedia.image! // Asserting image is present for image list
+                    }));
+
+                    const videoObjects: MediaData[] = apiProduct.videos.map(apiMedia => ({
+                        id: apiMedia.id,
+                        url: apiMedia.video! // Asserting video is present for video list
                     }));
 
                     return {
                         id: apiProduct.id,
                         productName: apiProduct.productName,
-                        productDescription: apiProduct.productDescription,
+                        model_number: apiProduct.model_number,
                         productDiscountedPrice: apiProduct.productDiscountedPrice,
                         productActualPrice: apiProduct.productActualPrice,
-                        images: imageObjects
+                        images: imageObjects,
+                        videos: videoObjects
                     };
                 });
                 this.products.set(mappedProducts);
             },
             error: (err) => {
-                console.error('Error fetching products:', err);
+                console.error('Error fetching products with media:', err);
             }
         });
     }
 
-    // --- Image Modal Methods (Open, Close Reason) ---
+    // --------------------------------------------------------------------------------------------------
+    // --- MODAL & VIEWER METHODS ---
+    // --------------------------------------------------------------------------------------------------
 
-    openImageModal(product: Product, content: TemplateRef<any>): void {
+    openMediaModal(product: Product, content: TemplateRef<any>): void {
         this.selectedProduct = product;
         this.filesToUpload = [];
         this.generalModalError = null;
@@ -119,22 +109,48 @@ export class ProductImage implements OnInit {
         );
     }
 
-    // --- DELETE LOGIC ---
+    // Dedicated Image Viewer
+    openImageViewer(imageUrl: string, content: TemplateRef<any>): void {
+        this.selectedImageUrl = imageUrl;
+        this.modalService.open(content, {
+            ariaLabelledBy: 'modal-image-viewer',
+            size: 'xl'
+        }).result.then(
+            () => { this.selectedImageUrl = null; },
+            () => { this.selectedImageUrl = null; }
+        );
+    }
 
-    deleteProductImage(imageUrl: string): void {
+    // Dedicated Video Viewer
+    openVideoPlayer(videoUrl: string, content: TemplateRef<any>): void {
+        this.selectedVideoUrl = videoUrl;
+        this.modalService.open(content, {
+            ariaLabelledBy: 'modal-video-player',
+            size: 'xl'
+        }).result.then(
+            () => { this.selectedVideoUrl = null; },
+            () => { this.selectedVideoUrl = null; }
+        );
+    }
+
+    // --------------------------------------------------------------------------------------------------
+    // --- DELETE LOGIC (Combined) ---
+    // --------------------------------------------------------------------------------------------------
+
+    deleteProductMedia(mediaUrl: string, mediaType: 'image' | 'video'): void {
         if (!this.selectedProduct || !this.confirmDeletionTemplate) return;
 
-        const imageId = this.getImageIdFromUrl(imageUrl);
+        const mediaId = this.getMediaIdFromUrl(mediaUrl, mediaType);
 
-        if (imageId === null) {
-            this.generalModalError = "Error: Could not find the image ID for deletion. Please reload the page.";
+        if (mediaId === null) {
+            this.generalModalError = `Error: Could not find the ${mediaType} ID for deletion. Please reload.`;
             return;
         }
 
         this.modalService.open(this.confirmDeletionTemplate, { ariaLabelledBy: 'modal-confirm-deletion' }).result.then(
             (result) => {
                 if (result === 'Delete click') {
-                    this.executeImageDeletion(imageId, imageUrl);
+                    this.executeMediaDeletion(mediaId, mediaUrl, mediaType);
                 }
             },
             (reason) => {
@@ -143,92 +159,85 @@ export class ProductImage implements OnInit {
         );
     }
 
-    private executeImageDeletion(imageId: number, imageUrl: string): void {
-        this.http.delete(`${this.imageDeleteUrl}${imageId}`).pipe(
+    private executeMediaDeletion(mediaId: number, mediaUrl: string, mediaType: 'image' | 'video'): void {
+        const deleteUrl = mediaType === 'image' ? this.imageDeleteUrl : this.videoDeleteUrl;
+
+        this.http.delete(`${deleteUrl}${mediaId}`).pipe(
             catchError(error => {
-                this.handleModalError(error, 'Failed to delete image.');
+                this.handleModalError(error, `Failed to delete ${mediaType}.`);
                 return throwError(() => error);
             })
         ).subscribe(() => {
-            const index = this.selectedProduct!.images.findIndex(img => img.url === imageUrl);
+            const mediaArray = mediaType === 'image' ? this.selectedProduct!.images : this.selectedProduct!.videos;
+            const index = mediaArray.findIndex(media => media.url === mediaUrl);
 
             if (index > -1) {
-                this.selectedProduct!.images.splice(index, 1);
+                mediaArray.splice(index, 1);
             }
-            console.log(`Successfully deleted image ID: ${imageId}.`);
-            this.loadAll(); // Reload all data
+            console.log(`Successfully deleted ${mediaType} ID: ${mediaId}.`);
+            this.loadAll();
         });
     }
 
-    private getImageIdFromUrl(imageUrl: string): number | null {
+    private getMediaIdFromUrl(mediaUrl: string, mediaType: 'image' | 'video'): number | null {
         if (!this.selectedProduct) return null;
 
-        const image = this.selectedProduct.images.find(img => img.url === imageUrl);
+        const mediaArray = mediaType === 'image' ? this.selectedProduct.images : this.selectedProduct.videos;
+        const media = mediaArray.find(m => m.url === mediaUrl);
 
-        return image ? image.id : null;
+        return media ? media.id : null;
     }
 
-// --------------------------------------------------------------------------------------------------
-// --- UPLOAD LOGIC (FIXED) ---
-// --------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------
+    // --- UPLOAD LOGIC (Combined) ---
+    // --------------------------------------------------------------------------------------------------
 
-    /**
-     * Sends each staged file in a separate request to the DRF CreateAPIView.
-     * This is required because the DRF serializer expects a single 'image' field per request.
-     */
-    uploadStagedFiles(): void {
+    uploadStagedFiles(mediaType: 'image' | 'video'): void {
         if (!this.selectedProduct || this.filesToUpload.length === 0) return;
 
         this.generalModalError = null;
         this.fieldValidationErrors = {};
 
         const productID = this.selectedProduct.id.toString();
+        const apiUrl = mediaType === 'image' ? this.imageApiUrl : this.videoApiUrl;
+        const formField = mediaType === 'image' ? 'image' : 'video';
 
-        // 1. Map each file to its own POST request Observable
         const uploadObservables = this.filesToUpload.map(file => {
             const formData = new FormData();
 
-            // 🔥 CRITICAL FIX: The file field key MUST be named 'image' to match the serializer.
-            formData.append('image', file, file.name);
+            formData.append(formField, file, file.name);
             formData.append('product', productID);
 
-            // Send the request for this single file
-            return this.http.post<ApiImage>(this.newApiUrl, formData).pipe(
+            return this.http.post<ApiMedia>(apiUrl, formData).pipe(
                 catchError(error => {
                     this.handleModalError(error, `Upload failed for file: ${file.name}.`);
-                    // IMPORTANT: Return a valid empty object here if you want forkJoin to continue
-                    // processing other successful files after a single file error.
-                    // If you throw here, forkJoin fails immediately.
                     return throwError(() => error);
                 })
             );
         });
 
-        // 2. Use forkJoin to manage all simultaneous uploads and wait for completion
         forkJoin(uploadObservables).subscribe({
-            next: (newImageObjects: ApiImage[]) => {
-                // Filter out any potential failed responses if error handling was adjusted to continue
-                // Since we throw the error above, we can assume we only get successful objects here.
-                newImageObjects.forEach(img => {
-                    this.selectedProduct!.images.push({
-                        id: img.id,
-                        url: img.image
+            next: (newMediaObjects: ApiMedia[]) => {
+                const mediaArray = mediaType === 'image' ? this.selectedProduct!.images : this.selectedProduct!.videos;
+
+                newMediaObjects.forEach(media => {
+                    mediaArray.push({
+                        id: media.id,
+                        url: mediaType === 'image' ? media.image! : media.video!
                     });
                 });
-                this.filesToUpload = []; // Clear staged files
+                this.filesToUpload = [];
                 this.loadAll();
-                console.log(`${newImageObjects.length} files uploaded successfully.`);
+                console.log(`${newMediaObjects.length} ${mediaType} file(s) uploaded successfully.`);
             },
             error: (err) => {
-                // This block runs if any single request fails (due to the throwError above)
-                // The handleModalError method should have already been called for the failed request.
-                console.error("One or more image uploads failed.", err);
+                console.error(`One or more ${mediaType} uploads failed.`, err);
             }
         });
     }
 
     // --------------------------------------------------------------------------------------------------
-    // --- ERROR HANDLING & HELPERS ---
+    // --- ERROR HANDLING & HELPERS (Unchanged) ---
     // --------------------------------------------------------------------------------------------------
 
     private handleModalError(error: HttpErrorResponse, defaultMessage: string): void {
@@ -267,7 +276,7 @@ export class ProductImage implements OnInit {
         }
     }
 
-    // --- Drag and Drop Handlers (Unchanged) ---
+    // --- Drag and Drop Handlers (Unified) ---
     onDragOver(event: DragEvent): void {
         event.preventDefault();
         event.stopPropagation();

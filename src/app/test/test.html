@@ -1,125 +1,146 @@
-<div class="container mt-4">
-  <h2>Product List</h2>
-
-  <table class="table table-striped table-hover table-bordered">
-    <thead class="table-dark">
-      <tr>
-        <th scope="col">Id</th>
-        <th scope="col">Product Name</th>
-        <th scope="col">Product Description</th>
-        <th scope="col">Product Discounted Price</th>
-        <th scope="col">Product Actual Price</th>
-        <th scope="col">Images</th>
-        <th scope="col" colspan="2">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let product of products">
-        <td>{{ product.id }}</td>
-        <td>{{ product.productName }}</td>
-        <td>{{ product.productDescription }}</td>
-        <td>
-          <span class="fw-bold text-success">${{ product.productDiscountedPrice | number: '1.2-2' }}</span>
-        </td>
-        <td>
-          <span class="text-muted text-decoration-line-through">${{ product.productActualPrice | number: '1.2-2' }}</span>
-        </td>
-        <td class="text-center">
-          <button class="btn btn-sm btn-outline-info" (click)="openImageModal(product, imageContent)" title="View/Manage Images">
-            <i class="bi bi-image"></i> 🖼️ ({{ product.images.length }})
-          </button>
-        </td>
-        <td>
-          <!-- <button class="btn btn-sm btn-primary" (click)="editProduct(product)" title="Edit">
-            <i class="bi bi-pencil-square"></i> ✏️
-          </button> -->
-        </td>
-        <td>
-          <!-- <button class="btn btn-sm btn-danger" (click)="deleteProduct(product)" title="Delete">
-            <i class="bi bi-trash"></i> 🗑️
-          </button> -->
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <p class="mt-3 text-info">Modal closed result: {{ closeResult }}</p>
-
+<div class="container py-4">
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h2>📦 Inventory Management</h2>
+<button class="btn btn-primary" (click)="openAddModal()">
+<i class="bi bi-plus-circle"></i> Add New Item
+</button>
 </div>
 
-<ng-template #imageContent let-modal>
+<div class="table-responsive">
+<table class="table table-striped table-hover align-middle">
+<thead class="table-dark">
+<tr>
+<th>ID</th>
+<th>Product</th> <th>Quantity in Stock</th>
+<th>Safety Stock Level</th>
+<th>Location</th> <th class="text-center">Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr *ngFor="let item of inventory">
+<td>{{ item.id }}</td>
+<td>{{ item.product }}</td>
+<td>{{ item.quantity_in_stock }}</td>
+<td [class.text-danger]="item.quantity_in_stock < item.safety_stock_level">
+{{ item.safety_stock_level }}
+<i class="bi bi-exclamation-triangle-fill text-danger" *ngIf="item.quantity_in_stock < item.safety_stock_level"></i>
+</td>
+<td>{{ item.location }}</td>
+<td class="text-center">
+<button class="btn btn-sm btn-info me-2" (click)="openEditModal(item)">
+<i class="bi bi-pencil-square"></i> Edit
+</button>
+<button class="btn btn-sm btn-danger" (click)="deleteItem(item.id)">
+<i class="bi bi-trash"></i> Delete
+</button>
+</td>
+</tr>
+<tr *ngIf="inventory.length === 0">
+<td colspan="6" class="text-center text-muted">No inventory items found. Click "Add New Item" to begin.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
-  <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title" *ngIf="selectedProduct">
-      Images for: {{ selectedProduct.productName }} (ID: {{ selectedProduct.id }})
-    </h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-  </div>
+<ng-template #content let-modal>
 
-  <div class="modal-body" *ngIf="selectedProduct">
+<div class="modal-header bg-primary text-white">
+<h4 class="modal-title" id="modal-basic-title">
+{{ isEditing ? 'Edit Item (ID: ' + currentItem.id + ')' : 'Add New Item' }}
+</h4>
+<button
+type="button"
+class="btn-close"
+aria-label="Close"
+(click)="modal.dismiss('Cross click')"></button>
+</div>
 
-    <div *ngIf="selectedProduct.images.length > 0" class="mb-4">
-      <h4>Existing Images ({{ selectedProduct.images.length }})</h4>
-      <div class="image-grid">
-        <div *ngFor="let imageUrl of selectedProduct.images" class="image-container">
-          <img [src]="imageUrl" alt="Product Image" class="img-thumbnail">
-          <button class="btn btn-sm btn-danger delete-image-btn" (click)="deleteProductImage(imageUrl)">
-            <i class="bi bi-x-lg"></i>
-          </button>
-        </div>
-      </div>
-    </div>
+<form #inventoryForm="ngForm" (ngSubmit)="onSubmit(inventoryForm)">
+<div class="modal-body">
+<div class="row g-3">
 
-    <div class="card p-3"
-          (dragover)="onDragOver($event)"
-          (drop)="onDrop($event)"
-          [class.no-images-placeholder]="selectedProduct.images.length === 0"
-          [class.drag-over]="false" >
-
-      <h4 class="text-center" *ngIf="selectedProduct.images.length === 0">
-        No images found for this product.
-      </h4>
-
-      <p class="text-center text-muted">Drag & Drop images here or click to select.</p>
-
+    <div class="col-md-6">
+      <label for="product" class="form-label">Product</label>
       <input
-        type="file"
-        id="fileUpload"
-        multiple
-        (change)="onFileSelect($event)"
-        style="display: none;">
+        type="text" class="form-control"
+        id="product"
+        name="product"
+        [(ngModel)]="currentItem.product"
+        required
+        #productModel="ngModel"
+        [ngbTypeahead]="searchProduct"
+        [resultFormatter]="formatter"
+        [inputFormatter]="inputFormatter"
 
-      <div class="d-grid gap-2 col-6 mx-auto">
-        <button
-          type="button"
-          class="btn btn-outline-primary"
-          onclick="document.getElementById('fileUpload').click()">
-          <i class="bi bi-upload"></i> Select and Upload Images
-        </button>
+        placeholder="Start typing product name..."
+      >
+      <div *ngIf="productModel.invalid && (productModel.dirty || productModel.touched)" class="text-danger">
+        Product is required.
       </div>
     </div>
 
-    <div *ngIf="filesToUpload.length > 0" class="mt-3">
-      <h6>Files Staged ({{ filesToUpload.length }})</h6>
-      <ul class="list-group">
-        <li *ngFor="let file of filesToUpload" class="list-group-item d-flex justify-content-between align-items-center">
-          {{ file.name }}
-          <span class="badge bg-secondary rounded-pill">{{ file.size / 1024 | number: '1.0-2' }} KB</span>
-        </li>
-      </ul>
+    <div class="col-md-6">
+      <label for="location" class="form-label">Location</label>
+      <input
+        type="text" class="form-control"
+        id="location"
+        name="location"
+        [(ngModel)]="currentItem.location"
+        required
+        #locationModel="ngModel"
+        [ngbTypeahead]="searchLocation"
+        [resultFormatter]="formatter"
+        [inputFormatter]="inputFormatter"
+
+        placeholder="Start typing location..."
+      >
+      <div *ngIf="locationModel.invalid && (locationModel.dirty || locationModel.touched)" class="text-danger">
+        Location is required.
+      </div>
     </div>
 
-  </div>
+    <div class="col-md-6">
+      <label for="quantity_in_stock" class="form-label">Quantity in Stock</label>
+      <input
+        type="number"
+        class="form-control"
+        id="quantity_in_stock"
+        name="quantity_in_stock"
+        [(ngModel)]="currentItem.quantity_in_stock"
+        required
+        min="0">
+    </div>
 
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="modal.close('Cancel click')">Cancel</button>
-
-    <button
-      type="button"
-      class="btn btn-success"
-      [disabled]="filesToUpload.length === 0"
-      (click)="uploadStagedFiles()">
-      Upload ({{ filesToUpload.length }})
-    </button>
+    <div class="col-md-6">
+      <label for="safety_stock_level" class="form-label">Safety Stock Level</label>
+      <input
+        type="number"
+        class="form-control"
+        id="safety_stock_level"
+        name="safety_stock_level"
+        [(ngModel)]="currentItem.safety_stock_level"
+        required
+        min="0">
+    </div>
   </div>
+</div>
+
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="modal.dismiss('Cancel click')">
+    Close
+  </button>
+  <button
+    type="submit"
+    class="btn btn-success"
+    [disabled]="inventoryForm.invalid">
+    <i class="bi bi-save"></i> {{ isEditing ? 'Update Item' : 'Add Item' }}
+  </button>
+</div>
+
+
+</form>
 </ng-template>

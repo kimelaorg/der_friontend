@@ -41,12 +41,12 @@ export interface ConnectivityItemForm extends FormGroup<{
 export interface ProductSpecForm {
     id: FormControl<number | null>;
     model: FormControl<string>;
-    brand: FormControl<number | null>;
-    screen_size: FormControl<number | null>;
-    resolution: FormControl<number | null>;
-    panel_type: FormControl<number | null>;
-    original_price: FormControl<number | null>;
-    sale_price: FormControl<number | null>;
+    brand: FormControl<number | null>; // Changed to number | null
+    screen_size: FormControl<number | null>; // Changed to number | null
+    resolution: FormControl<number | null>; // Changed to number | null
+    panel_type: FormControl<number | null>; // Changed to number | null
+    actual_price: FormControl<number | null>;
+    discounted_price: FormControl<number | null>;
     color: FormControl<string | null>;
     smart_features: FormControl<string | null>;
 
@@ -142,23 +142,25 @@ export class Products implements OnInit {
     });
 
     // Product Spec Form (Updated for nested fields AND FormArray)
-    specForm: FormGroup<any> = this.formBuilder.group({ // Use 'any' here for flexibility with FormArray
+    // NOTE: Using 'any' here is acceptable since the generic typing of FormArray is cumbersome
+    specForm: FormGroup<any> = this.formBuilder.group({
         id: [null as number | null],
         model: ['', [Validators.required, Validators.maxLength(255)]],
-        screen_size: [null as string | null],
-        resolution: [null as string | null],
-        panel_type: [null as string | null],
+        // Changed to number | null to align with API and lookup values
+        screen_size: [null as number | null],
+        resolution: [null as number | null],
+        panel_type: [null as number | null],
         // NOTE: Keeping as Number in form but converting to String in payload if required by API
-        original_price: [null as number | null, [Validators.required, Validators.min(0)]],
-        sale_price: [null as number | null, [Validators.required, Validators.min(0)]],
+        actual_price: [null as number | null, [Validators.required, Validators.min(0)]],
+        discounted_price: [null as number | null, [Validators.required, Validators.min(0)]],
         color: [null as string | null],
-        brand: [null as string | null],
+        // Changed to number | null to align with API and lookup values
+        brand: [null as number | null],
         smart_features: ['false'],
 
         // Electrical Specs (Optional fields)
         electrical_specs: this.formBuilder.group({
             voltage: [null as string | null],
-            // Note: You had a typo here before (electrical_speics_wattage). Make sure the name is correct now.
             wattage: [null as number | null],
             power_supply_type: [null as string | null],
         }),
@@ -166,6 +168,22 @@ export class Products implements OnInit {
         // NEW: FormArray to hold connectivity IDs and their counts
         product_connectivity_array: this.fb.array<ConnectivityItemForm>([]),
     });
+
+    /**
+     * @private
+     * Utility function to ensure optional foreign key IDs are null, not 0 or undefined/empty string.
+     * The API expects null for an optional link field that is not set.
+     * @param id The ID value from the form control.
+     * @returns The ID as a number, or null.
+     */
+    private cleanOptionalId(id: string | number | null | undefined): number | null {
+        if (id === null || id === undefined || id === '' || id === 0) {
+            return null;
+        }
+        // Attempt to convert to number if it's not already, or return as is.
+        const numId = typeof id === 'string' ? parseInt(id, 10) : id;
+        return (isNaN(numId) || numId === 0) ? null : numId;
+    }
 
 
     // --- Connectivity FormArray Helpers ---
@@ -175,12 +193,13 @@ export class Products implements OnInit {
     }
 
     get productConnectivityArray(): FormArray<ConnectivityItemForm> {
+        // NOTE: Added the generic type for stronger typing here as well
         return this.specForm.get('product_connectivity_array') as FormArray<ConnectivityItemForm>;
     }
 
     createConnectivityGroup(connectivityId: number, count: number = 1): ConnectivityItemForm {
         return this.fb.group({
-            connectivity: this.fb.control(connectivityId, { nonNullable: true }),
+            connectivity: this.fb.control(connectivityId, { nonNullable: false }), // Setting to false for edit modal, but value is always set
             connectivity_count: this.fb.control(count, [Validators.required, Validators.min(1)]),
         }) as ConnectivityItemForm;
     }
@@ -197,7 +216,8 @@ export class Products implements OnInit {
         const control = this.productConnectivityArray.controls.find(
             c => c.value.connectivity === id
         );
-        return control ? control.value.connectivity_count : null;
+        // Ensure to access the value property of the FormControl within the FormGroup
+        return control ? control.controls.connectivity_count.value : null;
     }
 
     // Toggles the selection and manages the FormArray
@@ -237,8 +257,8 @@ export class Products implements OnInit {
     ngOnInit(): void {
         this.loadInitialData();
         // if (!this.productId) {
-        //     console.error('Product ID is required for ProductMediaSpecsManagerComponent.');
-        //     // return; // Commented out to allow the component to load initial setup data
+        //      console.error('Product ID is required for ProductMediaSpecsManagerComponent.');
+        //      // return; // Commented out to allow the component to load initial setup data
         // }
         // Assuming loadData is only called if productId exists and the component is used as a child
         if(this.productId) {
@@ -260,6 +280,7 @@ export class Products implements OnInit {
                 this.specService.getElectricalSpecs(this.productId).subscribe(data => {
                     this.electricalSpecs$.next(data);
                     if (data) {
+                        // NOTE: Patches the *standalone* electricalForm
                         this.electricalForm.patchValue(data);
                     }
                 });
@@ -530,7 +551,8 @@ export class Products implements OnInit {
       const payload = {
           name: rawValue.name,
           description: rawValue.description,
-          category: Number(rawValue.category),
+          // CRITICAL FIX: Ensure category is a number or null, but since it's required it should be a number.
+          category: rawValue.category,
           is_active: rawValue.is_active === 'true',
       };
 
@@ -559,8 +581,15 @@ export class Products implements OnInit {
               }
 
           },
-          error: err => this.handleFormError(err, this.productForm)
+          error: err => this.handleFormError(err, this.productForm) // NOTE: handleFormError must be defined/implemented
       });
+    }
+
+    // Placeholder for handleFormError (you might need to implement this)
+    private handleFormError(err: any, form: FormGroup<any>): void {
+        console.error('API Error:', err);
+        this.message.set('An error occurred during submission. Check console for details.');
+        // Optionally map backend errors to form controls
     }
 
     /** Opens confirmation modal for deleting a product. */
@@ -612,10 +641,18 @@ export class Products implements OnInit {
             screen_size: null,
             resolution: null,
             panel_type: null,
-            electrical_specs_voltage: null,
-            electrical_specs_wattage: null,
-            electrical_specs_power_supply_type: null,
         });
+
+        // CRITICAL FIX: Patching the NESTED form group requires nesting the patchValue object.
+        this.specForm.get('electrical_specs')?.patchValue({
+            voltage: null,
+            wattage: null,
+            power_supply_type: null,
+        });
+        // Resetting to 'false' is necessary if you use a radio button/select
+        this.specForm.get('smart_features')?.setValue('false');
+
+
         this.selectedInternetServices.set([]);
         this.productConnectivityArray.clear(); // IMPORTANT: Clear the FormArray
 
@@ -657,21 +694,27 @@ export class Products implements OnInit {
         this.specForm.patchValue({
             id: specData.id || null,
             model: specData.model,
+            // These are direct FK IDs
             screen_size: specData.screen_size,
             resolution: specData.resolution,
             panel_type: specData.panel_type,
+            brand: specData.brand,
             // NOTE: Assuming prices in specData are numbers or strings convertible to number
             actual_price: Number(specData.actual_price),
             discounted_price: Number(specData.discounted_price),
             color: specData.color,
-            brand: specData.brand,
             smart_features: String(specData.smart_features),
-
-            // Patching nested Electrical Specs
-            electrical_specs_voltage: specData.electrical_specs?.voltage || null,
-            electrical_specs_wattage: specData.electrical_specs?.wattage || null,
-            electrical_specs_power_supply_type: specData.electrical_specs?.power_supply_type || null,
         });
+
+        // CRITICAL FIX: Patching nested Electrical Specs requires targeting the group control
+        this.specForm.get('electrical_specs')?.patchValue({
+            voltage: specData.electrical_specs?.voltage || null,
+            wattage: specData.electrical_specs?.wattage || null,
+            power_supply_type: specData.electrical_specs?.power_supply_type || null,
+            // Note: If the electrical_specs object includes an 'id' for a OneToOne update, it should be patched here as well
+            // (Assumed 'id' is not part of ElectricalSpecForm definition, but if it is, patch it.)
+        });
+
 
         // M2M services
         this.selectedInternetServices.set(specData.supported_internet_services || []);
@@ -681,6 +724,7 @@ export class Products implements OnInit {
         if (specData.product_connectivity && Array.isArray(specData.product_connectivity)) {
             specData.product_connectivity.forEach(conn => {
                 this.productConnectivityArray.push(
+                    // conn.connectivity is the ID
                     this.createConnectivityGroup(conn.connectivity, conn.connectivity_count)
                 );
             });
@@ -706,7 +750,7 @@ export class Products implements OnInit {
 
       const rawValue = this.specForm.getRawValue();
 
-      // 1. Prepare ElectricalSpecification Payload (No change needed)
+      // 1. Prepare ElectricalSpecification Payload (No change needed in logic, just type check)
       const electricalSpecsGroup = rawValue.electrical_specs;
       let electricalSpecsPayload: ElectricalSpecification | null = null;
 
@@ -715,12 +759,13 @@ export class Products implements OnInit {
               voltage: electricalSpecsGroup.voltage ?? '',
               wattage: electricalSpecsGroup.wattage ?? 0,
               power_supply_type: electricalSpecsGroup.power_supply_type ?? '',
+              // NOTE: Assuming there is an 'id' control in the electrical_specs group for updates. If not, remove it.
               id: electricalSpecsGroup.id ?? undefined
           };
       }
 
       // 2. Prepare Product Connectivity Payload (FormArray name: product_connectivity_array)
-      // CRITICAL CHANGE: The type definition now uses 'id' instead of 'connectivity'
+      // CRITICAL: The API expects 'connectivity' and 'connectivity_count' fields as per your previous design.
       let productConnectivityPayload: { connectivity: number; connectivity_count: number }[] = [];
       const connectivityArrayRaw = rawValue.product_connectivity_array;
 
@@ -730,17 +775,17 @@ export class Products implements OnInit {
               .filter((item: any) => item && item.connectivity)
               .map((item: any) => {
 
-                  // Use parseInt for robust integer conversion
-                  const connectivityId = item.connectivity ? parseInt(item.connectivity, 10) : NaN;
+                  // Use this.cleanOptionalId for robustness
+                  const connectivityId = this.cleanOptionalId(item.connectivity);
                   const count = item.connectivity_count ? parseInt(item.connectivity_count, 10) : NaN;
 
-                  const isValidId = !isNaN(connectivityId) && connectivityId > 0;
+                  const isValidId = connectivityId !== null && connectivityId > 0;
                   const isValidCount = !isNaN(count) && count > 0;
 
                   if (isValidId && isValidCount) {
                       return {
-                          // CRITICAL CHANGE: RENAME the field to 'id' for the API
-                          connectivity: connectivityId,
+                          // The payload field name should match what the backend expects
+                          connectivity: connectivityId, // This field holds the ID of the Connectivity setup item
                           connectivity_count: count,
                       };
                   }
@@ -751,35 +796,37 @@ export class Products implements OnInit {
               .filter((item): item is { connectivity: number; connectivity_count: number } => item !== null);
       }
 
-      // 3. Prepare the main ProductSpecification payload (No change needed)
+      // 3. Prepare the main ProductSpecification payload
       const payload: any = {
           id: rawValue.id ?? undefined,
           product: parentId,
           model: rawValue.model!,
           color: rawValue.color,
-          brand: Number(rawValue.brand),
+          // CRITICAL FIX: Apply cleanOptionalId to all optional FKs
+          brand: this.cleanOptionalId(rawValue.brand),
           smart_features: rawValue.smart_features === 'true' || rawValue.smart_features === true,
-          screen_size: Number(rawValue.screen_size),
-          resolution: Number(rawValue.resolution),
-          panel_type: Number(rawValue.panel_type),
-          original_price: String(rawValue.original_price),
-          sale_price: String(rawValue.sale_price),
+          // CRITICAL FIX: Apply cleanOptionalId to all optional FKs
+          screen_size: this.cleanOptionalId(rawValue.screen_size),
+          resolution: this.cleanOptionalId(rawValue.resolution),
+          panel_type: this.cleanOptionalId(rawValue.panel_type),
+          // Prices are mandatory/non-nullable on the form but you convert to string for API
+          actual_price: String(rawValue.actual_price),
+          discounted_price: String(rawValue.discounted_price),
           supported_internet_services: this.selectedInternetServices(),
       };
 
-      // 4. Attach the nested payloads (No change needed)
-      if (electricalSpecsPayload) {
+      // 4. Attach the nested payloads
+      if (electricalSpecsPayload && (electricalSpecsPayload.voltage || electricalSpecsPayload.wattage)) {
           payload.electrical_specs = electricalSpecsPayload;
       }
 
       // 5. Attach Product Connectivity.
-      // CRITICAL CHANGE: Remove the 'data' wrapper since the backend serializer is now 'many=True'.
       if (productConnectivityPayload.length > 0) {
           // Send the array directly
           payload.product_connectivity = productConnectivityPayload;
       }
 
-      // 6. Determine URL and Method (No change needed)
+      // 6. Determine URL and Method
       const isEdit = this.modalMode === 'edit-spec' && rawValue.id;
       const url = isEdit ? `${this.specUrl}${rawValue.id}/` : this.specUrl;
 
@@ -787,24 +834,22 @@ export class Products implements OnInit {
           this.http.put<ProductSpecification>(url, payload) :
           this.http.post<ProductSpecification>(url, payload);
 
-      // 7. Execute Request (No change needed)
       httpMethod.pipe(
           finalize(() => this.isLoading.set(false))
       ).subscribe({
-          next: (response) => {
+          next: (response: ProductSpecification) => {
               this.modalService.dismissAll('saved');
-              this.loadInitialData();
-              this.message.set(`Specification saved successfully.`);
+              this.message.set(`Specification "${response.model}" saved successfully.`);
+              this.loadInitialData(); // Reload all specs
           },
           error: err => this.handleFormError(err, this.specForm)
       });
-  }
+    }
 
     /** Opens confirmation modal for deleting a specification. */
-    handleDeleteSpecModal(specId: number, productId: number): void {
+    handleDeleteSpecModal(specId: number): void {
         this.modalMode = 'delete';
         this.currentSpecId = specId;
-        this.currentSpecProductParentId = productId;
         this.message.set(null);
         if (this.deleteSpecModal) this.openModal(this.deleteSpecModal, 'sm');
     }
@@ -828,27 +873,7 @@ export class Products implements OnInit {
             });
     }
 
-
-    // ----------------------------------------------------------------------
-    // --- UTILITIES (Intact) -----------------------------------------------
-    // ----------------------------------------------------------------------
-
-    private handleFormError(err: any, form: FormGroup): void {
-        this.isLoading.set(false);
-        const errors = err?.error;
-        if (errors && typeof errors === 'object') {
-            Object.keys(errors).forEach(field => {
-                const control = form.get(field);
-                if (control) {
-                    control.setErrors({ serverError: Array.isArray(errors[field]) ? errors[field][0] : errors[field] });
-                }
-            });
-            this.message.set('Please correct the highlighted form errors.');
-        } else {
-            this.message.set('An unexpected error occurred. Please try again.');
-            console.error('Unexpected operation error:', err);
-        }
-    }
+    
 
 
     toggleInternetServiceSelection(id: number): void {

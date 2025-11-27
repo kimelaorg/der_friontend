@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProductImage } from './product-image';
+import { ProductMedia } from './product-media';
 
-describe('ProductImage', () => {
-  let component: ProductImage;
-  let fixture: ComponentFixture<ProductImage>;
+describe('ProductMedia', () => {
+  let component: ProductMedia;
+  let fixture: ComponentFixture<ProductMedia>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ProductImage]
+      declarations: [ProductMedia]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ProductImage);
+    fixture = TestBed.createComponent(ProductMedia);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

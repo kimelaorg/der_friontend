@@ -48,6 +48,7 @@ export const MASTER_NAV_CONFIG: RoleMenu = {
         // Inventory Management
         { path: "/der/dashboards/purchasing", title: "Manage   Purchase Order" },
         { path: "/der/dashboards/products", title: "Manage Products" },
+        { path: "/der/dashboards/software-products", title: "Manage Software" },
         { path: "/der/dashboards/stock", title: "Stock Levels" },
 
         // Report and Analytics
