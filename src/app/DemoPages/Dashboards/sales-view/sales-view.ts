@@ -1,157 +1,274 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Required for (ngModel) binding
-import { SalesRecord, Customer } from './sales-data';
-
-// Import RxJS operators and core
-import { HttpClient } from '@angular/common/http';
+// 🔴 REQUIRED: Import HttpParams for query parameters
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { SalesRecord, Customer, SaleItem, PaginatedSalesResponse } from './sales-data';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of, throwError } from 'rxjs';
+import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { catchError, switchMap, tap, finalize, map } from 'rxjs/operators';
-import { Form, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl } from '@angular/forms';
 
 
 @Component({
-  selector: 'app-sales-view',
-  standalone: false,
-  templateUrl: './sales-view.html',
-  styleUrl: './sales-view.scss',
+  selector: 'app-sales-view',
+  standalone: false,
+  templateUrl: './sales-view.html',
+  styleUrl: './sales-view.scss',
 })
 export class SalesView implements OnInit {
 
-  heading = 'Sales Data';
-  subheading = 'View Sales Details';
-  icon = 'pe-7s-cash text-success';
+  heading = 'Sales Data';
+  subheading = 'View Sales Details';
+  icon = 'pe-7s-cash text-success';
+  faEdit = faEdit;
+  faSearch = faSearch;
 
-  // Sales Filtering Properties
-  public allSalesRecords: SalesRecord[] = [];
-  public salesRecords: SalesRecord[] = [];
-  public selectedFilter: string = 'all';
+  // Sales Filtering Properties
+  public searchText: string = '';
+  // 🔴 REMOVED: allSalesRecords (No longer needed for server-side loading)
+  public salesRecords: SalesRecord[] = [];
+  public selectedFilter: string = 'all';
 
-  // Sale Submission Properties (USING Angular Signals)
-  public customerForm!: FormGroup;
-  public paymentForm!: FormGroup;
+  // Pagination Properties (Server-Side)
+  public totalRecords: number = 0;
+  public currentPage: number = 1;
+  public itemsPerPage: number = 10;
+  public nextUrl: string | null = null;
+  public previousUrl: string | null = null;
+  // 🔴 Added for UI, calculated via getter
+  public maxPagesToShow: number = 5;
 
-  public submissionLoading = signal(false);
-  public errorMessage = signal<string | null>(null);
-  public successMessage = signal<string | null>(null);
-  public backendCustomerId = signal<string | null>(null);
-  public currentStage = signal<number>(2);
+  // Sale Submission Properties
+  public customerForm!: FormGroup;
+  public paymentForm!: FormGroup;
+  saleForm: FormGroup;
+  currentSale: SalesRecord | null = null;
 
-  // Placeholder functions for external dependencies
-  public cartItems = () => [{ product_specification_id: 1, quantity: 1, unit_price: 10.00, unit_measure: 'pc' }];
-  public resetComponent = () => {};
+  public submissionLoading = signal(false);
+  public errorMessage = signal<string | null>(null);
+  public successMessage = signal<string | null>(null);
+  public backendCustomerId = signal<string | null>(null);
+  public currentStage = signal<number>(2);
 
-  // NOTE: Replace with your actual API endpoint constants
-  readonly CUSTOMER_CREATE_API = '/api/customers/create-or-update/';
-  readonly SALES_RECORD_API = 'http://127.0.0.1:8000/api/sales/sales-records/';
+  // Placeholder functions (kept for compilation)
+  public cartItems = () => [{ product_specification_id: 1, quantity: 1, unit_price: 10.00, unit_measure: 'pc' }];
+  public resetComponent = () => {};
 
+  readonly SALES_RECORD_API = 'http://127.0.0.1:8000/api/sales/sales-records/';
 
-  constructor(private fb: FormBuilder, private http: HttpClient /* Angular HttpClient assumed */) {
-    // Initialize dummy forms for the sake of compiling the methods
-    this.customerForm = this.fb.group({
-      first_name: [''],
-      last_name: [''],
-      phone_number: ['', Validators.pattern(/^\d{10}$/)],
-      email: ['', Validators.email]
-    });
-    this.paymentForm = this.fb.group({
-      payment_method: ['CASH', Validators.required],
-      payment_status: ['PAID', Validators.required]
-    });
-  }
+  @ViewChild('content') content!: ElementRef;
+  constructor(private fb: FormBuilder, private http: HttpClient, private modalService: NgbModal) {
+    // Form initialization remains the same
+    this.customerForm = this.fb.group({
+      first_name: [''],
+      last_name: [''],
+      phone_number: ['', Validators.pattern(/^\d{10}$/)],
+      email: ['', Validators.email]
+    });
+    this.paymentForm = this.fb.group({
+      payment_method: ['CASH', Validators.required],
+      payment_status: ['PAID', Validators.required]
+    });
 
-  ngOnInit(): void {
-    this.loadAll()
-    this.salesRecords = this.allSalesRecords; // Initialize table with all data
-  }
+    this.saleForm = this.fb.group({
+        status: ['', Validators.required],
+        payment_method: ['', Validators.required],
+        payment_status: ['', Validators.required],
+        customer_first_name: [''],
+        customer_last_name: [''],
+        customer_phone_number: [''],
+        customer_email: [''],
+        items: this.fb.array([])
+    });
+  }
 
-  loadAll(): void {
-    this.http.get<SalesRecord[]>(`${this.SALES_RECORD_API}`).subscribe(res => {
-      this.allSalesRecords = res;
-    });
-  }
+  ngOnInit(): void {
+    // 🔴 Start by loading the first page of data
+    this.loadSalesRecords();
+  }
 
+  /** * 🔴 CORE FUNCTION: Fetches data from the backend based on current filters and page.
+   */
+  loadSalesRecords(): void {
+    let params = new HttpParams()
+      // 🔴 Pass page and page_size for server-side pagination
+      .set('page', this.currentPage.toString())
+      .set('page_size', this.itemsPerPage.toString());
 
-  /** Helper function to apply title case to a single string. */
-  private toTitleCase(value: string | null | undefined): string {
-      if (!value) return '';
-      return String(value).toLowerCase().split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-  }
+    // 🔴 Pass search term for server-side text filtering
+    if (this.searchText.length > 0) {
+      params = params.set('search', this.searchText);
+    }
 
-  /** Calculates the total quantity of items. */
-  getTotalQuantity(record: SalesRecord): number {
-    return record.items.reduce((sum, item) => sum + item.quantity, 0);
-  }
+    // 🔴 Pass date filter for server-side date filtering
+    if (this.selectedFilter !== 'all') {
+      params = params.set('filter_by', this.selectedFilter);
+    }
 
+    this.http.get<PaginatedSalesResponse>(this.SALES_RECORD_API, { params: params })
+      .subscribe({
+        next: (res) => {
+          this.salesRecords = res.results;
+          this.totalRecords = res.count;
+          this.nextUrl = res.next;
+          this.previousUrl = res.previous;
+        },
+        error: (err) => {
+          console.error("Failed to load sales records:", err);
+          this.salesRecords = [];
+          this.totalRecords = 0;
+        }
+      });
+  }
 
-  // =========================================================================
-  // === FILTERING METHODS ===
-  // =========================================================================
+  // 🔴 Pagination and Filter Handlers
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadSalesRecords(); // Triggers new API call
+    }
+  }
 
-  onFilterChange(): void {
-    if (this.selectedFilter === 'all') {
-      this.salesRecords = this.allSalesRecords;
-      return;
+  onFilterChange(): void {
+    // 🔴 Reset to page 1 on filter change
+    this.currentPage = 1;
+    this.loadSalesRecords(); // Triggers new API call with new filter
+  }
+
+  onSearchChange(): void {
+    // 🔴 Reset to page 1 on search change
+    this.currentPage = 1;
+    this.loadSalesRecords(); // Triggers new API call with new search term
+  }
+
+  // 🔴 Getter to calculate total pages for UI
+  get totalPages(): number {
+      return Math.ceil(this.totalRecords / this.itemsPerPage);
+  }
+
+  // 🔴 Getter for page links array (e.g., [1, 2, 3])
+  get pageNumbers(): number[] {
+        const pages = [];
+        const startPage = Math.max(1, this.currentPage - Math.floor(this.maxPagesToShow / 2));
+        const endPage = Math.min(this.totalPages, startPage + this.maxPagesToShow - 1);
+
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+        return pages;
     }
 
-    const now = new Date();
-    this.salesRecords = this.allSalesRecords.filter(record => {
-      const saleDate = new Date(record.sale_date);
 
-      // 1. Daily Sales Filters
-      if (this.selectedFilter === 'today') {
-        return this.isSameDay(saleDate, now);
-      }
-      if (this.selectedFilter === 'yesterday') {
-        const yesterday = new Date(now);
-        yesterday.setDate(now.getDate() - 1);
-        return this.isSameDay(saleDate, yesterday);
-      }
-      if (this.selectedFilter === 'day-before-yesterday') {
-        const dayBeforeYesterday = new Date(now);
-        dayBeforeYesterday.setDate(now.getDate() - 2);
-        return this.isSameDay(saleDate, dayBeforeYesterday);
-      }
-      // Specific date filter: date-21.11.2025
-      if (this.selectedFilter.startsWith('date-')) {
-        const targetDateString = this.selectedFilter.substring(5);
-        const [day, month, year] = targetDateString.split('.').map(Number);
-        const targetDate = new Date(year, month - 1, day); // Month is 0-indexed
-        return this.isSameDay(saleDate, targetDate);
-      }
+  // === Form Methods (Unchanged, but kept for completeness) ===
+ 
+  get saleItemsFormArray(): FormArray {
+      return this.saleForm.get('items') as FormArray;
+  }
 
-      // 2. Weekly Sales Filters
-      if (this.selectedFilter === 'current-week') {
-        return this.isSameWeek(saleDate, now);
-      }
+  calculateSubtotal(item: any): number {
+      const quantity = item.quantity || 0;
+      const price = parseFloat(item.unit_price) || 0;
+      return quantity * price;
+  }
 
-      // 3. Monthly Sales Filters
-      if (this.selectedFilter === 'current-month') {
-        return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear();
-      }
-      // Specific month filter: month-10-2025
-      if (this.selectedFilter.startsWith('month-')) {
-        const [targetMonth, targetYear] = this.selectedFilter.substring(6).split('-').map(Number);
-        return saleDate.getMonth() === targetMonth && saleDate.getFullYear() === targetYear;
-      }
+  calculateGrandTotal(): number {
+      if (!this.saleItemsFormArray) return 0;
+      let total = 0;
+      this.saleItemsFormArray.controls.forEach((control: AbstractControl) => {
+          const itemValue = control.value;
+          total += this.calculateSubtotal(itemValue);
+      });
+      return total;
+  }
 
-      return false;
-    });
-  }
+  onSaveSale() {
+      if (this.saleForm.invalid || !this.currentSale) {
+          this.saleForm.markAllAsTouched();
+          return;
+      }
 
-  private isSameDay(date1: Date, date2: Date): boolean {
-    return date1.getFullYear() === date2.getFullYear() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getDate() === date2.getDate();
-  }
+      const formValues = this.saleForm.value;
 
-  private isSameWeek(date1: Date, date2: Date): boolean {
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
-    d1.setDate(d1.getDate() - d1.getDay());
-    d2.setDate(d2.getDate() - d2.getDay());
-    return d1.getTime() === d2.getTime();
-  }
+      const updatedSalePayload = {
+          id: this.currentSale.id,
+          status: formValues.status,
+          payment_method: formValues.payment_method,
+          payment_status: formValues.payment_status,
+          total_amount: this.calculateGrandTotal().toFixed(2),
+
+          customer: {
+              id: this.currentSale.customer?.id,
+              first_name: formValues.customer_first_name,
+              last_name: formValues.customer_last_name,
+              phone_number: formValues.customer_phone_number,
+              email: formValues.customer_email,
+          },
+
+          items: formValues.items.map((item: any) => ({
+              id: item.id,
+              product_specification_id: item.product_specification,
+              quantity: item.quantity,
+              unit_price: parseFloat(item.unit_price).toFixed(2),
+          }))
+      };
+
+
+      this.http.put<SalesRecord>(`${this.SALES_RECORD_API}${updatedSalePayload.id}/`, updatedSalePayload).subscribe({
+          next: (response) => {
+              this.loadSalesRecords(); // 🔴 Reload the current page to reflect changes
+              this.modalService.dismissAll();
+          },
+          error: (err) => {
+              console.error('API Error: Failed to update sale.', err);
+          }
+      });
+  }
+
+  private createItemFormGroup(item: SaleItem): FormGroup {
+      return this.fb.group({
+          id: [item.id],
+          product_specification: [item.product_specification],
+          product_sku: [item.product_sku],
+          product_name: [item.product_name],
+          unit_measure: [item.unit_measure],
+          model: [item.model],
+
+          quantity: [item.quantity, [Validators.required, Validators.min(1)]],
+          unit_price: [parseFloat(item.unit_price), [Validators.required, Validators.min(0)]],
+      });
+  }
+
+  openEditModal(sale: SalesRecord) {
+      this.currentSale = sale;
+      const customer = sale.customer || {
+          id: '', first_name: '', last_name: '', email: '', phone_number: ''
+      };
+
+      this.saleForm.patchValue({
+          status: sale.status,
+          payment_method: sale.payment_method,
+          payment_status: sale.payment_status,
+          customer_first_name: customer.first_name,
+          customer_last_name: customer.last_name,
+          customer_phone_number: customer.phone_number,
+          customer_email: customer.email
+      });
+
+      const itemsArray = this.saleItemsFormArray;
+      itemsArray.clear();
+
+      sale.items.forEach(item => {
+          itemsArray.push(this.createItemFormGroup(item));
+      });
+
+      this.modalService.open(this.content, {
+          ariaLabelledBy: 'modal-basic-title',
+          size: 'lg',
+          scrollable: true
+      });
+  }
+
+  // 🔴 REMOVED: isSameDay, isSameWeek, loadAll
 }

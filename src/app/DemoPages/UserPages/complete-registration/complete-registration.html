@@ -1,0 +1,352 @@
+
+
+  <div class="registration-container mt-5 bg-light">
+      <div class="d-flex justify-content-center align-items-center mb-5">
+          <div class="profile-container w-100">
+              <div class="background-animation">
+                  <span class="brand-text">Daz Electronics</span>
+              </div>
+              <div class="profile-card">
+                  <div class="profile-image-wrapper"
+                       (click)="openProfileModal()"
+                       title="Click to upload profile picture">
+                      <img [src]="profileImageUrl()"
+                           alt="Profile Picture"
+                           class="profile-img rounded-circle">
+                      <span class="upload-icon"><i class="bi bi-camera-fill"></i></span>
+                  </div>
+                  <p class="profile-title">Complete Registration by Filling the form below</p>
+              </div>
+          </div>
+      </div>
+
+      <div class="progress-tracker mb-4">
+          <div class="row text-center">
+              @for (stage of stages; track $index) {
+                  <div [class]="'col step-item ' + (currentStage() > $index + 1 ? 'completed' : '') + (currentStage() === $index + 1 ? 'active' : '')">
+                      <div class="step-counter">{{ $index + 1 }}</div>
+                      <p class="step-name d-none d-sm-block">{{ stage }}</p>
+                  </div>
+              }
+          </div>
+          <div class="progress-line">
+              <div class="progress" [style.width]="((currentStage() - 1) / (stages.length - 1)) * 100 + '%'"></div>
+          </div>
+      </div>
+
+      <!-- <hr> -->
+
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="card shadow-sm p-4">
+          <!-- <h2 class="card-title text-center mb-4">
+              Stage {{ currentStage() }}: {{ stages[currentStage() - 1] }}
+          </h2> -->
+
+          @if (currentStage() === 1) {
+              <div formGroupName="personalInfo" class="animate__animated animate__fadeIn">
+                  <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label for="Title" class="form-label">Title *</label>
+                          <select class="form-select" id="title" formControlName="title" aria-label=".form-select-sm example"
+                            [class.is-invalid]="getCurrentFormGroup().get('title')?.invalid && getCurrentFormGroup().get('title')?.touched">
+                            <option disable selected></option>
+                            <option value="Mr">Mr</option>
+                            <option value="Ms">Ms</option>
+                            <option value="Mrs">Mrs</option>
+                          </select>
+                          <div class="invalid-feedback" *ngIf="getCurrentFormGroup().get('title')?.errors?.['required']">Title is required.</div>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                          <label for="firstName" class="form-label">First Name *</label>
+                          <input type="text" id="firstName" formControlName="first_name" class="form-control"
+                                 [class.is-invalid]="getCurrentFormGroup().get('first_name')?.invalid && getCurrentFormGroup().get('first_name')?.touched">
+                          <div class="invalid-feedback" *ngIf="getCurrentFormGroup().get('first_name')?.errors?.['required']">First Name is required.</div>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                          <label for="middleName" class="form-label">Middle Name</label>
+                          <input type="text" id="middleName" formControlName="middle_name" class="form-control">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                          <label for="lastName" class="form-label">Last Name *</label>
+                          <input type="text" id="lastName" formControlName="last_name" class="form-control"
+                                 [class.is-invalid]="getCurrentFormGroup().get('last_name')?.invalid && getCurrentFormGroup().get('last_name')?.touched">
+                          <div class="invalid-feedback" *ngIf="getCurrentFormGroup().get('last_name')?.errors?.['required']">Last Name is required.</div>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                          <label for="birth_date" class="form-label">Birth Date *</label>
+                          <input type="date" id="birth_date" formControlName="birth_date" class="form-control"
+                                 [class.is-invalid]="getCurrentFormGroup().get('birth_date')?.invalid && getCurrentFormGroup().get('birth_date')?.touched">
+                          <div class="invalid-feedback" *ngIf="getCurrentFormGroup().get('birth_date')?.errors?.['required']">Birth date is required.</div>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                          <label for="secondPhoneNumber" class="form-label">Secondary Phone (Optional)</label>
+                          <input type="tel" id="secondPhoneNumber" formControlName="second_phone_number" class="form-control">
+                      </div>
+                      <div class="col-md-12 mb-3">
+                          <label for="email" class="form-label">Email (Optional)</label>
+                          <input type="email" id="email" formControlName="email" class="form-control"
+                                 [class.is-invalid]="getCurrentFormGroup().get('email')?.errors?.['email'] && getCurrentFormGroup().get('email')?.touched">
+                          <div class="invalid-feedback" *ngIf="getCurrentFormGroup().get('email')?.errors?.['email']">Enter a valid email address.</div>
+                      </div>
+                  </div>
+              </div>
+          }
+
+          @if (currentStage() === 2) {
+              <div formGroupName="address" class="animate__animated animate__fadeIn">
+                  <div class="row">
+                      <div class="col-md-6 mb-3">
+                          <label for="regionId" class="form-label">Region *</label>
+                          <select id="regionId" formControlName="region_id" class="form-select"
+                                  (change)="onRegionSelected($event)"
+                                  [class.is-invalid]="getCurrentFormGroup().get('region_id')?.invalid && getCurrentFormGroup().get('region_id')?.touched">
+                              <option value="" disabled>Select Region</option>
+                              @for (region of regions; track region.id) {
+                                  <option [value]="region.id">{{ region.name }}</option>
+                              }
+                          </select>
+                          <div class="invalid-feedback">Region is required.</div>
+                      </div>
+
+                      <div class="col-md-6 mb-3">
+                          <label for="district" class="form-label">District *</label>
+                          <select id="district" formControlName="district" class="form-select"
+                                  (change)="onDistrictSelected($event)"
+                                  [disabled]="!selectedRegionId || districts.length === 0"
+                                  [class.is-invalid]="getCurrentFormGroup().get('district')?.invalid && getCurrentFormGroup().get('district')?.touched">
+                              <option value="" disabled>Select District</option>
+                              @for (district of districts; track district.id) {
+                                  <option [value]="district.name">{{ district.name }}</option>
+                              }
+                          </select>
+                          <div class="invalid-feedback">District is required.</div>
+                      </div>
+
+                      <div class="col-md-6 mb-3">
+                          <label for="ward" class="form-label">Ward *</label>
+                          <select id="ward" formControlName="ward" class="form-select"
+                                  (change)="onWardSelected($event)"
+                                  [disabled]="!selectedDistrictName || wards.length === 0"
+                                  [class.is-invalid]="getCurrentFormGroup().get('ward')?.invalid && getCurrentFormGroup().get('ward')?.touched">
+                              <option value="" disabled>Select Ward</option>
+                              @for (ward of wards; track ward.id) {
+                                  <option [value]="ward.name">{{ ward.name }}</option>
+                              }
+                          </select>
+                          <div class="invalid-feedback">Ward is required.</div>
+                      </div>
+
+                      <div class="col-md-6 mb-3">
+                          <label for="street" class="form-label">Street *</label>
+                          <select id="street" formControlName="street" class="form-select"
+                                  (change)="onStreetSelected($event)"
+                                  [disabled]="!selectedWardName || streets.length === 0"
+                                  [class.is-invalid]="getCurrentFormGroup().get('street')?.invalid && getCurrentFormGroup().get('street')?.touched">
+                              <option value="" disabled>Select Street</option>
+                              @for (street of streets; track street.id) {
+                                  <option [value]="street.name">{{ street.name }}</option>
+                              }
+                          </select>
+                          <div class="invalid-feedback">Street is required.</div>
+                      </div>
+
+                      <div class="col-md-4 mb-3">
+                          <label for="postCode" class="form-label">Post Code *</label>
+                          <input type="text" id="postCode" formControlName="post_code" class="form-control" readonly>
+                          <div class="form-text">Set automatically based on street selection.</div>
+                      </div>
+
+                      <div class="col-md-4 mb-3">
+                          <label for="houseNumber" class="form-label">House Number</label>
+                          <input type="text" id="houseNumber" formControlName="house_number" class="form-control">
+                      </div>
+
+                      <div class="col-md-4 mb-3">
+                          <label for="plotNumber" class="form-label">Plot Number (Optional)</label>
+                          <input type="text" id="plotNumber" formControlName="plot_number" class="form-control">
+                      </div>
+
+                      <div class="col-md-12 mb-3">
+                          <label for="streetProminentName" class="form-label">Prominent Street Name (Optional)</label>
+                          <input type="text" id="streetProminentName" formControlName="street_prominent_name" class="form-control">
+                      </div>
+                  </div>
+              </div>
+          }
+
+          @if (currentStage() === 3) {
+              <div formArrayName="next_of_kin" class="animate__animated animate__fadeIn">
+
+                  <p class="lead">You must provide at least one Next of Kin.</p>
+
+                  @if (nextOfKinControls.errors?.['required'] && nextOfKinControls.touched) {
+                      <div class="alert alert-danger">At least one Next of Kin is required.</div>
+                  }
+
+                  @for (nokGroup of nextOfKinControls.controls; track $index) {
+                      <div [formGroupName]="$index" class="card shadow-sm p-3 mb-3">
+                          <div class="d-flex justify-content-between align-items-center mb-3">
+                              <h5 class="mb-0 text-primary">Next of Kin #{{ $index + 1 }}</h5>
+                              @if (nextOfKinControls.length > 1) {
+                                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeNextOfKin($index)">
+                                      <i class="bi bi-x-lg"></i> Remove
+                                  </button>
+                              }
+                          </div>
+
+                          <div class="row">
+                              <div class="col-md-6 mb-3">
+                                  <label for="nokFirstName{{$index}}" class="form-label">First Name *</label>
+                                  <input type="text" id="nokFirstName{{$index}}" formControlName="first_name" class="form-control"
+                                         [class.is-invalid]="nokGroup.get('first_name')?.invalid && nokGroup.get('first_name')?.touched">
+                                  <div class="invalid-feedback">First Name is required.</div>
+                              </div>
+                              <div class="col-md-6 mb-3">
+                                  <label for="nokLastName{{$index}}" class="form-label">Last Name *</label>
+                                  <input type="text" id="nokLastName{{$index}}" formControlName="last_name" class="form-control"
+                                         [class.is-invalid]="nokGroup.get('last_name')?.invalid && nokGroup.get('last_name')?.touched">
+                                  <div class="invalid-feedback">Last Name is required.</div>
+                              </div>
+                              <div class="col-md-6 mb-3">
+                                  <label for="nokPhoneNumber{{$index}}" class="form-label">Phone Number *</label>
+                                  <input type="tel" id="nokPhoneNumber{{$index}}" formControlName="phone_number" class="form-control"
+                                         [class.is-invalid]="nokGroup.get('phone_number')?.invalid && nokGroup.get('phone_number')?.touched">
+                                  <div class="invalid-feedback">Phone Number is required.</div>
+                              </div>
+                              <div class="col-md-6 mb-3">
+                                  <label for="nokEmail{{$index}}" class="form-label">Email (Optional)</label>
+                                  <input type="email" id="nokEmail{{$index}}" formControlName="email" class="form-control">
+                              </div>
+                              <div class="col-md-12 mb-3">
+                                  <label for="physicalAddress{{$index}}" class="form-label">Physical Address *</label>
+                                  <textarea id="physicalAddress{{$index}}" formControlName="physical_address" class="form-control" rows="2"
+                                            [class.is-invalid]="nokGroup.get('physical_address')?.invalid && nokGroup.get('physical_address')?.touched"></textarea>
+                                  <div class="invalid-feedback">Physical Address is required.</div>
+                              </div>
+                          </div>
+                      </div>
+                  }
+
+                  <div class="d-grid gap-2">
+                      <button type="button" class="btn btn-outline-primary" (click)="addNextOfKin()">
+                          <i class="bi bi-plus-circle"></i> Add Another Next of Kin
+                      </button>
+                  </div>
+              </div>
+          }
+
+          @if (currentStage() === 4) {
+            <div class="review-stage animate__animated animate__fadeIn">
+                <p class="lead text-center">Please review your information before final submission.</p>
+                <div class="card bg-light p-3 mb-3">
+                    <h5 class="text-primary">Personal Information</h5>
+                    <dl class="row">
+                        <dt class="col-sm-3">Name:</dt>
+                        <dd class="col-sm-9">{{ registrationForm.get('personalInfo.first_name')?.value }} {{ registrationForm.get('personalInfo.last_name')?.value }}</dd>
+                        <dt class="col-sm-3">Primary Phone:</dt>
+                        <dd class="col-sm-9">{{ registrationForm.get('personalInfo.phone_number')?.value }}</dd>
+                        <dt class="col-sm-3">Email:</dt>
+                        <dd class="col-sm-9">{{ registrationForm.get('personalInfo.email')?.value || 'N/A' }}</dd>
+                    </dl>
+                </div>
+
+                <div class="card bg-light p-3 mb-3">
+                    <h5 class="text-primary">Residential Address</h5>
+                    <dl class="row">
+                        <dt class="col-sm-3">Location:</dt>
+                        <dd class="col-sm-9">{{ registrationForm.get('address.district')?.value }}, {{ registrationForm.get('address.ward')?.value }}</dd>
+                        <dt class="col-sm-3">Street:</dt>
+                        <dd class="col-sm-9">{{ registrationForm.get('address.street')?.value }} (Post Code: {{ registrationForm.get('address.post_code')?.value }})</dd>
+                        <dt class="col-sm-3">Plot/Prominent Name:</dt>
+                        <dd class="col-sm-9">{{ registrationForm.get('address.plot_number')?.value || 'N/A' }} / {{ registrationForm.get('address.street_prominent_name')?.value || 'N/A' }}</dd>
+                    </dl>
+                </div>
+
+                <div class="card bg-light p-3">
+                    <h5 class="text-primary">Next of Kin ({{ nextOfKinControls.length }} Entr{{ nextOfKinControls.length > 1 ? 'ies' : 'y' }})</h5>
+                    @for (nokGroup of nextOfKinControls.controls; track $index) {
+                        <h6 class="mt-2">#{{ $index + 1 }}</h6>
+                        <dl class="row border-bottom pb-2">
+                            <dt class="col-sm-3">Name:</dt>
+                            <dd class="col-sm-9">{{ nokGroup.get('first_name')?.value }} {{ nokGroup.get('last_name')?.value }}</dd>
+                            <dt class="col-sm-3">Phone:</dt>
+                            <dd class="col-sm-9">{{ nokGroup.get('phone_number')?.value }}</dd>
+                            <dt class="col-sm-3">Address:</dt>
+                            <dd class="col-sm-9">{{ nokGroup.get('physical_address')?.value }}</dd>
+                        </dl>
+                    }
+                </div>
+
+                <div class="alert alert-warning mt-4 text-center" *ngIf="registrationForm.invalid">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> **Warning:** Please go back and complete all required fields.
+                </div>
+            </div>
+          }
+
+          @if (currentStage() === 5) {
+              <div class="alert alert-success text-center animate__animated animate__zoomIn">
+                  <i class="bi bi-check-circle-fill me-2"></i>
+                  <h4>Registration Complete!</h4>
+                  <p>Congraturation Your account was successfully activated. You can now log in.</p>
+                  <!-- <app-reset/> -->
+              </div>
+          }
+
+          @if (currentStage() < 5) {
+              <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                  <button type="button" class="btn btn-secondary" (click)="prevStage()" [disabled]="currentStage() === 1">
+                      <i class="bi bi-arrow-left"></i> Previous
+                  </button>
+
+                  @if (currentStage() < stages.length) {
+                      <button type="button" class="btn btn-primary" (click)="nextStage()">
+                          Next <i class="bi bi-arrow-right"></i>
+                      </button>
+                  }
+                  @if (currentStage() === stages.length) {
+                      <button type="submit" class="btn btn-success" [disabled]="registrationForm.invalid || isSubmitting()">
+                          @if (isSubmitting()) {
+                              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                              Submitting...
+                          } @else {
+                              Complete Registration
+                          }
+                      </button>
+                  }
+              </div>
+          }
+      </form>
+
+      <!-- <div class="text-center text-white mt-4">
+        <p class="mb-0 opacity-75 small">
+          Copyright © {{ Copyright }}
+        </p>
+      </div> -->
+  </div>
+
+
+  <ng-template #profileUploadModal let-modal>
+      <div class="modal-header">
+          <h4 class="modal-title" id="modal-title">Upload Profile Picture</h4>
+          <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+      </div>
+      <div class="modal-body text-center">
+          <p>Select an image file (PNG, JPG, etc.) for your profile.</p>
+
+          <img [src]="profileImageUrl()"
+               alt="Profile Preview"
+               class="img-fluid rounded-circle mb-3 profile-preview-modal">
+
+          <div class="input-group mb-3">
+              <input type="file"
+                     class="form-control"
+                     id="profileFile"
+                     accept="image/*"
+                     (change)="onFileSelected($event)">
+          </div>
+
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="modal.close('Close button')">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="uploadFile()" [disabled]="!selectedProfileFile">Upload & Save</button>
+      </div>
+  </ng-template>

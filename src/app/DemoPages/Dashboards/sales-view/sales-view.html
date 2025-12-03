@@ -1,38 +1,51 @@
 <app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon"></app-page-title>
 
-  <h2 class="lead">Sales Records ({{ salesRecords.length }} Total)</h2>
+<h2 class="lead">Sales Records ({{ totalRecords }} Total)</h2>
 
-  <div class="mb-3 d-flex align-items-center">
-    <label for="salesFilter" class="form-label me-2 fw-bold">Filter Sales By:</label>
-    <select
-      id="salesFilter"
-      class="form-select w-auto"
-      [(ngModel)]="selectedFilter"
-      (change)="onFilterChange()">
+<div class="d-flex flex-wrap align-items-center mb-3 justify-content-between">
 
-      <option value="all">-- Show All Records --</option>
+    <div class="d-flex align-items-center me-3 mb-2 mb-md-0">
+        <label for="salesFilter" class="form-label me-2 fw-bold mb-0">Filter Sales By:</label>
+        <select
+          id="salesFilter"
+          class="form-select w-auto"
+          [(ngModel)]="selectedFilter"
+          (change)="onFilterChange()">
 
-      <optgroup label="Daily Sales">
-        <option value="today" selected>Today</option>
-        <option value="yesterday">Yesterday</option>
-        <option value="day-before-yesterday">Day Before Yesterday</option>
-      </optgroup>
+          <option value="all">-- Show All Records --</option>
+          <optgroup label="Daily Sales">
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="day-before-yesterday">Day Before Yesterday</option>
+          </optgroup>
 
-      <optgroup label="Weekly Sales">
-        <option value="current-week">Current Week</option>
-      </optgroup>
+          <optgroup label="Weekly Sales">
+            <option value="current-week">Current Week</option>
+            <option value="last-week">Last Week</option>  </optgroup>
 
-      <optgroup label="Monthly Sales">
-        <option value="current-month">Current Month</option>
-      </optgroup>
+          <optgroup label="Monthly Sales">
+            <option value="current-month">Current Month</option>
+            <option value="past-month">Past Month</option>
+          </optgroup>
+        </select>
+    </div>
 
-    </select>
-  </div>
-  <div *ngIf="salesRecords.length === 0" class="alert alert-warning" role="alert">
-    No sales records found for the selected filter ({{ selectedFilter | titlecase }}).
-  </div>
+    <div class="input-group w-auto flex-grow-1" style="max-width: 300px;">
+        <span class="input-group-text"><fa-icon [icon]="faSearch"></fa-icon></span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search Customer, Agent, or Status..."
+          [(ngModel)]="searchText"
+          (ngModelChange)="onSearchChange()" >
+    </div>
+</div>
 
-  <div class="table-responsive">
+<div *ngIf="salesRecords.length === 0 && totalRecords === 0" class="alert alert-info" role="alert">
+    No sales records found matching the current search and filter criteria.
+</div>
+
+<div class="table-responsive">
     <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
       <thead>
         <tr>
@@ -51,14 +64,14 @@
       <tbody>
         <ng-container *ngFor="let record of salesRecords; let i = index">
           <tr>
-            <td>{{ i + 1  }}</td>
+            <td>{{ i + 1 + (currentPage - 1) * itemsPerPage }}</td>
             <td>{{ record.sale_date | date:'MMM d, y h:mm a' }}</td>
             <td>
-                @if(record.customer){
-                  {{ record.customer.first_name | titlecase}} {{ record.customer.last_name | titlecase }}
-                }@else{
-                  N/A
-                }
+              @if(record.customer){
+                {{ record.customer.first_name | titlecase}} {{ record.customer.last_name | titlecase }}
+              }@else{
+                N/A
+              }
             </td>
             <td>{{ record.sales_agent_name }}</td>
             <td>{{ record.items.length }}</td>
@@ -69,19 +82,19 @@
               <span
                 [class]="{
                   'badge': true,
-                  'bg-success': record.status === 'COMPLETED',
-                  'bg-warning': record.status === 'PENDING',
-                  'bg-danger': record.status !== 'COMPLETED' && record.status !== 'PENDING'
+                  'bg-success': record.payment_status === 'Completed',
+                  'bg-warning': record.payment_status === 'Pending',
+                  'bg-danger': record.payment_status !== 'Completed' && record.status !== 'Pending'
                 }">
-
-                {{ record.status === 'COMPLETED' ? 'PAID' : 'Not Paid' }}
+                {{ record.payment_status === 'Completed' ? 'PAID' : 'Not Paid' }}
               </span>
             </td>
             <td>
               {{ record.payment_method === 'MOMO' ? 'Mobile Money' : record.payment_method }}
+            </td>
             <td>
               <button
-                class="btn btn-sm btn-outline-info"
+                class="btn btn-sm btn-outline-info w-100"
                 type="button"
                 data-bs-toggle="collapse"
                 [attr.data-bs-target]="'#details-' + i"
@@ -91,15 +104,17 @@
               </button>
             </td>
             <td>
-              <button type="button" class="btn btn-sm btn-secondary" name="button">Edit</button>
+              <button class="btn btn-primary btn-sm w-100" (click)="openEditModal(record)">
+                <fa-icon [icon]="faEdit"></fa-icon> Edit
+              </button>
             </td>
           </tr>
 
           <tr>
-            <td colspan="8" class="p-0 border-0">
+            <td colspan="10" class="p-0 border-0">
               <div class="collapse" [id]="'details-' + i">
                 <div class="card card-body bg-light m-2">
-                  <h5>Items in Sale #{{ record.id }} ({{ record.items.length }})</h5>
+                  <h5>Items in Sale #00{{ record.id }}</h5>
                   <table class="table table-sm table-bordered mb-0 bg-white">
                     <thead>
                       <tr>
@@ -129,4 +144,171 @@
         </ng-container>
       </tbody>
     </table>
-  </div>
+</div>
+
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+
+    <div class="small text-muted">
+        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ (currentPage - 1) * itemsPerPage + salesRecords.length }} of {{ totalRecords }} placements
+    </div>
+
+    <nav *ngIf="totalRecords > 0">
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+                <a class="page-link" (click)="goToPage(currentPage - 1)">Previous</a>
+            </li>
+
+            <li class="page-item active">
+                <a class="page-link">{{ currentPage }}</a>
+            </li>
+
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <a class="page-link" (click)="goToPage(currentPage + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- <button class="btn btn-danger ms-3" (click)="closeDailySales()" [disabled]="isClosing">
+    <span *ngIf="isClosing" class="spinner-border spinner-border-sm me-2"></span>
+    Close Today's Sales
+</button>
+ -->
+
+
+<ng-template #content let-modal>
+    <div class="modal-header bg-primary text-white">
+        <h4 class="modal-title" id="modal-basic-title">
+            Edit Sale Transaction #{{ currentSale?.id }}
+        </h4>
+        <button
+            type="button"
+            class="btn-close btn-close-white"
+            aria-label="Close"
+            (click)="modal.dismiss('Cross click')">
+        </button>
+    </div>
+
+    <form [formGroup]="saleForm" (ngSubmit)="onSaveSale()">
+        <div class="modal-body">
+            <h5 class="mb-3 text-primary border-bottom pb-2">Status & Payment</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" formControlName="status" class="form-select">
+                        <option value="COMPLETED">COMPLETED</option>
+                        <option value="PENDING">PENDING</option>
+                        <option value="CANCELLED">CANCELLED</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="payment_method" class="form-label">Payment Method</label>
+                    <select id="payment_method" formControlName="payment_method" class="form-select">
+                        <option value="CASH">CASH</option>
+                        <option value="CARD">CARD</option>
+                        <option value="TRANSFER">TRANSFER</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="payment_status" class="form-label">Payment Status</label>
+                    <select id="payment_status" formControlName="payment_status" class="form-select">
+                        <option value="Completed">Completed</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Failed">Failed</option>
+                    </select>
+                </div>
+            </div>
+
+            <h5 class="mb-3 text-primary border-bottom pb-2">Customer Details</h5>
+            <div class="row g-3 mb-4 border p-3 rounded-3 bg-light">
+                <div class="col-md-6">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input id="first_name" type="text" formControlName="customer_first_name" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input id="last_name" type="text" formControlName="customer_last_name" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label for="phone_number" class="form-label">Phone Number</label>
+                    <input id="phone_number" type="text" formControlName="customer_phone_number" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email</label>
+                    <input id="email" type="email" formControlName="customer_email" class="form-control">
+                </div>
+            </div>
+
+            <h5 class="mb-3 text-primary border-bottom pb-2">Items Sold</h5>
+            <div formArrayName="items" class="table-responsive">
+                <table class="table table-striped table-sm align-middle">
+                    <thead class="bg-info text-white">
+                        <tr>
+                            <th>Product Name</th>
+                            <th style="width: 120px;">Unit Price ($)</th>
+                            <th style="width: 80px;">Qty</th>
+                            <th class="text-end">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let itemControl of saleItemsFormArray.controls; let i = index" [formGroupName]="i">
+                            <td>
+                                <span class="fw-bold">{{ itemControl.value.product_name }}</span>
+                                <small class="text-muted d-block">{{ itemControl.value.unit_measure }}</small>
+                                <input type="hidden" formControlName="id">
+                                <input type="hidden" formControlName="product_specification">
+                            </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    formControlName="unit_price"
+                                    class="form-control form-control-sm text-end"
+                                    min="0"
+                                    step="0.01">
+                                <div *ngIf="itemControl.get('unit_price')?.invalid && itemControl.get('unit_price')?.touched" class="text-danger small">
+                                    Required Price.
+                                </div>
+                            </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    formControlName="quantity"
+                                    class="form-control form-control-sm text-center"
+                                    min="1"
+                                    step="1">
+                                <div *ngIf="itemControl.get('quantity')?.invalid && itemControl.get('quantity')?.touched" class="text-danger small">
+                                    Required Qty.
+                                </div>
+                            </td>
+                            <td class="fw-bold align-middle text-end">
+                                {{ calculateSubtotal(itemControl.value) | currency: 'USD' }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end mt-2">
+                <span class="fw-bold me-3">Estimated New Total:</span>
+                <span class="fw-bold fs-5 text-success">{{ calculateGrandTotal() | currency: 'USD' }}</span>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="modal.dismiss('Cancel click')">
+                Cancel
+            </button>
+            <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="saleForm.invalid">
+                Save Changes
+            </button>
+        </div>
+    </form>
+</ng-template>

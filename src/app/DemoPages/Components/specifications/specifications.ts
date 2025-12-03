@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators, FormControl, NonNullableFormBuilder
 import { Router } from '@angular/router';
 import { Observable, of, forkJoin, throwError } from 'rxjs';
 import { finalize, catchError, map } from 'rxjs/operators';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap'; // Keep this import
 import { faStar, faPlus, IconDefinition, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { NgIf, NgFor, CommonModule, DatePipe } from '@angular/common';
 
@@ -61,7 +61,8 @@ export class Specifications implements OnInit {
     http = inject(HttpClient);
     private router = inject(Router);
     private formBuilder = inject(NonNullableFormBuilder);
-    constructor(private modalService: NgbModal) { }
+    // 💡 BEST PRACTICE: Inject NgbModal using the modern inject() function
+    private modalService = inject(NgbModal);
 
     // --- Component Constants ---
     private baseUrl = 'http://localhost:8000/api/setups';
@@ -117,6 +118,8 @@ export class Specifications implements OnInit {
     });
 
     // --- ViewChildren for Modals (Used in HTML template) ---
+    // Note: If these elements are conditionally rendered inside a structural directive (*ngIf),
+    // you might need to handle their readiness with a setter or ngAfterViewInit.
     @ViewChild('editCreateModal') editCreateModal: ElementRef | undefined;
     @ViewChild('deleteConfirmationModal') deleteConfirmationModal: ElementRef | undefined;
 
@@ -176,20 +179,24 @@ export class Specifications implements OnInit {
 
     /**
      * Opens the NgbModal immediately, minimizing delay.
-     * @param content The modal template reference.
+     * @param content The modal template reference (e.g., this.editCreateModal.nativeElement).
      * @param type 'saved' or 'deleted' for successful operations.
      */
-    open(content: any | null, type?: 'saved' | 'deleted'): void {
+    open(content: ElementRef | any | null, type?: 'saved' | 'deleted'): void {
         if (!content) {
             console.error("Modal content reference is undefined.");
             return;
         }
 
-        this.modalService.open(content, { centered: true }).result.then((result) => {
+        // Use the nativeElement if ElementRef is passed, otherwise pass the content directly (for <ng-template>)
+        const modalContent = content instanceof ElementRef ? content.nativeElement : content;
+
+        this.modalService.open(modalContent, { centered: true }).result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
 
-            if (result === 'saved' || result === 'deleted' || type === 'saved' || type === 'deleted') {
-                this.loadAllSetupData(); // Reload data after success
+            // Check the dismissal result to trigger data reload
+            if (result === 'saved' || result === 'deleted') {
+                this.loadAllSetupData();
             }
         }, (reason) => {
             this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -212,7 +219,12 @@ export class Specifications implements OnInit {
      * Initializes the modal for Create mode.
      * @param type The type of specification (e.g., 'Brand', 'Resolution').
      */
-    handleCreateModal(type: SpecType, content): void {
+    handleCreateModal(type: SpecType): void {
+        if (!this.editCreateModal) {
+            console.error('Edit/Create Modal template not available.');
+            return;
+        }
+
         this.currentSpecType = type;
         this.currentSpecId = null;
         this.modalMode = 'create';
@@ -221,17 +233,21 @@ export class Specifications implements OnInit {
         const specConfig = this.specMap[type];
         specConfig.form.reset(); // Reset the specific form
 
-        // Open modal immediately for perceived speed
+        // Open modal using the ViewChild reference
         this.open(this.editCreateModal);
     }
 
     /**
      * Initializes the modal for Edit mode.
-     * Opens the modal immediately, then fetches and patches data asynchronously.
      * @param type The type of specification.
      * @param id The ID of the item to edit.
      */
     handleEditModal(type: SpecType, id: number): void {
+        if (!this.editCreateModal) {
+            console.error('Edit/Create Modal template not available.');
+            return;
+        }
+
         this.currentSpecType = type;
         this.currentSpecId = id;
         this.modalMode = 'edit';
@@ -261,21 +277,16 @@ export class Specifications implements OnInit {
     }
 
     /**
-     * Patches the form group dynamically based on the received data.
-     * @param form The target FormGroup.
-     * @param data The data object from the API.
-     */
-    private patchFormForEdit(form: FormGroup<any>, data: any): void {
-        // Simple patch for all fields present in the data object
-        form.patchValue(data);
-    }
-
-    /**
      * Initializes the modal for Delete mode.
      * @param type The type of specification.
      * @param id The ID of the item to delete.
      */
     handleDeleteModal(type: SpecType, id: number): void {
+        if (!this.deleteConfirmationModal) {
+            console.error('Delete Confirmation Modal template not available.');
+            return;
+        }
+
         this.currentSpecType = type;
         this.currentSpecId = id;
         this.modalMode = 'delete';
@@ -291,6 +302,7 @@ export class Specifications implements OnInit {
      * Handles both CREATE (POST) and UPDATE (PUT) requests for any specification type.
      */
     onAddSpec(): void {
+        // ... (rest of onAddSpec is unchanged and correct) ...
         if (!this.currentSpecType) return;
 
         this.message.set(null);
@@ -320,6 +332,7 @@ export class Specifications implements OnInit {
         ).subscribe({
             next: () => {
                 console.log(`${this.currentSpecType} ${this.modalMode}ed successfully`);
+                // Use modalService.dismissAll to explicitly close and pass the 'saved' result
                 this.modalService.dismissAll('saved');
             }
         });
@@ -329,6 +342,7 @@ export class Specifications implements OnInit {
      * Confirms and performs the DELETE request for any specification type.
      */
     onDeleteSpec(): void {
+        // ... (rest of onDeleteSpec is unchanged and correct) ...
         if (!this.currentSpecType || !this.currentSpecId) {
             this.message.set('Error: No item selected for deletion.');
             return;
@@ -351,12 +365,18 @@ export class Specifications implements OnInit {
             .subscribe({
                 next: () => {
                     console.log(`${this.currentSpecType} deleted successfully`);
+                    // Use modalService.dismissAll to explicitly close and pass the 'deleted' result
                     this.modalService.dismissAll('deleted');
                 }
             });
     }
 
-    // --- Error Handling ---
+    // --- Helper Methods (Unchanged) ---
+
+    private patchFormForEdit(form: FormGroup<any>, data: any): void {
+        // Simple patch for all fields present in the data object
+        form.patchValue(data);
+    }
 
     private handleApiError(err: any, form: FormGroup<any>): Observable<never> {
         this.isLoading.set(false);
@@ -378,5 +398,4 @@ export class Specifications implements OnInit {
         }
         return throwError(() => new Error('API error handled.'));
     }
-
 }

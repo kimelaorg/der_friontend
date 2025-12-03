@@ -2,7 +2,7 @@
   <div class="d-flex h-100 justify-content-center align-items-center p-3">
     <div class="w-100 app-login-box" style="max-width: 600px;">
 
-      <div class="app-logo-inverse mx-auto mb-4 d-block" style="width: 60px; height: 60px; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('assets/images/logo-inverse.png');"></div>
+      <!-- <div class="app-logo-inverse mx-auto mb-4 d-block" style="width: 60px; height: 60px; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('assets/images/logo-inverse.png');"></div> -->
 
       <div class="card shadow-lg border-0">
         <div class="card-body p-4 p-md-5">
@@ -77,6 +77,9 @@
                 <!-- <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</span> -->
                 <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email.</span>
                 <span *ngIf="registerForm.get('email')?.errors?.['serverError']">{{ registerForm.get('email')?.errors?.['serverError'] }}</span>
+              </div>
+              <div class="form-text text-muted small">
+                Email is optional field.
               </div>
 
             </div>

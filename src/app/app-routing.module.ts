@@ -192,7 +192,9 @@ import {
     Search,
     SearchSpecific,
     SoftwareProducts,
+    CompleteRegistration,
     Trial,
+    ChangePassword,
     Test
 } from './components.barrel';
 
@@ -210,6 +212,7 @@ const routes: Routes = [
             { path: 'account/register', component: RegisterBoxedComponent, data: { extraParameter: '' } },
             { path: 'account/forgot-password', component: ForgotPasswordBoxedComponent, data: { extraParameter: '' } },
             { path: 'account/otp', component: Otp, data: { extraParameter: '' } },
+            // { path: 'account/complete-registration', component: CompleteRegistration, data: { extraParameter: '' } },
             { path: 'motherboards', component: Motherboards, data: { extraParameter: '' } },
             { path: 'screens', component: Screens, data: { extraParameter: '' } },
             { path: 't-con', component: TCoins, data: { extraParameter: '' } },
@@ -222,6 +225,17 @@ const routes: Routes = [
             { path: 'product/:id', component: SearchSpecific, data: { extraParameter: '' }, resolve: {singleItem_resolve: specificIdResolver,}},
             { path: 'components/modals', component: ModalsComponent, data: { extraParameter: 'componentsMenu' } },
         ]
+    },
+
+    {
+      path: 'der/account/complete-registration',
+      component: CompleteRegistration,
+      canActivate: [authenticityGuard],
+    },
+    {
+      path: 'der/account/change-password',
+      component: ChangePassword,
+      canActivate: [authenticityGuard],
     },
 
     // --- PROTECTED ROUTES (Requires Authentication) ---
@@ -344,7 +358,7 @@ const routes: Routes = [
             { path: 'dashboards/purchased', component: Purchased, data: { extraParameter: 'elementsMenu' } },
             { path: 'dashboards/reviews', component: Reviews, data: { extraParameter: 'elementsMenu' } },
             { path: 'dashboards/wishlists', component: Wishlists, data: { extraParameter: 'elementsMenu' } },
-            { path: 'dashboards/wishlists', component: Profile, data: { extraParameter: 'elementsMenu' } },
+            { path: 'user/profile', component: Profile, data: { extraParameter: 'elementsMenu' } },
             // ... (rest of your routes, adding roles as needed) ...
 
             // Example of a route protected by only the parent guard (any authenticated user)

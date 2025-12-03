@@ -43,7 +43,7 @@
 
   <div class="modal-header">
     <h4 class="modal-title" id="modal-image-title" *ngIf="selectedProduct">
-      Images for: **{{ selectedProduct.productName }}** (ID: {{ selectedProduct.id }})
+      Images for: {{ selectedProduct.model_number }}
     </h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
@@ -135,7 +135,7 @@
 
   <div class="modal-header">
     <h4 class="modal-title" id="modal-video-title" *ngIf="selectedProduct">
-      Videos for: **{{ selectedProduct.productName }}** (ID: {{ selectedProduct.id }})
+      Videos for: {{ selectedProduct.model_number }}
     </h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>

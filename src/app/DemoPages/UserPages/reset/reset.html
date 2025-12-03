@@ -1,0 +1,42 @@
+<form [formGroup]="passwordForm" (ngSubmit)="onSubmit()" class="password-form">
+
+  <h3>🔒 Change Password</h3>
+
+  <div class="form-group">
+    <label for="newPassword">New Password:</label>
+    <input
+      type="password"
+      id="newPassword"
+      formControlName="newPassword"
+      class="form-control"
+    >
+    <div *ngIf="f['newPassword'].touched && f['newPassword'].errors" class="error-message">
+      <span *ngIf="f['newPassword'].errors['required']">New password is required.</span>
+      <span *ngIf="f['newPassword'].errors['minlength']">Password must be at least 8 characters.</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="confirmPassword">Confirm Password:</label>
+    <input
+      type="password"
+      id="confirmPassword"
+      formControlName="confirmPassword"
+      class="form-control"
+    >
+    <div *ngIf="f['confirmPassword'].touched && f['confirmPassword'].errors" class="error-message">
+      <span *ngIf="f['confirmPassword'].errors['required']">Confirmation is required.</span>
+    </div>
+  </div>
+
+  <div *ngIf="passwordForm.errors?.['passwordsMismatch'] && passwordForm.touched" class="error-message mismatch-error">
+    **Passwords do not match.**
+  </div>
+
+  <button type="submit" [disabled]="passwordForm.invalid">Submit</button>
+
+  <p class="form-status">
+    Form Status: {{ passwordForm.status }}
+  </p>
+
+</form>

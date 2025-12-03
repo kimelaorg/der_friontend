@@ -19,7 +19,7 @@ interface RegisterForm {
   selector: 'app-register-boxed',
   templateUrl: './register-boxed.component.html',
   standalone: false,
-  styles: []
+  styleUrl: './register-boxed.component.scss',
 })
 export class RegisterBoxedComponent implements OnInit {
 

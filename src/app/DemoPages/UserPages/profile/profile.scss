@@ -1,0 +1,243 @@
+:host {
+      display: block;
+      /* Ensure full screen height for centering */
+      min-height: 100vh;
+      background-color: #f8f9fa;
+      overflow: hidden;
+    }
+
+    /* 2. Profile Container (The main banner area) */
+    .profile-container {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      background-color: #5f7a7d;
+      border-radius: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      margin: 0;
+    }
+
+    /* Responsive adjustments for container height */
+    @media (max-width: 768px) {
+      .profile-container {
+        height: 300px;
+        /* max-width is implicitly 100% now */
+      }
+    }
+    @media (max-width: 576px) {
+      .profile-container {
+        height: 250px;
+      }
+    }
+
+    /* 3. Background Animation Layer (Gradients and Brand Text) */
+    .background-animation {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* Initial multiple background gradients */
+      background:
+          radial-gradient(circle at 20% 80%, rgba(100, 149, 237, 0.6) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(135, 206, 250, 0.6) 0%, transparent 50%),
+          radial-gradient(circle at 50% 50%, rgba(173, 216, 230, 0.6) 0%, transparent 50%);
+
+      background-size: 300% 300%;
+      background-position: 0% 0%, 50% 50%, 100% 100%;
+
+      /* Apply two simultaneous background animations */
+      animation:
+          colorShift 15s infinite ease-in-out alternate,
+          gradientPan 20s infinite linear alternate;
+
+      filter: grayscale(30%);
+      opacity: 0.9;
+    }
+
+    /* 4. Keyframes for Color and Position Shifting */
+
+    @keyframes colorShift {
+      0% {
+          background-image:
+              radial-gradient(circle at 20% 80%, rgba(100, 149, 237, 0.6) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(135, 206, 250, 0.6) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(173, 216, 230, 0.6) 0%, transparent 50%);
+      }
+      33% {
+          background-image:
+              radial-gradient(circle at 20% 80%, rgba(106, 90, 205, 0.6) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(123, 104, 238, 0.6) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(147, 112, 219, 0.6) 0%, transparent 50%);
+      }
+      66% {
+          background-image:
+              radial-gradient(circle at 20% 80%, rgba(70, 130, 180, 0.6) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(95, 158, 160, 0.6) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(119, 136, 153, 0.6) 0%, transparent 50%);
+      }
+      100% {
+          background-image:
+              radial-gradient(circle at 20% 80%, rgba(100, 149, 237, 0.6) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(135, 206, 250, 0.6) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(173, 216, 230, 0.6) 0%, transparent 50%);
+      }
+    }
+
+    @keyframes gradientPan {
+      0% { background-position: 0% 0%, 50% 50%, 100% 100%; }
+      100% { background-position: 100% 100%, 0% 0%, 50% 50%; }
+    }
+
+
+    /* 5. Brand Text Styling and Animation */
+    .brand-text {
+        position: absolute;
+        color: rgba(255, 255, 255, 0.2); /* Very subtle white */
+        font-size: 4rem; /* Large size */
+        font-weight: bold;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        white-space: nowrap;
+        pointer-events: none; /* Ignore mouse events */
+        z-index: 5; /* Below profile card, above gradients */
+
+        /* Positioning for animation */
+        transform: translate(-50%, -50%) rotate(-10deg);
+        top: 50%;
+        left: 50%;
+        opacity: 0;
+
+        animation: brandTextFlow 25s infinite ease-in-out;
+    }
+
+    @keyframes brandTextFlow {
+        0% {
+            transform: translate(-100%, -50%) rotate(-10deg) scale(0.9);
+            opacity: 0;
+        }
+        15% {
+            transform: translate(-50%, -50%) rotate(-5deg) scale(1);
+            opacity: 0.15;
+        }
+        85% {
+            transform: translate(0%, -50%) rotate(5deg) scale(1.1);
+            opacity: 0.1;
+        }
+        100% {
+            transform: translate(50%, -50%) rotate(10deg) scale(0.9);
+            opacity: 0;
+        }
+    }
+
+    /* Brand Text Responsiveness */
+    @media (max-width: 768px) {
+        .brand-text {
+            font-size: 3rem;
+            letter-spacing: 3px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .brand-text {
+            font-size: 2rem;
+            letter-spacing: 2px;
+        }
+    }
+
+
+    /* 6. Profile Card Content (Static Layer) */
+    .profile-card {
+        position: relative;
+        z-index: 10; /* Ensure it is on top of all background animations */
+        text-align: center;
+        color: #ffffff;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .profile-image-wrapper {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background-color: #a7d9f7; /* Light blue border */
+        padding: 5px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+    }
+
+    .profile-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .profile-name {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .profile-title {
+        font-size: 1.2rem;
+        opacity: 0.8;
+    }
+
+    /* Profile Text Responsiveness */
+    @media (max-width: 768px) {
+        .profile-name { font-size: 2rem; }
+        .profile-title { font-size: 1rem; }
+    }
+    @media (max-width: 576px) {
+        .profile-name { font-size: 1.5rem; }
+        .profile-title { font-size: 0.9rem; }
+    }
+
+
+    .profile-list {
+      padding-left: 0; // Remove default list padding
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee; // Subtle separator
+
+        &:last-child {
+          border-bottom: none; // No border on the last item
+        }
+      }
+
+      .label-title {
+        font-weight: 600;
+        color: #555;
+        flex-basis: 50%; // Allocate space for the label
+      }
+
+      .data-value {
+        text-align: right;
+        color: #333;
+        flex-basis: 50%; // Allocate space for the data value
+      }
+    }
+
+    // Ensure the vertical dividers are visible and styled nicely
+    .border-end {
+      border-right: 1px solid #ddd !important;
+      @media (max-width: 767.98px) {
+        border-right: none !important;
+        border-bottom: 1px solid #ddd !important;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+      }
+    }

@@ -59,19 +59,40 @@
               <form [formGroup]="salesForm" class="mb-4">
                   <div class="input-group">
                       <div class="autocomplete-container flex-grow-1 position-relative me-2">
-                          <input type="text" formControlName="searchQuery" class="form-control" placeholder="Search by SKU or Product Name">
+                          <input
+                              type="text"
+                              formControlName="searchQuery"
+                              class="form-control"
+                              placeholder="Search by SKU or Product Name"
+                              required>
+
+                          <div *ngIf="salesForm.get('searchQuery')?.invalid && (salesForm.get('searchQuery')?.dirty || salesForm.get('searchQuery')?.touched)" class="text-danger small mt-1">
+                              <div *ngIf="salesForm.get('searchQuery')?.errors?.['required']">
+                                  Product search query is required.
+                              </div>
+                          </div>
                           <ul class="list-group position-absolute w-100 z-100 shadow-sm" *ngIf="autocompleteResults.length > 0">
                               <li class="list-group-item list-group-item-action py-2 small"
                                   *ngFor="let product of autocompleteResults"
                                   (click)="selectProduct(product)">
-                                  **{{ product.sku }}** - {{ product.name }} (**${{ product.sale_price }}**)
+                                  {{ product.product_name }} - {{ product.model }}
                               </li>
                           </ul>
                       </div>
+
                       <input type="number" formControlName="quantity" class="form-control text-center" style="width: 80px;" min="1" value="1">
                       <span class="input-group-text">Qty</span>
                   </div>
-              </form>
+
+                  <div *ngIf="salesForm.get('quantity')?.invalid && (salesForm.get('quantity')?.dirty || salesForm.get('quantity')?.touched)" class="text-danger small mt-1">
+                       <div *ngIf="salesForm.get('quantity')?.errors?.['required']">
+                          Quantity is required.
+                       </div>
+                       <div *ngIf="salesForm.get('quantity')?.errors?.['min']">
+                          Quantity must be at least 1.
+                       </div>
+                  </div>
+                  </form>
 
               <div class="table-responsive mt-2">
                   <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
@@ -90,7 +111,7 @@
                           </tr>
                           <tr *ngFor="let item of cartItems(); index as i">
                               <td>
-                                  <div class="fw-bold">{{ item.name }}</div>
+                                  <div class="fw-bold">{{ item.name }} - {{ item.model }}</div>
                                   <div class="small text-muted">SKU: {{ item.sku }}</div>
                               </td>
                               <td class="text-center">
@@ -100,7 +121,7 @@
                               <td class="text-end fw-bold">{{ item.subtotal | currency: 'TZS': 'symbol' }}</td>
                               <td class="text-center">
                                   <button (click)="removeItem(i)" class="btn btn-sm btn-outline-danger p-1" aria-label="Remove item">
-                                    <i class="fa-solid fa-trash"></i>
+                                      <i class="fa-solid fa-trash"></i>
                                   </button>
                               </td>
                           </tr>
@@ -141,7 +162,8 @@
                   <div class="col-md-6">
                       <label for="payment_status" class="form-label">Payment Status</label>
                       <select id="payment_status" formControlName="payment_status" class="form-select">
-                          <option value="Completed">Completed</option>
+                          <option value="Completed">Full Paid</option>
+                          <option value="Partial Paid">Partial Paid</option>
                           <option value="Pending">Pending</option>
                           <option value="Failed">Failed</option>
                       </select>
@@ -170,7 +192,7 @@
                                   <ng-container *ngIf="customerForm.value.first_name || customerForm.value.last_name">
                                       <dt class="col-sm-5">Customer Name:</dt>
                                       <dd class="col-sm-7 text-truncate">
-                                          {{ customerForm.value.first_name }} {{ customerForm.value.last_name }}
+                                          {{ customerForm.value.first_name | titlecase }} {{ customerForm.value.last_name | titlecase }}
                                       </dd>
                                   </ng-container>
 
@@ -181,6 +203,13 @@
                                       </dd>
                                   </ng-container>
 
+                                  <ng-container *ngIf="customerForm.value.email">
+                                      <dt class="col-sm-5">Email:</dt>
+                                      <dd class="col-sm-7 text-truncate">
+                                          {{ customerForm.value.email }}
+                                      </dd>
+                                  </ng-container>
+
                                   <dt class="col-sm-5">Payment Method</dt>
                                   <dd class="col-sm-7">{{ paymentForm.get('payment_method')?.value }}</dd>
 
@@ -188,6 +217,7 @@
                                   <dd class="col-sm-7">
                                       <span class="badge"
                                             [class.bg-success]="paymentForm.get('payment_status')?.value === 'Completed'"
+                                            [class.bg-primary]="paymentForm.get('payment_status')?.value === 'Partial Paid'"
                                             [class.bg-danger]="paymentForm.get('payment_status')?.value === 'Failed'"
                                             [class.bg-warning]="paymentForm.get('payment_status')?.value === 'Pending'">
                                           {{ paymentForm.get('payment_status')?.value }}
@@ -219,17 +249,19 @@
                   <table class="table table-lg">
                       <thead>
                           <tr class="table">
+                              <th>#</th>
                               <th>Product</th>
                               <th class="text-center">Sale Price</th>
-                              <th class="text-center">Qty</th>
+                              <th class="text-center">Quantity</th>
                               <th class="text-end">Subtotal</th>
                           </tr>
                       </thead>
                       <tbody class="table-group-divider">
-                          <tr *ngFor="let item of cartItems()">
-                              <td>{{ item.name }} ({{ item.sku }})</td>
+                          <tr *ngFor="let item of cartItems(); let i = index">
+                              <th>{{ i + 1 }}</th>
+                              <td>{{ item.name }} ({{ item.model }})</td>
                               <td class="text-center">{{ item.unit_price | currency: 'TZS': 'symbol' }}</td>
-                              <td class="text-center">{{ item.quantity }} pc</td>
+                              <td class="text-center">{{ item.quantity }} PCS</td>
                               <td class="text-end">{{ item.subtotal | currency: 'TZS': 'symbol' }}</td>
                           </tr>
                       </tbody>

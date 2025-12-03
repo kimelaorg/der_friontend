@@ -69,6 +69,7 @@ export interface Product {
   id: number;
   name: string;
   sku: string;
+  model: string;
 }
 
 export interface Location {

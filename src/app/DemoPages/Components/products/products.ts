@@ -1,6 +1,6 @@
 import { Component, signal, WritableSignal, inject, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { FormBuilder, FormGroup, Validators, FormControl, NonNullableFormBuilder, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, AbstractControl, ValidationErrors, ValidatorFn, Validators, FormControl, NonNullableFormBuilder, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, of, forkJoin, BehaviorSubject } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -141,8 +141,21 @@ export class Products implements OnInit {
         is_active: ['true', [Validators.required]],
     });
 
-    // Product Spec Form (Updated for nested fields AND FormArray)
-    // NOTE: Using 'any' here is acceptable since the generic typing of FormArray is cumbersome
+    private priceRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+      const actualPrice = control.get('actual_price')?.value;
+      const discountedPrice = control.get('discounted_price')?.value;
+
+      if (actualPrice === null || discountedPrice === null) {
+        return null;
+      }
+
+      if (discountedPrice > actualPrice) {
+        return { priceMismatch: true };
+      }
+
+      return null;
+    };
+
     specForm: FormGroup<any> = this.formBuilder.group({
         id: [null as number | null],
         model: ['', [Validators.required, Validators.maxLength(255)]],
@@ -169,13 +182,7 @@ export class Products implements OnInit {
         product_connectivity_array: this.fb.array<ConnectivityItemForm>([]),
     });
 
-    /**
-     * @private
-     * Utility function to ensure optional foreign key IDs are null, not 0 or undefined/empty string.
-     * The API expects null for an optional link field that is not set.
-     * @param id The ID value from the form control.
-     * @returns The ID as a number, or null.
-     */
+
     private cleanOptionalId(id: string | number | null | undefined): number | null {
         if (id === null || id === undefined || id === '' || id === 0) {
             return null;
@@ -873,7 +880,7 @@ export class Products implements OnInit {
             });
     }
 
-    
+
 
 
     toggleInternetServiceSelection(id: number): void {

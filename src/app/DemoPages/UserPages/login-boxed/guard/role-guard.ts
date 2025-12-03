@@ -18,7 +18,7 @@ export const roleGuard: (requiredGroups: string[]) => CanActivateFn =
 
         // 1. Basic check: Is the user logged in (do they have a token)?
         if (!authService.getAccessToken()) {
-            console.warn('Access denied: User not authenticated.');
+            console.warn('Access denied: Authentication credentials were not provided.');
             // Redirect to the login page if not logged in
             return router.createUrlTree(['/der/account/login']);
         }

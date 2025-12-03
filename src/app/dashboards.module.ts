@@ -11,6 +11,7 @@ import { Transactions } from './DemoPages/Dashboards/transactions/transactions';
 import { Purchasing } from './DemoPages/Dashboards/purchasing/purchasing';
 import { Reports } from './DemoPages/Dashboards/reports/reports';
 import { GroupPipe } from './DemoPages/Dashboards/purchasing/group-pipe';
+import { SeachPipe } from './DemoPages/Dashboards/sales-view/seach-pipe';
 // import { SalesDatePipe } from './DemoPages/Dashboards/sales-view/sales-date-pipe';
 import { SalesView } from './DemoPages/Dashboards/sales-view/sales-view';
 import { Wishlists } from './DemoPages/Customer/wishlists/wishlists';
@@ -29,6 +30,7 @@ import { Me } from './DemoPages/Customer/me/me';
     Purchasing,
     Reports,
     GroupPipe,
+    SeachPipe,
     // SalesDatePipe,
     SalesView,
     Wishlists,
@@ -49,6 +51,7 @@ import { Me } from './DemoPages/Customer/me/me';
   exports: [
     AnalyticsComponent,
     GroupPipe,
+    SeachPipe,
     // SalesDatePipe
   ]
 })

@@ -14,10 +14,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PageTitleComponent } from './Layout/Components/page-title/page-title.component';
 import { LoginBoxedComponent } from './DemoPages/UserPages/login-boxed/login-boxed.component';
 
-
 @NgModule({
   declarations: [
     PageTitleComponent,
+  
   ],
   imports: [
     CommonModule,

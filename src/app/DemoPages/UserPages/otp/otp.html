@@ -3,7 +3,7 @@
     <div class="w-100 app-login-box" style="max-width: 600px;">
 
       <!-- Logo (Mimics Register component structure) -->
-      <div class="app-logo-inverse mx-auto mb-4 d-block" style="width: 60px; height: 60px; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('assets/images/logo-inverse.png');"></div>
+      <!-- <div class="app-logo-inverse mx-auto mb-4 d-block" style="width: 60px; height: 60px; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('assets/images/logo-inverse.png');"></div> -->
 
       <div class="card shadow-lg border-0">
         <div class="card-body p-4 p-md-5">
@@ -64,7 +64,7 @@
               <div class="d-grid">
                 <button
                   type="submit"
-                  class="btn btn-secondary btn-lg rounded-pill shadow-sm"
+                  class="btn btn-primary btn-lg rounded-pill shadow-sm"
                   [disabled]="otpForm.invalid || isLoading()">
                   <span *ngIf="isLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                   <i *ngIf="!isLoading()" class="fa fa-check me-2" aria-hidden="true"></i>

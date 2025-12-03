@@ -137,12 +137,12 @@
               </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let specification of specifications()">
-                <td class="text-center text-muted" style="width: 80px;">{{ specification.model }}</td>
+              <tr *ngFor="let specification of specifications();">
+                <td class="text-center text-muted" style="width: 80px;">00{{ specification.id }}</td>
                 <td class="text-center" style="width: 80px;">
-                  {{ lookupProductName(specification.product) }}
+                  {{ specification.product_name | titlecase }}
                 </td>
-                <td class="text-center"><a [routerLink]="">{{ lookupBrandName(specification.brand) }}</a></td>
+                <td class="text-center"><a [routerLink]="">{{ lookupBrandName(specification.brand) | titlecase}}</a></td>
                 <td class="text-center text-muted" style="width: 80px;">{{ specification.model }}</td>
                 <td class="text-center text-muted" style="width: 80px;">{{ specification.actual_price }}</td>
                 <td class="text-center text-muted" style="width: 80px;">{{ specification.discounted_price }}</td>
@@ -308,7 +308,7 @@
                       <option [ngValue]="null">Select Brand</option>
                       <option *ngFor="let brand of brands()" [ngValue]="brand.id">{{ brand.name }}</option>
                   </select>
-                  <!-- <div class="invalid-feedback" *ngIf="specForm.get('brand')?.errors?.['required']">Brand is required.</div> -->
+                  <div class="invalid-feedback" *ngIf="specForm.get('brand')?.errors?.['required']">Brand is required.</div>
               </div>
                 <div class="col-md-4 mb-3">
                     <label for="screen_size" class="form-label">Screen Size</label>
@@ -344,7 +344,7 @@
                     <div class="invalid-feedback" *ngIf="specForm.get('actual_price')?.errors?.['required']">Required.</div>
                 </div>
                 <div class="col-md-5 mb-3">
-                    <label for="discounted_price" class="form-label">Sale Price</label>
+                    <label for="discounted_price" class="form-label">Discounted Price</label>
                     <input id="sale_price" type="number" formControlName="discounted_price" class="form-control"
                         [class.is-invalid]="specForm.get('discounted_price')?.invalid && specForm.get('discounted_price')?.touched">
                     <div class="invalid-feedback" *ngIf="specForm.get('discounted_price')?.errors?.['required']">Required.</div>

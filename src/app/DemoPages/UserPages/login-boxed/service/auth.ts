@@ -26,7 +26,9 @@ export interface User {
     middle_name: string;
     last_name: string;
     email: string;
+    title: string;
     is_verified: boolean;
+    is_default_password: boolean;
     is_staff: boolean;
     groups: string[]; // This is the key for your roles/permissions
 }

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { FormGroup, Validators, NonNullableFormBuilder } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { finalize } from 'rxjs/operators';
-import { Auth } from '../login-boxed/service/auth';
+import { Auth, User } from '../login-boxed/service/auth';
 
 // Interface for the OTP verification payload
 interface OtpForm {
@@ -27,16 +27,20 @@ export class Otp implements OnInit { // Renamed class from Otp to OtpComponent f
   private baseUrl = 'http://localhost:8000/api/auth';
   readonly currentYear: number = new Date().getFullYear();
   public Copyright: string = '';
+  private redirectRoute: string = '';
   public brand = "Daz Electronics";
 
   // State Management using Signals
   phoneNumber: WritableSignal<string | null> = signal(null);
+  password_status: WritableSignal<boolean> = signal(false);
   password: WritableSignal<string | null> = signal(null);
   isLoginRequest: WritableSignal<string | null> = signal(null); // Tracks if data came from Login (requires email)
   message: WritableSignal<string | null> = signal(null);
   success: WritableSignal<string | null> = signal(null);
   isLoading: WritableSignal<boolean> = signal(false);
   isResending: WritableSignal<boolean> = signal(false);
+
+  public userDetails: User | null = null;
 
   // Reactive Form for OTP input
   otpForm: FormGroup<any> = this.formBuilder.group({
@@ -127,8 +131,24 @@ export class Otp implements OnInit { // Renamed class from Otp to OtpComponent f
 
           // Success: Redirect to the main application dashboard (for login)
           // or to the login page (for registration)
-          const redirectRoute = isLoginVerification ? '/der/dashboards' : '/der/account/login';
-          this.router.navigate([redirectRoute]);
+          this.userDetails = this.authService.getAuthenticatedUser();
+          const credentials = this.otpForm.getRawValue();
+
+          if(this.userDetails.is_default_password){
+            this.redirectRoute = '/der/account/complete-registration'
+            this.router.navigate([this.redirectRoute], {
+                state: {
+                    phoneNumber: credentials.phone_number
+                  }
+                });
+          }else if(this.userDetails.is_default_password){
+            this.redirectRoute = '/der/account/change-password'
+            this.router.navigate([this.redirectRoute]);
+          }else{
+            this.redirectRoute = isLoginVerification ? '/der/dashboards' : '/der/account/login';
+            this.router.navigate([this.redirectRoute]);
+
+          }
         },
         error: err => {
           const errors = err?.error;

@@ -7,13 +7,21 @@ import { LoginBoxedComponent } from './DemoPages/UserPages/login-boxed/login-box
 import { RegisterBoxedComponent } from './DemoPages/UserPages/register-boxed/register-boxed.component';
 import { Otp } from './DemoPages/UserPages/otp/otp';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Profile } from './DemoPages/UserPages/profile/profile';
+import { CompleteRegistration } from './DemoPages/UserPages/complete-registration/complete-registration';
+import { Reset } from './DemoPages/UserPages/reset/reset';
+import { ChangePassword } from './DemoPages/UserPages/change-password/change-password';
 
 @NgModule({
   declarations: [
     ForgotPasswordBoxedComponent,
     LoginBoxedComponent,
     RegisterBoxedComponent,
-    Otp
+    Otp,
+    Profile,
+    CompleteRegistration,
+    Reset,
+    ChangePassword
   ],
   imports: [
     SharedModule,

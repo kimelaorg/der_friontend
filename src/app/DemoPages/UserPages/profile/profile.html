@@ -1,0 +1,309 @@
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="profile-container">
+      <div class="background-animation">
+        <span class="brand-text">Daz Electronics</span>
+      </div>
+      <div class="profile-card" *ngIf="userData">
+        <div class="profile-image-wrapper">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJwAAACUCAMAAABRNbASAAAAMFBMVEXk5ueutLfn6eqrsbTh4+S0ubzd4OG7wMLKztDS1dfW2drAxcfN0dPEyMqorrG4vcBqnWuJAAAESElEQVR4nO2b25arIAyGJRzkpL7/226w1WrHtggJuPbyv5lp52K+FUggIem6W7du3bp169atW1UFAK0R/ioyCWWN995YJR5fXEIAwmon+TjyqPBDOm3FJfDAOsk4Z1uFj9LZ1uYDpeW4B1s1Mq8a4gFo+YHsYUA5tLIedIZ/Q5vxmG/DpvpfaPPiuhZr61kKW5SpTjeMiWhhbYfKbElLutL1NW0nvjrpAd1Ub+OJ6RxbDCrV4JJdYWs7UYft1H5b6arsOxhy2KLP0tOBT48hb3SGHE5lokWRb7vTjrox3US7sODz2eLCktKJArQgSbqwmZ66mo7SY0u84SE600FW+K1kOlHKRrjrYChmY9wTmU5M5XCMEcHZ8lUNOYUiYQOHAcdoXAJQ2BjNxU7lXkfeZAnYyo7Vl0j8FXoUNsYdPlvIuHDgGEWuY5HY2IjP1hk0OAKPQPKHAEdw5Sy8yr3ENT4czvkQ5dDhyu9yq/DTayhIu96En4TdcP8nHJ5DXBqOoBiGF4QJ7sIaDQ7/QgcG7WwlOPjxrkwESYTCumxyfLauQ0mpGUUkQcwhKB6bwOCkhjTlTYEDJ0nqEYDjEURVa5QwTFUDKy+6MprEcBaCv5I9gWGcYJyijPOgK7dcT8VW8Ci3Go7wDae4mEP5YF266+h23ExXdPpzuh03SxWZjqaSvir3ET1qpHogeSk7C6Ne1CDIfnKluY680WWWOLmt0ruRd+us1AuW4xQVnGGhO32zoyi1ftRJunp2izrlFZxV8YUNnU1uoeOyetcmpJbXuWvRbA0mwXhcVl7SlU4MPxqF+ajb9aiHtf1iPS6Hrml7Oih/3JzOx6lpa/oTD9QgYyP/gjj/JnV7socCn9FDP8moqR+0Ua3HDXaaYUTU8uEqggO1ZuoeWJ2yRmvXr3KD9saKhowAQoWd1rMxah/v5kmc8OXkfBwXqosYLGKDqSTnv4Jw+PvktBGV+MJ/UcFePL0FnM/h2ArygAzCDNMvex0Sjsx5ygATFtOxjKb5hS8sMdFEDnT28xTVCUCHP64WjNbn22yPJzXq7gPhGVJ/2sw3OoXFB9330bMcPIY1cKVxwZ54vC9+PATw2FZ74Q1lrgEK66nwEE8WpNohR0B0g2O83PTnRGqaT8ey5jjpzfbEyzAeKHqzLTpdSEmfwSzX2ahSZ0lXulPVFLzWoES69DrU2RlMDKV2mVZ0hY3Sap9lbzT5GnWK3dqwpdiucOqsSL8qx2jd8Vn68VRcO4a868sLFNKUTYk+nhV4/XvZ+jzJgdLUUqhPLovYCVyg48fF8w9aNJquuqhRRwuL2KRcKP7HY8FWvcF91d9eLMoc8KzeQ3H7EPfSexsbUssjksb9rR1ryBFHfDdChNUDjKbtrrtKjFu06zpFm4bDktxY7jIBeNFm8hphPh9ZrzMMq+scU2sfdklPHJmWA/ZaEfip5VrXMh38pHnT/QPOITooAy1cIwAAAABJRU5ErkJggg=="
+               alt="Profile Picture"
+               class="profile-img rounded-circle">
+        </div>
+          <h1 class="profile-name">{{ fullName | titlecase }}</h1>
+          <p class="profile-title">{{userData.groups }}</p>
+      </div>
+    </div>
+  </div>
+
+
+<div class="card main-card mb-3 py-4">
+  <!-- <div class="card-header">
+    user Details
+  </div> -->
+  <div class="card-body">
+    <ul class="nav nav-tabs"
+        [class.nav-justified]="currentJustify === 'justified'"
+        [class.nav-fill]="currentJustify === 'fill'"
+        [class.justify-content-center]="currentJustify === 'center'"
+        [class.justify-content-end]="currentJustify === 'end'"
+        id="justifiedTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="just-tab1-tab" data-bs-toggle="tab" data-bs-target="#just-tab1" type="button" role="tab" aria-controls="just-tab1" aria-selected="true"><b>Account</b> Info</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="just-tab2-tab" data-bs-toggle="tab" data-bs-target="#just-tab2" type="button" role="tab" aria-controls="just-tab2" aria-selected="false"><b>Residential</b> Info</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="just-tab3-tab" data-bs-toggle="tab" data-bs-target="#just-tab3" type="button" role="tab" aria-controls="just-tab3" aria-selected="false"><b>Next</b> of Kin</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="just-tab4-tab" data-bs-toggle="tab" data-bs-target="#just-tab4" type="button" role="tab" aria-controls="just-tab4" aria-selected="false"><b>Recent</b> Activities</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="just-tab4-tab" data-bs-toggle="tab" data-bs-target="#just-tab5" type="button" role="tab" aria-controls="just-tab5" aria-selected="false"><b>Change</b> Password</button>
+      </li>
+    </ul>
+    <div class="tab-content" id="justifiedTabContent">
+      <div *ngIf="userData" class="tab-pane fade show active" id="just-tab1" role="tabpanel" aria-labelledby="just-tab1-tab">
+        <div class="row mt-2">
+          <div class="col-6">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"><strong>First name:</strong> {{ userData.first_name | titlecase }}</li>
+              <li class="list-group-item"><strong>Middle name:</strong> {{ userData.middle_name | titlecase}}</li>
+              <li class="list-group-item"><strong>Last name:</strong> {{ userData.last_name | titlecase }}</li>
+              <li class="list-group-item"><strong>Date of Birth:</strong> {{ userData.birth_date | date: 'MMM dd, yyyy' }}</li>
+            </ul>
+          </div>
+          <div class="col-6">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"><strong>Primary Phone:</strong> {{ userData.phone_number }}</li>
+              <li class="list-group-item"><strong>Secondary Phone:</strong> {{ userData.second_phone_number }}</li>
+              <li class="list-group-item"><strong>Email:</strong> {{ userData.email }}</li>
+              <li class="list-group-item"><strong>Last login:</strong> {{ userData.last_login }}</li>
+            </ul>
+          </div>
+        </div>
+
+
+      </div>
+      <div class="tab-pane fade" id="just-tab2" role="tabpanel" aria-labelledby="just-tab2-tab">
+        <p class="mt-3">Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid.
+          Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four
+          loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts
+          ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit.</p>
+      </div>
+      <div class="tab-pane fade" id="just-tab3" role="tabpanel" aria-labelledby="just-tab3-tab">
+        <p class="mt-3">Sed commodo, leo at suscipit dictum, quam est porttitor sapien, eget sodales nibh elit id diam.
+          Nulla facilisi. Donec egestas ligula vitae odio interdum aliquet. Duis lectus turpis, luctus eget
+          tincidunt eu, congue et odio. Duis pharetra et nisl at faucibus. Quisque luctus pulvinar arcu, et
+          molestie lectus ultrices et. Sed diam urna, egestas ut ipsum vel, volutpat volutpat neque.</p>
+      </div>
+      <div class="tab-pane fade" id="just-tab4" role="tabpanel" aria-labelledby="just-tab4-tab">
+        <p class="mt-3">Sed commodo, leo at suscipit dictum, quam est porttitor sapien, eget sodales nibh elit id diam.
+          Nulla facilisi. Donec egestas ligula vitae odio interdum aliquet. Duis lectus turpis, luctus eget
+          tincidunt eu, congue et odio. Duis pharetra et nisl at faucibus. Quisque luctus pulvinar arcu, et
+          molestie lectus ultrices et. Sed diam urna, egestas ut ipsum vel, volutpat volutpat neque.</p>
+      </div>
+      <div class="tab-pane fade" id="just-tab5" role="tabpanel" aria-labelledby="just-tab5-tab">
+        <p class="mt-3">Sed commodo, leo at suscipit dictum, quam est porttitor sapien, eget sodales nibh elit id diam.
+          Nulla facilisi. Donec egestas ligula vitae odio interdum aliquet. Duis lectus turpis, luctus eget
+          tincidunt eu, congue et odio. Duis pharetra et nisl at faucibus. Quisque luctus pulvinar arcu, et
+          molestie lectus ultrices et. Sed diam urna, egestas ut ipsum vel, volutpat volutpat neque.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="text-center">
+      <div class="btn-group btn-group-toggle" role="group" aria-label="Tab justify options">
+        <input type="radio" class="btn-check" name="justify" id="justify-start" value="start"
+               [(ngModel)]="currentJustify" autocomplete="off">
+        <label class="btn btn-outline-primary btn-sm" for="justify-start">Start</label>
+
+        <input type="radio" class="btn-check" name="justify" id="justify-center" value="center"
+               [(ngModel)]="currentJustify" autocomplete="off">
+        <label class="btn btn-outline-primary btn-sm" for="justify-center">Center</label>
+
+        <input type="radio" class="btn-check" name="justify" id="justify-end" value="end"
+               [(ngModel)]="currentJustify" autocomplete="off">
+        <label class="btn btn-outline-primary btn-sm" for="justify-end">End</label>
+
+        <input type="radio" class="btn-check" name="justify" id="justify-fill" value="fill"
+               [(ngModel)]="currentJustify" autocomplete="off">
+        <label class="btn btn-outline-primary btn-sm" for="justify-fill">Fill</label>
+
+        <input type="radio" class="btn-check" name="justify" id="justify-justified" value="justified"
+               [(ngModel)]="currentJustify" autocomplete="off">
+        <label class="btn btn-outline-primary btn-sm" for="justify-justified">Justified</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container my-5" *ngIf="userData">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+
+      <div class="card shadow-lg mb-4">
+        <div class="card-header bg-primary text-white">
+          <h2 class="h4 mb-0">👤 {{ fullName | titlecase }}</h2>
+        </div>
+        <div class="card-body">
+          <div class="row">
+
+            <div class="col-md-6 mb-3">
+              <h5 class="card-title text-primary">Contact & Personal Info</h5>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Email:</strong> {{ userData.email }}</li>
+                <li class="list-group-item"><strong>Primary Phone:</strong> {{ userData.phone_number }}</li>
+                <li class="list-group-item"><strong>Secondary Phone:</strong> {{ userData.second_phone_number }}</li>
+                <li class="list-group-item"><strong>Date of Birth:</strong> {{ userData.birth_date }}</li>
+              </ul>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <h5 class="card-title text-primary">Residential Address</h5>
+              <div class="card-text">
+                <p class="mb-1">
+                  <strong>Region:</strong> {{ userData.address.region.name }}<br>
+                  <strong>District:</strong> {{ userData.address.district }}<br>
+                  <strong>Ward:</strong> {{ userData.address.ward }}<br>
+                  <strong>Street:</strong> {{ userData.address.street }}<br>
+                  <strong>House No:</strong> {{ userData.address.house_number }}<br>
+                  <strong>Post Code:</strong> {{ userData.address.post_code }}
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <h3 class="mt-5 mb-3 text-secondary">Family & Next of Kin ({{ userData.next_of_kin.length }})</h3>
+
+      <div class="row">
+        <div class="col-md-4 mb-4" *ngFor="let kin of userData.next_of_kin; let i = index">
+          <div class="card h-100 border-info">
+            <div class="card-header bg-info text-white">
+              <h5 class="h6 mb-0">Relative #{{ i + 1 }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <strong>Name:</strong> {{ kin.first_name | titlecase }} {{ kin.last_name | titlecase }}
+              </li>
+              <li class="list-group-item">
+                <strong>Phone:</strong> {{ kin.phone_number }}
+              </li>
+              <li class="list-group-item">
+                <strong>Email:</strong> {{ kin.email }}
+              </li>
+              <li class="list-group-item">
+                <strong>Address:</strong> {{ kin.physical_address | titlecase }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="container my-5" *ngIf="!userData">
+    <div class="alert alert-danger" role="alert">
+        Error: Could not load user data.
+    </div>
+</div>
+
+
+<div class="container my-5">
+  <div class="row justify-content-center" *ngIf="userData">
+    <div class="col-lg-12">
+      <div class="card shadow-lg">
+        <div class="card-body">
+          <h3 class="card-title text-primary mb-4">
+            <i class="bi bi-person-circle"></i> User Profile
+          </h3>
+
+          <div class="row">
+            <div class="col-md-4 border-end">
+              <h5 class="text-secondary mb-3">Personal Details</h5>
+              <ul class="list-unstyled profile-list">
+                <li>
+                  <strong class="label-title">👤 First Name</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">📝 Middle Name</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">📝 Last Name</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">👑 Title</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">ID Username</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">🚻 Gender</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="col-md-4 border-end">
+              <h5 class="text-secondary mb-3">Contact & Identity</h5>
+              <ul class="list-unstyled profile-list">
+                <li>
+                  <strong class="label-title">🎂 Birth Date</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">🏠 Physical Address</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">📬 Postal Address</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">📧 Email</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">📱 Mobile</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">🆔 National Identification Number</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="col-md-4">
+              <h5 class="text-secondary mb-3">Academic & System</h5>
+              <ul class="list-unstyled profile-list">
+                <li>
+                  <strong class="label-title">🏢 Department</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">⚙️ Unit</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">🏫 Campus</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">🔖 Registration Number</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">🎓 Year of Study</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+                <li>
+                  <strong class="label-title">🕰️ Last Login</strong>
+                  <span class="data-value">waooo</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-info my-5" role="alert" *ngIf="!userData">
+    Loading profile data...
+  </div>
+</div>

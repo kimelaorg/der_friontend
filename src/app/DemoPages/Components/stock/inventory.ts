@@ -11,9 +11,8 @@ export class Inventory {
   private BASE_URL = 'http://localhost:8000/api/inventory/management/';
   private INVENTORY_STATUS_URL = `${this.BASE_URL}`;
   private ADJUSTMENT_URL = `${this.BASE_URL}adjust-stock/`;
-  private apiUrl = '/api/inventory/management/';
-  private productUrl = '/api/products/';
-  private locationUrl = '/api/locations/';
+  private productUrl = 'http://localhost:8000/api/products/specs/';
+  private locationUrl = 'http://localhost:8000/api/inventory/locations/';
 
   constructor(private http: HttpClient) { }
 
@@ -37,17 +36,17 @@ export class Inventory {
     return this.http.get<Location[]>(this.locationUrl);
   }
 
-  addItem(item: Omit<InventoryItem, 'id'>): Observable<InventoryItem> {
-    return this.http.post<InventoryItem>(this.apiUrl, item);
+  addStockValue(item: Omit<InventoryItem, 'id'>): Observable<InventoryItem> {
+    return this.http.post<InventoryItem>(this.BASE_URL, item);
   }
 
-  updateItem(item: InventoryItem): Observable<InventoryItem> {
-    const url = `${this.apiUrl}${item.id}/`;
+  updateStockValue(item: InventoryItem): Observable<InventoryItem> {
+    const url = `${this.BASE_URL}${item.id}/`;
     return this.http.put<InventoryItem>(url, item);
   }
 
-  deleteItem(id: number): Observable<void> {
-    const url = `${this.apiUrl}${id}/`;
+  deleteStockValue(id: number): Observable<void> {
+    const url = `${this.BASE_URL}${id}/`;
     return this.http.delete<void>(url);
   }
 

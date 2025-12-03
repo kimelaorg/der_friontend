@@ -31,3 +31,10 @@ export interface SalesRecord {
   customer: Customer;
   items: SaleItem[];
 }
+
+export interface PaginatedSalesResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: SalesRecord[];
+}

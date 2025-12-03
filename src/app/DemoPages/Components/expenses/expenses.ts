@@ -189,7 +189,7 @@ export class Expenses implements OnInit, OnDestroy {
           this.expenseForm.get('payee_choice')!.valueChanges
               .subscribe(choice => {
                   const payeeIdControl = this.expenseForm.get('payee_id')!;
-                  const newPayeeNameControl = this.newPayee.get('payee_name')!;
+                  const newPayeeNameControl = this.newPayee.get('name')!;
 
                   payeeIdControl.clearValidators();
                   newPayeeNameControl.clearValidators();
@@ -346,7 +346,7 @@ export class Expenses implements OnInit, OnDestroy {
       payload.payee_id = rawValue.payee_id;
     } else if (rawValue.payee_choice === 'new') {
       const newPayeePayload: any = {
-        payee_name: rawValue.new_payee.payee_name,
+        name: rawValue.new_payee.payee_name,
         phone_number: rawValue.new_payee.phone_number,
       };
 

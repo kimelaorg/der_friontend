@@ -1,0 +1,365 @@
+// :host {
+//       display: block;
+//       /* Ensure full screen height for centering */
+//       min-height: 100vh;
+//       background-color: #f8f9fa;
+//       overflow: hidden;
+//     }
+//
+//     /* 2. Profile Container (The main banner area) */
+//     .profile-container {
+//       position: relative;
+//       width: 100%;
+//       height: 220px;
+//       background-color: #5f7a7d;
+//       border-radius: 0;
+//       overflow: hidden;
+//       display: flex;
+//       justify-content: center;
+//       align-items: center;
+//       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+//       margin: 0;
+//     }
+//
+//     /* Responsive adjustments for container height */
+//     @media (max-width: 768px) {
+//       .profile-container {
+//         height: 300px;
+//         /* max-width is implicitly 100% now */
+//       }
+//     }
+//     @media (max-width: 576px) {
+//       .profile-container {
+//         height: 250px;
+//       }
+//     }
+//
+//     /* 3. Background Animation Layer (Gradients and Brand Text) */
+//     .background-animation {
+//       position: absolute;
+//       top: 0;
+//       left: 0;
+//       width: 100%;
+//       height: 100%;
+//       /* Initial multiple background gradients */
+//       background:
+//           radial-gradient(circle at 20% 80%, rgba(100, 149, 237, 0.6) 0%, transparent 50%),
+//           radial-gradient(circle at 80% 20%, rgba(135, 206, 250, 0.6) 0%, transparent 50%),
+//           radial-gradient(circle at 50% 50%, rgba(173, 216, 230, 0.6) 0%, transparent 50%);
+//
+//       background-size: 300% 300%;
+//       background-position: 0% 0%, 50% 50%, 100% 100%;
+//
+//       /* Apply two simultaneous background animations */
+//       animation:
+//           colorShift 15s infinite ease-in-out alternate,
+//           gradientPan 20s infinite linear alternate;
+//
+//       filter: grayscale(30%);
+//       opacity: 0.9;
+//     }
+//
+//     /* 4. Keyframes for Color and Position Shifting */
+//
+//     @keyframes colorShift {
+//       0% {
+//           background-image:
+//               radial-gradient(circle at 20% 80%, rgba(100, 149, 237, 0.6) 0%, transparent 50%),
+//               radial-gradient(circle at 80% 20%, rgba(135, 206, 250, 0.6) 0%, transparent 50%),
+//               radial-gradient(circle at 50% 50%, rgba(173, 216, 230, 0.6) 0%, transparent 50%);
+//       }
+//       33% {
+//           background-image:
+//               radial-gradient(circle at 20% 80%, rgba(106, 90, 205, 0.6) 0%, transparent 50%),
+//               radial-gradient(circle at 80% 20%, rgba(123, 104, 238, 0.6) 0%, transparent 50%),
+//               radial-gradient(circle at 50% 50%, rgba(147, 112, 219, 0.6) 0%, transparent 50%);
+//       }
+//       66% {
+//           background-image:
+//               radial-gradient(circle at 20% 80%, rgba(70, 130, 180, 0.6) 0%, transparent 50%),
+//               radial-gradient(circle at 80% 20%, rgba(95, 158, 160, 0.6) 0%, transparent 50%),
+//               radial-gradient(circle at 50% 50%, rgba(119, 136, 153, 0.6) 0%, transparent 50%);
+//       }
+//       100% {
+//           background-image:
+//               radial-gradient(circle at 20% 80%, rgba(100, 149, 237, 0.6) 0%, transparent 50%),
+//               radial-gradient(circle at 80% 20%, rgba(135, 206, 250, 0.6) 0%, transparent 50%),
+//               radial-gradient(circle at 50% 50%, rgba(173, 216, 230, 0.6) 0%, transparent 50%);
+//       }
+//     }
+//
+//     @keyframes gradientPan {
+//       0% { background-position: 0% 0%, 50% 50%, 100% 100%; }
+//       100% { background-position: 100% 100%, 0% 0%, 50% 50%; }
+//     }
+//
+//
+//     /* 5. Brand Text Styling and Animation */
+//     .brand-text {
+//         position: absolute;
+//         color: rgba(255, 255, 255, 0.2); /* Very subtle white */
+//         font-size: 4rem; /* Large size */
+//         font-weight: bold;
+//         letter-spacing: 5px;
+//         text-transform: uppercase;
+//         white-space: nowrap;
+//         pointer-events: none; /* Ignore mouse events */
+//         z-index: 5; /* Below profile card, above gradients */
+//
+//         /* Positioning for animation */
+//         transform: translate(-50%, -50%) rotate(-10deg);
+//         top: 50%;
+//         left: 50%;
+//         opacity: 0;
+//
+//         animation: brandTextFlow 25s infinite ease-in-out;
+//     }
+//
+//     @keyframes brandTextFlow {
+//         0% {
+//             transform: translate(-100%, -50%) rotate(-10deg) scale(0.9);
+//             opacity: 0;
+//         }
+//         15% {
+//             transform: translate(-50%, -50%) rotate(-5deg) scale(1);
+//             opacity: 0.15;
+//         }
+//         85% {
+//             transform: translate(0%, -50%) rotate(5deg) scale(1.1);
+//             opacity: 0.1;
+//         }
+//         100% {
+//             transform: translate(50%, -50%) rotate(10deg) scale(0.9);
+//             opacity: 0;
+//         }
+//     }
+//
+//     /* Brand Text Responsiveness */
+//     @media (max-width: 768px) {
+//         .brand-text {
+//             font-size: 3rem;
+//             letter-spacing: 3px;
+//         }
+//     }
+//
+//     @media (max-width: 576px) {
+//         .brand-text {
+//             font-size: 2rem;
+//             letter-spacing: 2px;
+//         }
+//     }
+//
+//
+//     /* 6. Profile Card Content (Static Layer) */
+//     .profile-card {
+//         position: relative;
+//         z-index: 10; /* Ensure it is on top of all background animations */
+//         text-align: center;
+//         color: #ffffff;
+//         padding: 20px;
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
+//     }
+//
+//     .profile-image-wrapper {
+//         width: 120px;
+//         height: 120px;
+//         border-radius: 50%;
+//         background-color: #a7d9f7; /* Light blue border */
+//         padding: 5px;
+//         margin-bottom: 20px;
+//         display: flex;
+//         justify-content: center;
+//         align-items: center;
+//         box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+//     }
+//
+//     .profile-img {
+//         width: 100%;
+//         height: 100%;
+//         object-fit: cover;
+//         border-radius: 50%;
+//     }
+//
+//     .profile-name {
+//         font-size: 2.5rem;
+//         font-weight: bold;
+//         margin-bottom: 5px;
+//     }
+//
+//     .profile-title {
+//         font-size: 1.2rem;
+//         opacity: 0.8;
+//     }
+//
+//     /* Profile Text Responsiveness */
+//     @media (max-width: 768px) {
+//         .profile-name { font-size: 2rem; }
+//         .profile-title { font-size: 1rem; }
+//     }
+//     @media (max-width: 576px) {
+//         .profile-name { font-size: 1.5rem; }
+//         .profile-title { font-size: 0.9rem; }
+//     }
+//
+//
+
+
+$primary-color: #007bff; // Bootstrap primary
+$success-color: #28a745; // Bootstrap success
+
+.registration-container {
+    max-width: 750px;
+    margin: 0 auto;
+}
+
+// --- Background Header Styling (Adjust to your design) ---
+.profile-container {
+    position: relative;
+    .background-animation {
+        height: 120px;
+        background-color: $primary-color;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 8px 8px 0 0;
+        .brand-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    }
+    .profile-card {
+        margin-top: -60px; // Pull the card up over the background
+        padding: 15px;
+        text-align: center;
+        .profile-image-wrapper {
+            position: relative;
+            display: inline-block;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+
+            &:hover {
+                transform: scale(1.05);
+                .upload-icon {
+                    opacity: 1;
+                }
+            }
+
+            .profile-img {
+                width: 120px;
+                height: 120px;
+                object-fit: cover;
+                border: 4px solid white;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .upload-icon {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: rgba(0, 0, 0, 0.4);
+                color: white;
+                font-size: 2rem;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                border-radius: 50%;
+            }
+        }
+        .profile-title {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #6c757d;
+        }
+    }
+}
+
+
+// --- Progress Tracker Styling ---
+.progress-tracker {
+    position: relative;
+    padding: 0 15px;
+    .step-item {
+        position: relative;
+        z-index: 10;
+        .step-counter {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            margin: 0 auto 5px;
+            border: 2px solid #adb5bd;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .step-name {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        &.active .step-counter {
+            background-color: $primary-color;
+            color: white;
+            border-color: $primary-color;
+        }
+
+        &.completed .step-counter {
+            background-color: $success-color;
+            color: white;
+            border-color: $success-color;
+        }
+
+        &.completed .step-name {
+            color: $success-color;
+        }
+    }
+
+    .progress-line {
+        position: absolute;
+        top: 20px;
+        left: 15px; // Start after first icon space
+        right: 15px; // End before last icon space
+        height: 2px;
+        background-color: #dee2e6;
+        z-index: 5;
+
+        .progress {
+            height: 100%;
+            background-color: $primary-color;
+            transition: width 0.5s ease-in-out;
+        }
+    }
+}
+
+// --- Form and Review Styling ---
+.card {
+    border: none; // Remove default bootstrap card border
+}
+
+.review-stage {
+    .card {
+        border-left: 5px solid $primary-color;
+    }
+    dt {
+        font-weight: 600;
+    }
+}
+
+// Modal Preview Style
+.profile-preview-modal {
+    max-width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}

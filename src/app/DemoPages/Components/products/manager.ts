@@ -95,6 +95,7 @@ export interface DigitalProduct {
 export interface ProductSpecification {
     id?: number;
     model: string;
+    product_name: string;
     product: number; // Foreign Key to Product ID
     screen_size: number;
     brand: number;

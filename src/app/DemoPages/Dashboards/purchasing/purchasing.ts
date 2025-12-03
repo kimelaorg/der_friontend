@@ -111,7 +111,7 @@ export class Purchasing implements OnInit {
 
     ngOnInit(): void {
         this.loadRouteData();
-        this.loadSuppliers(); // Load suppliers on component initialization
+        this.loadSuppliers();
         this.loadPurchaseOrders();
         this.loadReceptions();
 
@@ -178,6 +178,7 @@ export class Purchasing implements OnInit {
       operation$.subscribe({
         next: () => {
           this.loadReceptions();
+          this.loadPurchaseOrders();
           this.closeModal();
         },
         error: (err) => {
@@ -206,7 +207,10 @@ export class Purchasing implements OnInit {
     deleteReception(id: number): void {
       if (confirm('Are you sure you want to delete this reception record?')) {
         this.purchasingService.deleteReception(id).subscribe({
-          next: () => this.loadReceptions(),
+          next: () => {
+            this.loadReceptions();
+            this.loadPurchaseOrders();
+          },
           error: (err) => console.error('Failed to delete reception', err)
         });
       }

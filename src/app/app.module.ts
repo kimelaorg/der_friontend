@@ -58,7 +58,6 @@ import { AuthenticationInterceptor } from './DemoPages/UserPages/login-boxed/int
 import { roleGuard } from './DemoPages/UserPages/login-boxed/guard/role-guard';
 
 
-
 @NgModule({
   declarations: [
     // LAYOUT
@@ -81,6 +80,7 @@ import { roleGuard } from './DemoPages/UserPages/login-boxed/guard/role-guard';
     FooterComponent,
 
     // All page components are declared in feature modules
+
 
   ],
   imports: [
