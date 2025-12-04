@@ -1,4 +1,6 @@
-<app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon"></app-page-title>
+<!-- <app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon"></app-page-title> -->
+<app-page-title [heading]="heading" [subheading]="subheading" [icon]="icon" [actionButtons]="actionButtons"></app-page-title>
+
 
 <h2 class="lead">Sales Records ({{ totalRecords }} Total)</h2>
 
@@ -169,6 +171,64 @@
         </ul>
     </nav>
 </div>
+
+
+<ng-template #confirmationModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title"><i class="fa fa-triangle-exclamation"></i> Confirm Day Closure</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <p>
+      You are about to permanently close your sales today's sale.
+    </p>
+    <p>
+      Are you sure you have recorded all sales and expenses? This action calculates the final cash settlement and cannot be undone for today's date.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('Cancel click')">
+      Cancel
+    </button>
+    <button type="button" class="btn btn-danger" (click)="confirmAction()">
+      Yes, Close Day Now
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #summaryModal let-modal>
+  <div class="modal-header" [ngClass]="{'bg-success-subtle': isSuccess, 'bg-danger-subtle': !isSuccess}">
+    <h4 class="modal-title" id="summary-modal-title">
+        <i class="fa me-2" [ngClass]="{'fa-circle-check': isSuccess, 'fa-circle-xmark': !isSuccess}"></i>
+        {{ isSuccess ? 'Closure Successful' : 'Closure Failed' }}
+    </h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+
+  <div class="modal-body">
+    <div *ngIf="message" [class.success]="isSuccess" [class.error]="!isSuccess" class="message-box">
+      <p>**{{ message }}**</p>
+
+      <div *ngIf="summary && isSuccess" class="summary-details">
+        <h3>Closure Summary</h3>
+        <ul>
+          <li>**Total Cash Sales:** ${{ summary.total_cash_sales | number:'1.2-2' }}</li>
+          <li>**Total Cash Expenses:** ${{ summary.total_cash_expenses | number:'1.2-2' }}</li>
+          <li>**Net Cash Settlement:** **${{ summary.net_cash_settlement | number:'1.2-2' }}**</li>
+        </ul>
+        <p class="mt-3">
+          **Note:** This is the net cash amount you must settle today.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('OK')">
+      Acknowledge & Close
+    </button>
+  </div>
+</ng-template>
 
 <!-- <button class="btn btn-danger ms-3" (click)="closeDailySales()" [disabled]="isClosing">
     <span *ngIf="isClosing" class="spinner-border spinner-border-sm me-2"></span>

@@ -38,3 +38,14 @@ export interface PaginatedSalesResponse {
   previous: string | null;
   results: SalesRecord[];
 }
+
+export interface CloseDaySummary {
+  total_cash_sales: number;
+  total_cash_expenses: number;
+  net_cash_settlement: number;
+}
+
+export interface CloseDayResponse {
+  detail: string;
+  summary: CloseDaySummary;
+}

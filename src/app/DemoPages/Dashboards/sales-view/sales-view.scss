@@ -5,3 +5,31 @@
     /* You can adjust 5rem to any size you prefer (e.g., 80px, 10vw, etc.) */
     border-width: 0.5em; /* Makes the border line thicker */
 }
+
+.message-box {
+  padding: 15px;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+.success {
+  background-color: #e6ffed;
+  border: 1px solid #00a854;
+  color: #00a854;
+}
+.error {
+  background-color: #fff0f0;
+  border: 1px solid #e53935;
+  color: #e53935;
+}
+.action-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.action-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

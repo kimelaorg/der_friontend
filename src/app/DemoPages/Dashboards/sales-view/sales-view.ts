@@ -1,15 +1,15 @@
-import { Component, OnInit, inject, signal, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ViewChild, TemplateRef, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// 🔴 REQUIRED: Import HttpParams for query parameters
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { SalesRecord, Customer, SaleItem, PaginatedSalesResponse } from './sales-data';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SalesRecord, Customer, SaleItem, PaginatedSalesResponse, CloseDaySummary, CloseDayResponse } from './sales-data';
+import { NgbModule, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of, throwError } from 'rxjs';
-import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { ActionButton } from '../../../Layout/Components/page-title/page-title.component';
+import { faEdit, faSearch, faPlus, faTriangleExclamation, faLock, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { catchError, switchMap, tap, finalize, map } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl } from '@angular/forms';
-
+import { Data } from './data';
 
 @Component({
   selector: 'app-sales-view',
@@ -24,10 +24,14 @@ export class SalesView implements OnInit {
   icon = 'pe-7s-cash text-success';
   faEdit = faEdit;
   faSearch = faSearch;
+  faTriangleExclamation = faTriangleExclamation;
+
+  currentView = signal<'view' | 'create'>('view');
+  isFlipping = signal(false);
+  isFlipped = computed(() => this.currentView() === 'create');
 
   // Sales Filtering Properties
   public searchText: string = '';
-  // 🔴 REMOVED: allSalesRecords (No longer needed for server-side loading)
   public salesRecords: SalesRecord[] = [];
   public selectedFilter: string = 'all';
 
@@ -56,10 +60,19 @@ export class SalesView implements OnInit {
   public cartItems = () => [{ product_specification_id: 1, quantity: 1, unit_price: 10.00, unit_measure: 'pc' }];
   public resetComponent = () => {};
 
+  isLoading: boolean = false;
+  message: string | null = null;
+  summary: CloseDaySummary | null = null;
+  isSuccess: boolean = false;
+
   readonly SALES_RECORD_API = 'http://127.0.0.1:8000/api/sales/sales-records/';
 
   @ViewChild('content') content!: ElementRef;
-  constructor(private fb: FormBuilder, private http: HttpClient, private modalService: NgbModal) {
+  @ViewChild('confirmationModal') confirmationModal!: TemplateRef<any>;
+  @ViewChild('summaryModal') summaryModal!: TemplateRef<any>;
+  private modalRef!: NgbModalRef;
+
+  constructor(private salesService: Data, private fb: FormBuilder, private http: HttpClient, private modalService: NgbModal) {
     // Form initialization remains the same
     this.customerForm = this.fb.group({
       first_name: [''],
@@ -89,8 +102,101 @@ export class SalesView implements OnInit {
     this.loadSalesRecords();
   }
 
-  /** * 🔴 CORE FUNCTION: Fetches data from the backend based on current filters and page.
-   */
+  toggleView(target: 'view' | 'create'): void {
+      if (this.isFlipping()) return;
+
+      // Ensure the current view is the opposite of the target to avoid re-flipping
+      if (this.currentView() === target) {
+           console.log('Already on target view:', target);
+           return;
+      }
+
+      this.isFlipping.set(true);
+
+      // 1. Flip the card (changes the computed isFlipped signal)
+      this.currentView.set(target);
+
+      // 2. Wait for the CSS transition (0.8s) before allowing further clicks
+      setTimeout(() => {
+          this.isFlipping.set(false);
+      }, 800); // Matches transition duration in CSS
+  }
+
+  closeSalesDay(): void {
+    this.isLoading = true;
+    this.message = null;
+    this.summary = null;
+    this.isSuccess = false;
+
+    this.salesService.closeDay().subscribe({
+      next: (response: CloseDayResponse) => {
+        // SUCCESS: Set data and open the summary modal
+        this.message = response.detail;
+        this.summary = response.summary;
+        this.isSuccess = true;
+        this.isLoading = false;
+
+        // **NEW: Open the dedicated summary modal on success**
+        this.openSummaryModal();
+      },
+      error: (error: HttpErrorResponse) => {
+        // ERROR: Set data and open the summary modal (to display the error)
+        this.isSuccess = false;
+        this.isLoading = false;
+
+        let errorMessage = "An unknown error occurred while closing the day.";
+
+        if (error.error && error.error.detail) {
+          errorMessage = error.error.detail;
+        } else if (error.statusText) {
+          errorMessage = `${error.status}: ${error.statusText}`;
+        }
+
+        this.message = errorMessage;
+
+        // **NEW: Open the dedicated summary modal on error as well**
+        this.openSummaryModal();
+      }
+    });
+  }
+
+  openConfirmationModal(): void {
+    // Reset messages before opening
+    this.message = null;
+    this.summary = null;
+    this.isSuccess = false;
+
+    // Open the modal, capturing the reference
+    this.modalRef = this.modalService.open(this.confirmationModal, {
+      ariaLabelledBy: 'modal-basic-title',
+      backdrop: 'static' // Prevents closing by clicking outside
+    });
+
+    // Subscribe to the result of the modal (i.e., when it's closed/dismissed)
+    this.modalRef.result.then(
+      (result) => {
+        // This block executes if the modal is closed with a "Close" reason (i.e., confirmed)
+        if (result === 'ConfirmClose') {
+          this.closeSalesDay();
+        }
+      },
+      (reason) => {
+        // This block executes if the modal is dismissed (i.e., canceled)
+        console.log(`Modal dismissed: ${reason}`);
+      }
+    );
+  }
+
+  openSummaryModal(): void {
+    this.modalService.open(this.summaryModal, {
+      ariaLabelledBy: 'summary-modal-title'
+    });
+  }
+
+  confirmAction(): void {
+    this.modalRef.close('ConfirmClose');
+  }
+
   loadSalesRecords(): void {
     let params = new HttpParams()
       // 🔴 Pass page and page_size for server-side pagination
@@ -270,5 +376,17 @@ export class SalesView implements OnInit {
       });
   }
 
-  // 🔴 REMOVED: isSameDay, isSameWeek, loadAll
+  handleCreateModal = () => {
+      this.openConfirmationModal();
+   }
+
+  actionButtons: ActionButton[] = [
+      {
+          text: 'Close Day Sales',
+          icon: faLock,
+          class: 'btn-success',
+          onClick: this.handleCreateModal
+      }
+  ];
+
 }
