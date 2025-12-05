@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
-import { ExpensePayload, Entity, DistrictEntity, WardEntity, AddressDataResponse } from './data';
+import { ExpensePayload, Entity, DistrictEntity, WardEntity, StreetEntity, PostcodeEntity, AddressDataResponse } from './data';
 
 
 @Injectable({
@@ -55,6 +55,35 @@ export class Logic {
      
     return this.http.get<WardEntity[]>(this.locationsUrl, { params });
   }
+
+  // Assuming this is within a LocationService class that imports HttpClient and HttpParams
+  fetchStreetsByWard(regionName: string, districtName: string, wardName: string): Observable<StreetEntity[]> {
+    // 1. Initialize HttpParams
+    let params = new HttpParams()
+        .set('level', 'streets')
+        .set('region', regionName)
+        .set('district', districtName)
+        .set('ward', wardName);
+
+    return this.http.get<StreetEntity[]>(this.locationsUrl, { params });
+  }
+
+  // Assuming this is within a LocationService class that imports HttpClient and HttpParams
+    fetchPostcodesByStreet(regionName: string, districtName: string, wardName: string, streetName: string): Observable<PostcodeEntity[]> {
+        // 1. Initialize HttpParams
+        let params = new HttpParams()
+            // Level must be set to 'postcodes' to fetch the final list
+            .set('level', 'postcodes')
+            // Include all ancestor locations for precise filtering
+            .set('region', regionName)
+            .set('district', districtName)
+            .set('ward', wardName)
+            .set('street', streetName);
+
+        // 2. Make the HTTP GET request
+        // Assumes PostcodeEntity is defined (e.g., { id: string, code: string, name: string })
+        return this.http.get<PostcodeEntity[]>(this.locationsUrl, { params });
+    }
 
   /**
    * Replaced with fetchDistrictsByRegion and fetchWardsByDistrict to use the single endpoint.

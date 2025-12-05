@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, signal, WritableSignal } from '@angular/c
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
 import { Subscription, startWith, switchMap, of, filter } from 'rxjs'; // Added 'filter'
 import { Logic } from './logics';
-import { Entity, ExpensePayload, RegionEntity, DistrictEntity, WardEntity } from './data';
+import { Entity, ExpensePayload, RegionEntity, DistrictEntity, WardEntity, StreetEntity, PostcodeEntity } from './data';
 
 
 @Component({
@@ -22,6 +22,7 @@ export class Expenses implements OnInit, OnDestroy {
   isSubmitted: boolean = false;
 
   expenses: WritableSignal<ExpensePayload[]> = signal([]);
+  message: WritableSignal<string | null> = signal(null);
 
   // --- Dynamic Data Containers ---
   paymentMethods: string[] = ['Cash', 'Credit Card', 'Mobile Money', 'Bank Transfer'];
@@ -30,7 +31,9 @@ export class Expenses implements OnInit, OnDestroy {
 
   regions: RegionEntity[] = [];
   districts: DistrictEntity[] = []; // Districts will be loaded dynamically
-  wards: WardEntity[] = [];         // Wards will be loaded dynamically
+  wards: WardEntity[] = []; 
+  streets: StreetEntity[] = [];
+  post_codes: PostcodeEntity[] = [];      
 
   // Subscriptions management
   private subscriptions: Subscription = new Subscription();
@@ -62,7 +65,7 @@ export class Expenses implements OnInit, OnDestroy {
       category_choice: ['existing', Validators.required],
       category_id: [null],
       new_category: this.fb.group({
-        category_name: [''],
+        name: [''],
       }),
 
       // Payee
@@ -76,6 +79,8 @@ export class Expenses implements OnInit, OnDestroy {
           region_id: [null],
           district_id: [null],
           ward_id: [null],
+          street_id: [null],
+          post_code_id: [null],
         }),
       }),
     }, { validators: [
@@ -177,7 +182,9 @@ export class Expenses implements OnInit, OnDestroy {
             this.newPayeeAddress.reset({
                 region_id: null,
                 district_id: null,
-                ward_id: null
+                ward_id: null,
+                street_id: null,
+                post_code_id: null
             });
         }
       })
@@ -208,62 +215,140 @@ export class Expenses implements OnInit, OnDestroy {
   }
 
   // 7. Chained Region -> District -> Ward population (FIXED IMPLEMENTATION)
-  private setupRegionDistrictChains(): void {
-      // Get form controls
-      const regionControl = this.newPayeeAddress.get('region_id')!;
-      const districtControl = this.newPayeeAddress.get('district_id')!;
-      const wardControl = this.newPayeeAddress.get('ward_id')!;
+  private setupRegionDistrictChains(): void {
+    // Get form controls
+    const regionControl = this.newPayeeAddress.get('region_id')!;
+    const districtControl = this.newPayeeAddress.get('district_id')!;
+    const wardControl = this.newPayeeAddress.get('ward_id')!;
+    const streetControl = this.newPayeeAddress.get('street_id')!;
+    const postCodeControl = this.newPayeeAddress.get('post_code_id')!;
 
-      // --- A. Region -> District Chain (Fetches Districts from API) ---
-      this.subscriptions.add(
-          regionControl.valueChanges.pipe(
-              startWith(regionControl.value),
-              // CRITICAL FIX: Filter out null/undefined values (on reset/init) to prevent API call
-              filter((selectedRegionId): selectedRegionId is string => !!selectedRegionId),
-              switchMap((selectedRegionId: string) => { // ID is the Mtaa name (string)
-                  // CRITICAL FIX: Use { emitEvent: false } to prevent this reset from triggering the District subscription
-                  districtControl.setValue(null, { emitEvent: false });
-                  wardControl.setValue(null, { emitEvent: false });
-                  this.districts = [];
-                  this.wards = [];
-                 
-                  // Call service (using the new single-endpoint logic from Logic.ts)
-                  return this.expenseService.fetchDistrictsByRegion(selectedRegionId);
-              })
-          ).subscribe(districts => {
-              this.districts = districts;
-              districtControl.updateValueAndValidity();
-          },
+    // --- A. Region -> District Chain (Fetches Districts from API) ---
+    this.subscriptions.add(
+        regionControl.valueChanges.pipe(
+            startWith(regionControl.value),
+            filter((selectedRegionId): selectedRegionId is string => !!selectedRegionId),
+            switchMap((selectedRegionId: string) => {
+                // Reset all downstream controls and data
+                districtControl.setValue(null, { emitEvent: false });
+                wardControl.setValue(null, { emitEvent: false });
+                streetControl.setValue(null, { emitEvent: false });
+                postCodeControl.setValue(null, { emitEvent: false });
+
+                this.districts = [];
+                this.wards = [];
+                this.streets = [];
+                this.post_codes = [];
+
+                // Call service (Assuming fetchDistrictsByRegion is available)
+                return this.expenseService.fetchDistrictsByRegion(selectedRegionId);
+            })
+        ).subscribe(districts => {
+            this.districts = districts;
+            districtControl.updateValueAndValidity();
+        },
             error => console.error('Error fetching districts:', error))
-      );
+    );
 
-      // --- B. District -> Ward Chain (Fetches Wards from API) ---
-      this.subscriptions.add(
-          districtControl.valueChanges.pipe(
-              startWith(districtControl.value),
-              // CRITICAL FIX: Filter out null/undefined values (on reset/init) to prevent API call
-              filter((selectedDistrictId): selectedDistrictId is string => !!selectedDistrictId),
-              switchMap((selectedDistrictId: string) => { // ID is the Mtaa name (string)
-                  // CRITICAL FIX: Use { emitEvent: false } to prevent this reset from triggering unwanted events
-                  wardControl.setValue(null, { emitEvent: false });
-                  this.wards = [];
+    // --- B. District -> Ward Chain (Fetches Wards from API) ---
+    this.subscriptions.add(
+        districtControl.valueChanges.pipe(
+            startWith(districtControl.value),
+            filter((selectedDistrictId): selectedDistrictId is string => !!selectedDistrictId),
+            switchMap((selectedDistrictId: string) => {
+                // Reset all downstream controls and data
+                wardControl.setValue(null, { emitEvent: false });
+                streetControl.setValue(null, { emitEvent: false });
+                postCodeControl.setValue(null, { emitEvent: false });
 
-                  const selectedRegionId: string = regionControl.value; // Get parent Region ID/Name
+                this.wards = [];
+                this.streets = [];
+                this.post_codes = [];
 
-                  if (!selectedRegionId) {
-                      return of([]);
-                  }
-                 
-                  // Call service (using the new single-endpoint logic from Logic.ts)
-                  return this.expenseService.fetchWardsByDistrict(selectedRegionId, selectedDistrictId);
-              })
-          ).subscribe(wards => {
-              this.wards = wards;
-              wardControl.updateValueAndValidity();
-          },
+                const selectedRegionId: string = regionControl.value;
+
+                if (!selectedRegionId) {
+                    return of([]);
+                }
+
+                // Call service: fetchWardsByDistrict (Requires Region + District)
+                return this.expenseService.fetchWardsByDistrict(selectedRegionId, selectedDistrictId);
+            })
+        ).subscribe(wards => {
+            this.wards = wards;
+            wardControl.updateValueAndValidity();
+        },
             error => console.error('Error fetching wards:', error))
-      );
-  }
+    );
+
+    // --- C. Ward -> Street Chain (Fetches Streets from API) ---
+    this.subscriptions.add(
+        wardControl.valueChanges.pipe(
+            startWith(wardControl.value),
+            filter((selectedWardId): selectedWardId is string => !!selectedWardId),
+            switchMap((selectedWardId: string) => {
+                // Reset all downstream controls and data
+                streetControl.setValue(null, { emitEvent: false });
+                postCodeControl.setValue(null, { emitEvent: false });
+
+                this.streets = [];
+                this.post_codes = [];
+
+                const selectedRegionId: string = regionControl.value;
+                const selectedDistrictId: string = districtControl.value;
+
+                if (!selectedRegionId || !selectedDistrictId) {
+                    return of([]);
+                }
+
+                // Call service: fetchStreetsByWard (Requires Region + District + Ward)
+                return this.expenseService.fetchStreetsByWard(
+                    selectedRegionId,
+                    selectedDistrictId,
+                    selectedWardId
+                );
+            })
+        ).subscribe(streets => {
+            this.streets = streets;
+            streetControl.updateValueAndValidity();
+        },
+            error => console.error('Error fetching streets:', error))
+    );
+
+    // --- D. Street -> Post Code Chain (Fetches Post Codes from API) ---
+    this.subscriptions.add(
+        streetControl.valueChanges.pipe(
+            startWith(streetControl.value),
+            filter((selectedStreetId): selectedStreetId is string => !!selectedStreetId),
+            switchMap((selectedStreetId: string) => {
+                // Reset downstream controls and data
+                postCodeControl.setValue(null, { emitEvent: false });
+                this.post_codes = [];
+
+                const selectedRegionId: string = regionControl.value;
+                const selectedDistrictId: string = districtControl.value;
+                const selectedWardId: string = wardControl.value;
+
+                if (!selectedRegionId || !selectedDistrictId || !selectedWardId) {
+                    return of([]);
+                }
+
+                // Call service: fetchPostcodesByStreet (Requires Region + District + Ward + Street)
+                // Note: I assume 'fetchPostcodesByStreet' is the correct method name based on your provided service code snippet.
+                return this.expenseService.fetchPostcodesByStreet(
+                    selectedRegionId,
+                    selectedDistrictId,
+                    selectedWardId,
+                    selectedStreetId
+                );
+            })
+        ).subscribe(post_codes => {
+            this.post_codes = post_codes;
+            postCodeControl.updateValueAndValidity();
+        },
+            error => console.error('Error fetching post codes:', error))
+    );
+  }
 
   // --- 3. Custom Validators (unchanged) ---
 
@@ -272,7 +357,7 @@ export class Expenses implements OnInit, OnDestroy {
     return (control: AbstractControl): {[key: string]: any} | null => {
       const choice = control.get('category_choice')?.value;
       const id = control.get('category_id')?.value;
-      const newName = control.get('new_category.category_name')?.value;
+      const newName = control.get('new_category.name')?.value;
 
       if (choice === 'existing' && !id) { return { categoryMissing: true }; }
       if (choice === 'new' && !newName) { return { categoryMissing: true }; }
@@ -352,9 +437,11 @@ export class Expenses implements OnInit, OnDestroy {
 
       if (rawValue.new_payee.hasAddress && rawValue.new_payee.address.region_id) {
         newPayeePayload.address = {
-            region_id: rawValue.new_payee.address.region_id,
-            district_id: rawValue.new_payee.address.district_id,
-            ward_id: rawValue.new_payee.address.ward_id,
+            region: rawValue.new_payee.address.region_id,
+            district: rawValue.new_payee.address.district_id,
+            ward: rawValue.new_payee.address.ward_id,
+            street: rawValue.new_payee.address.street_id,
+            post_code: rawValue.new_payee.address.post_code_id,
         };
       }
       payload.new_payee = newPayeePayload;
@@ -377,12 +464,22 @@ export class Expenses implements OnInit, OnDestroy {
           this.isSubmitted = false;
           this.fetchInitialData();
         },
-        error: (error) => {
-          console.error('API Error during expense creation:', error);
-          // FIX: Replaced alert() with console logging
-          console.error('Failed to record expense. Please check input details.');
-          this.isLoading = false;
-        }
+        error: err => {
+          const errors = err?.error;
+          if (errors && typeof errors === 'object') {
+            // Server-side validation handling
+            Object.keys(errors).forEach(field => {
+              const control = this.expenseForm.get(field);
+              if (control) {
+                control.setErrors({ serverError: errors[field][0] });
+              }
+            });
+          } else {
+            // General error message (e.g., network failure)
+            this.message.set('An unexpected error occurred. Please try again.');
+            console.error('Unexpected registration error:', err);
+          }
+        }
       });
   }
 }

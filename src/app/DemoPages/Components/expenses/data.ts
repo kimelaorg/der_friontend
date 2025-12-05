@@ -13,6 +13,14 @@ export interface WardEntity extends Entity {
     district_id: string;
 }
 
+export interface StreetEntity extends Entity {
+    street_id: string;
+}
+
+export interface PostcodeEntity extends Entity {
+    post_code_id: string;
+}
+
 
 // --- Final Expense Payload Structure ---
 export interface ExpensePayload {
@@ -35,6 +43,7 @@ export interface ExpensePayload {
       region_id: string;
       district_id?: string;
       ward_id?: string;
+      street_id?: string;
       post_code?: string;
     };
   };
@@ -44,6 +53,8 @@ export interface ExpensePayload {
 export interface AddressDataResponse {
   districts: DistrictEntity[];
   wards: WardEntity[];
+  streets: StreetEntity[];
+  post_codes: PostcodeEntity[];
 }
 
 /**
