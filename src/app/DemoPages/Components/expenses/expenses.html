@@ -146,7 +146,7 @@
                                                   <option [ngValue]="null" disabled>
                                                       {{ newPayeeAddress.get('region_id')?.value ? (districts.length > 0 ? 'Select District' : 'Loading districts...') : 'Select Region First' }}
                                                   </option>
-                                                  <option *ngFor="let district of districts" [ngValue]="district.id">{{ district.name }}</option>
+                                                  <option *ngFor="let district of districts" [ngValue]="district.name">{{ district.name }}</option>
                                               </select>
                                           </div>
 
@@ -157,7 +157,7 @@
                                                   <option [ngValue]="null" disabled>
                                                       {{ newPayeeAddress.get('district_id')?.value ? (wards.length > 0 ? 'Select Ward' : 'Loading wards...') : 'Select District First' }}
                                                   </option>
-                                                  <option *ngFor="let ward of wards" [ngValue]="ward.id">{{ ward.name }}</option>
+                                                  <option *ngFor="let ward of wards" [ngValue]="ward.name">{{ ward.name }}</option>
                                               </select>
                                           </div>
 
