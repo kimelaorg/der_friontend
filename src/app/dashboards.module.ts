@@ -20,6 +20,7 @@ import { Purchased } from './DemoPages/Customer/purchased/purchased';
 import { Orders } from './DemoPages/Customer/orders/orders';
 import { Profile } from './DemoPages/Customer/profile/profile';
 import { Me } from './DemoPages/Customer/me/me';
+import { SalesOrder } from './DemoPages/Dashboards/sales-order/sales-order';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { Me } from './DemoPages/Customer/me/me';
     Orders,
     Profile,
     Me,
+    SalesOrder,
   ],
   imports: [
     SharedModule,

@@ -1,0 +1,126 @@
+// Import Bootstrap's utilities if you are using a custom SCSS compilation.
+// @import 'bootstrap/scss/functions';
+// @import 'bootstrap/scss/variables';
+// @import 'bootstrap/scss/mixins';
+
+$primary: #007bff; // Example Primary Color
+$success: #28a745; // Example Success Color
+$info: #17a2b8;   // Example Info Color
+
+// --- 1. Multi-Stage Navigation Styling ---
+.nav-pills {
+    // Ensure tabs wrap nicely on small screens instead of overflowing
+    flex-wrap: wrap;
+    .nav-item {
+        margin-bottom: 0.5rem;
+
+        @media (min-width: 768px) { // Tablet and up
+            flex: 1 1 auto; // Distribute space evenly
+            margin-bottom: 0;
+        }
+    }
+
+    .nav-link {
+        font-weight: 600;
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+
+        // Active State
+        &.active {
+            color: #fff;
+            background-color: $success; // Use success color for active stage
+        }
+
+        // Disabled/Future State
+        &.disabled {
+            color: #6c757d; // Bootstrap secondary/muted color
+            background-color: #f8f9fa; // Light background
+            cursor: not-allowed;
+            opacity: 0.7;
+
+            // Interaction feedback for active stages
+            &:not(.active):hover {
+                background-color: #e9ecef;
+            }
+        }
+
+        // The number badge styling
+        .badge {
+            font-size: 0.8em;
+            vertical-align: middle;
+        }
+    }
+}
+
+// --- 2. Stage 1: Customer Search & Form Enhancement ---
+.autocomplete-container {
+    position: relative;
+
+    .list-group {
+        max-height: 250px;
+        overflow-y: auto;
+        border-radius: 0.25rem;
+        width: calc(100% - 1.5rem); // Match the input width minus the margin
+
+        .list-group-item {
+            cursor: pointer;
+            &:hover {
+                background-color: $primary;
+                color: #fff;
+            }
+        }
+    }
+}
+
+
+// --- 3. Stage 2 & 6: Table Responsiveness (Cart Items) ---
+.table-responsive {
+    // Ensures scrolling for large tables on small devices
+    overflow-x: auto;
+}
+
+// Ensure the table in the review stage is readable on mobile
+@media (max-width: 767px) {
+    .table-lg {
+        font-size: 0.85rem;
+        th, td {
+            padding: 0.5rem;
+        }
+    }
+
+    // Make the total row stand out
+    tfoot tr th {
+        font-size: 1rem;
+    }
+}
+
+
+// --- 4. Review Stage (Stage 6) Card Layout ---
+
+// Improve readability of description lists (dt/dd) on mobile
+@media (max-width: 575px) { // Extra small devices
+    .card-body dl.row {
+        .col-sm-5 {
+            flex: 0 0 40%; // Keep labels short
+            max-width: 40%;
+        }
+        .col-sm-7 {
+            flex: 0 0 60%; // Give values more space
+            max-width: 60%;
+        }
+    }
+}
+
+// --- 5. General Utility & Feedback ---
+.form-control, .form-select {
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.alert-success.position-fixed {
+    // Custom styling for the success notification
+    max-width: 90%;
+    @media (min-width: 576px) {
+        max-width: 400px;
+    }
+}

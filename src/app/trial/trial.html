@@ -3,7 +3,7 @@
         type="button"
         class="btn btn-primary"
         (click)="openSoftwareManagement()">
-        <fa-icon [icon]="faHdd" class="me-2"></fa-icon> 
+        <fa-icon [icon]="faHdd" class="me-2"></fa-icon>
         Create New Software
     </button>
 </div>
@@ -37,6 +37,13 @@
                         title="Delete Software"
                         (click)="deleteSoftware(software.id)">
                         <fa-icon [icon]="faTrash"></fa-icon>
+                    </button>
+
+                    <button
+                      class="btn btn-sm btn-outline-info me-2"
+                      title="Download {{ software.name }}"
+                      (click)="downloadSoftware(software)">
+                      <fa-icon [icon]="faDownload"></fa-icon>
                     </button>
                 </div>
             </div>

@@ -77,3 +77,5 @@ export { SoftwareProducts } from './DemoPages/Components/software-products/softw
 export { ChangePassword } from './DemoPages/UserPages/change-password/change-password';
 export { Profile } from './DemoPages/UserPages/profile/profile';
 export { CompleteRegistration } from './DemoPages/UserPages/complete-registration/complete-registration';
+export { SalesOrder } from './DemoPages/Dashboards/sales-order/sales-order';
+export { Proof } from './proof/proof';

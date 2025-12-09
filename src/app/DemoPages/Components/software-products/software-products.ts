@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, inject, signal, WritableSignal, ViewChild } from '@angular/core';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { faTrash, faTimesCircle, faStar, faPlus, IconDefinition, faCheckCircle, faSpinner, faHdd } from '@fortawesome/free-solid-svg-icons';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse, HttpParams } from '@angular/common/http';
+import { faTrash, faTimesCircle, faMagnifyingGlass, faStar, faCheck, faPlus, IconDefinition, faCheckCircle, faSpinner, faHdd, faDownload, faBan } from '@fortawesome/free-solid-svg-icons';
 import { catchError, finalize } from 'rxjs/operators';
 import { throwError, forkJoin, Observable } from 'rxjs';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -28,6 +28,9 @@ interface SoftwareRecord {
     size_mb: number;
     category: string;
     file: string;
+    date_uploaded: string;
+    uploaded_by: string;
+    is_for_sale: boolean;
 }
 
 
@@ -39,8 +42,8 @@ interface SoftwareRecord {
 })
 export class SoftwareProducts implements OnInit {
 
-  heading = 'Product Cartegories';
-  subheading = 'Manage cartegories related to your Business Products.';
+  heading = 'Software Library Management';
+  subheading = 'Manage software related Products.';
   icon = 'pe-7s-diskette icon-gradient bg-happy-green';
 
   private softwareApiUrl = 'http://127.0.0.1:8000/api/products/softwares/';
@@ -51,15 +54,25 @@ export class SoftwareProducts implements OnInit {
   softwareLibrary: WritableSignal<SoftwareRecord[]> = signal([]);
   filesToUpload: StagedFile[] = [];
   isUploading: boolean = false;
+  isLoading: WritableSignal<boolean> = signal(false);
 
   faTrash = faTrash;
   faTimesCircle = faTimesCircle;
   faCheckCircle = faCheckCircle;
   faSpinner = faSpinner;
   faHdd = faHdd;
+  faDownload = faDownload;
+  faCheck = faCheck;
+  faBan = faBan;
+  faSearch = faMagnifyingGlass;
 
   generalModalError: string | null = null;
+  message: string | null = null;
+  messageok: string | null = null;
   fieldValidationErrors: FieldErrors = {};
+  currentSearchTerm: string = '';
+  currentCategoryFilter: string = '';
+  availableCategories: string[] = ['Uncategorized', 'Operating Systems', 'Design', 'Development', 'Utilities'];
 
   private http = inject(HttpClient);
   private modalService = inject(NgbModal);
@@ -71,7 +84,19 @@ export class SoftwareProducts implements OnInit {
   }
 
   loadSoftwareLibrary(): void {
-      this.http.get<SoftwareRecord[]>(this.softwareApiUrl).subscribe({
+      let params = new HttpParams();
+
+      if (this.currentSearchTerm) {
+          // DRF SearchFilter uses the 'search' query parameter
+          params = params.set('search', this.currentSearchTerm);
+      }
+
+      if (this.currentCategoryFilter) {
+          // DRF DjangoFilterBackend uses the field name, 'category'
+          params = params.set('category', this.currentCategoryFilter);
+      }
+
+      this.http.get<SoftwareRecord[]>(this.softwareApiUrl, { params: params }).subscribe({
           next: (apiResponse) => {
               this.softwareLibrary.set(apiResponse);
           },
@@ -81,6 +106,97 @@ export class SoftwareProducts implements OnInit {
           }
       });
   }
+
+  applySearch(): void {
+      // This handler triggers data reload based on the two-way bound search term
+      this.loadSoftwareLibrary();
+  }
+
+  onCategoryChange(event: Event): void {
+      const selectElement = event.target as HTMLSelectElement;
+      // Update the filter state and reload the data
+      this.currentCategoryFilter = selectElement.value;
+      this.loadSoftwareLibrary();
+  }
+
+  // Download Logics
+  downloadSoftware(record: SoftwareRecord): void {
+      // Construct the full URL. If 'record.file' is already a full URL, use it directly.
+      // Assuming record.file is the path to the file on the backend server.
+      const fileUrl = record.file.startsWith('http') ? record.file : `http://127.0.0.1:8000${record.file}`;
+
+      // **1. Make a GET request for the file data**
+      // We use { responseType: 'blob', observe: 'response' } to handle binary data
+      // and to get access to headers (specifically Content-Disposition for the filename).
+      this.http.get(fileUrl, { responseType: 'blob', observe: 'response' }).pipe(
+          catchError((error: HttpErrorResponse) => {
+              this.handleModalError(error, `Failed to download file: ${record.name}.`);
+              return throwError(() => error);
+          })
+      ).subscribe((response: HttpResponse<Blob>) => {
+          if (!response.body) {
+              this.generalModalError = `Download failed: Empty response body for ${record.name}.`;
+              return;
+          }
+
+          // **2. Determine the filename**
+          // Prefer the filename from the Content-Disposition header if available.
+          let filename = record.name;
+          const contentDisposition = response.headers.get('Content-Disposition');
+          if (contentDisposition) {
+              const match = contentDisposition.match(/filename="?(.+?)"?($|;)/i);
+              if (match && match[1]) {
+                  filename = match[1];
+              }
+          }
+
+          // **3. Create a download link and trigger the download**
+          const blob = new Blob([response.body], { type: record.mime_type });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename; // Set the filename
+          document.body.appendChild(a);
+          a.click();
+
+          // Cleanup
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+
+          console.log(`Successfully triggered download for ${filename}`);
+      });
+  }
+
+  // toggle for updating is_for_sale status
+
+  toggleForSaleStatus(record: SoftwareRecord, newValue: boolean): void {
+        const updateData = { is_for_sale: newValue };
+        const apiUrl = `${this.softwareApiUrl}${record.id}/`;
+
+        // Optimistically update the local signal, and roll back on error.
+        const originalValue = (record as any).is_for_sale; // Cast to access is_for_sale
+        // NOTE: You should update your SoftwareRecord interface to include is_for_sale
+        (record as any).is_for_sale = newValue;
+
+        this.http.patch<SoftwareRecord>(apiUrl, updateData).pipe(
+            catchError((error: HttpErrorResponse) => {
+                // Rollback the local change on error
+                (record as any).is_for_sale = originalValue;
+                this.handleModalError(error, `Failed to update 'For Sale' status for ${record.name}.`);
+                return throwError(() => error);
+            })
+        ).subscribe({
+            next: (updatedRecord) => {
+                // Backend successfully saved the data.
+                // We don't need to explicitly update the signal since we mutated the object reference,
+                // but we should refresh the library if the backend returns more data than just the patch.
+                console.log(`Successfully updated ${record.name} to Is For Sale: ${newValue}`);
+            },
+            error: () => {
+                // Error handled in pipe(catchError)
+            }
+        });
+    }
 
   // --- FILE STAGING HANDLERS ---
 
@@ -182,12 +298,15 @@ export class SoftwareProducts implements OnInit {
               });
 
               this.filesToUpload = this.filesToUpload.filter(f => f.status !== 'complete');
+              this.messageok =`${successCount} software file(s) uploaded successfully.`
               this.loadSoftwareLibrary();
               console.log(`${successCount} software file(s) uploaded successfully.`);
           },
+
           error: (err) => {
               console.error('One or more software uploads failed.', err);
-          }
+          },
+
       });
   }
 
@@ -220,7 +339,7 @@ export class SoftwareProducts implements OnInit {
                       })
                   ).subscribe(() => {
                       this.softwareLibrary.update(list => list.filter(s => s.id !== id));
-                      this.generalModalError = `Software ID ${id} deleted successfully.`;
+                      this.message = `Software ID ${id} deleted successfully.`;
                   });
               }
           },
@@ -274,7 +393,7 @@ export class SoftwareProducts implements OnInit {
 
   actionButtons: ActionButton[] = [
     {
-      text: 'Create New',
+      text: 'New Upload',
       icon: faPlus,
       class: 'btn-success',
       onClick: this.handleCreateModal

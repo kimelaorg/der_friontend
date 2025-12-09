@@ -4,44 +4,78 @@
 
 <h2 class="lead">Sales Records ({{ totalRecords }} Total)</h2>
 
-<div class="d-flex flex-wrap align-items-center mb-3 justify-content-between">
+<div class="row mb-3">
 
-    <div class="d-flex align-items-center me-3 mb-2 mb-md-0">
-        <label for="salesFilter" class="form-label me-2 fw-bold mb-0">Filter Sales By:</label>
-        <select
-          id="salesFilter"
-          class="form-select w-auto"
-          [(ngModel)]="selectedFilter"
-          (change)="onFilterChange()">
+    <div class="col-4 col-sm-2 col-md-4">
 
-          <option value="all">-- Show All Records --</option>
-          <optgroup label="Daily Sales">
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="day-before-yesterday">Day Before Yesterday</option>
-          </optgroup>
+        <div class="d-none d-md-flex align-items-center justify-content-start">
+            <label for="salesFilter-lg" class="form-label me-2 fw-bold mb-0 text-nowrap">Filter By:</label>
+            <select
+                id="salesFilter-lg"
+                class="form-select w-auto"
+                [(ngModel)]="selectedFilter"
+                (change)="onFilterChange()">
+                <ng-container *ngTemplateOutlet="filterOptions"></ng-container>
+            </select>
+        </div>
 
-          <optgroup label="Weekly Sales">
-            <option value="current-week">Current Week</option>
-            <option value="last-week">Last Week</option>  </optgroup>
+        <div class="d-flex d-md-none justify-content-end">
+            <button
+                class="btn btn-outline-secondary"
+                type="button"
+                id="filterDropdownMenuButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Filter Records">
+                <fa-icon [icon]="faFilter"></fa-icon> </button>
 
-          <optgroup label="Monthly Sales">
-            <option value="current-month">Current Month</option>
-            <option value="past-month">Past Month</option>
-          </optgroup>
-        </select>
+            <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="filterDropdownMenuButton" style="min-width: 250px;">
+                <li class="dropdown-header fw-bold">Filter Sales By:</li>
+                <li>
+                    <select
+                        id="salesFilter-sm"
+                        class="form-select"
+                        [(ngModel)]="selectedFilter"
+                        (change)="onFilterChange();"
+                        (click)="$event.stopPropagation()"> <ng-container *ngTemplateOutlet="filterOptions"></ng-container>
+                    </select>
+                </li>
+            </ul>
+        </div>
+
     </div>
 
-    <div class="input-group w-auto flex-grow-1" style="max-width: 300px;">
-        <span class="input-group-text"><fa-icon [icon]="faSearch"></fa-icon></span>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Search Customer, Agent, or Status..."
-          [(ngModel)]="searchText"
-          (ngModelChange)="onSearchChange()" >
+    <div class="col-8 col-sm-10 col-md-8">
+        <div class="input-group">
+            <input
+                type="text"
+                class="form-control"
+                placeholder="Search Customer, Agent, or Status..."
+                [(ngModel)]="searchText"
+                (ngModelChange)="onSearchChange()"
+            >
+            <span class="input-group-text"><fa-icon [icon]="faSearch"></fa-icon></span>
+        </div>
     </div>
+
 </div>
+
+<ng-template #filterOptions>
+    <option value="all">-- Show All Records --</option>
+    <optgroup label="Daily Sales">
+        <option value="today">Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="day-before-yesterday">Day Before Yesterday</option>
+    </optgroup>
+    <optgroup label="Weekly Sales">
+        <option value="current-week">Current Week</option>
+        <option value="last-week">Last Week</option>
+    </optgroup>
+    <optgroup label="Monthly Sales">
+        <option value="current-month">Current Month</option>
+        <option value="past-month">Past Month</option>
+    </optgroup>
+</ng-template>
 
 <div *ngIf="salesRecords.length === 0 && totalRecords === 0" class="alert alert-info" role="alert">
     No sales records found matching the current search and filter criteria.
@@ -207,21 +241,24 @@
 
   <div class="modal-body">
     <div *ngIf="message" [class.success]="isSuccess" [class.error]="!isSuccess" class="message-box">
-      <p>**{{ message }}**</p>
+      <p>{{ message }}</p>
+    </div>
 
       <div *ngIf="summary && isSuccess" class="summary-details">
-        <h3>Closure Summary</h3>
+        <h3 class="text-center mt-3">Closure Summary</h3>
         <ul>
-          <li>**Total Cash Sales:** ${{ summary.total_cash_sales | number:'1.2-2' }}</li>
-          <li>**Total Cash Expenses:** ${{ summary.total_cash_expenses | number:'1.2-2' }}</li>
-          <li>**Net Cash Settlement:** **${{ summary.net_cash_settlement | number:'1.2-2' }}**</li>
+          <li>Total Cash Sales: {{ summary.total_cash_sales | currency: 'TZS': 'symbol' }}</li>
+          <li>Total Cash Expenses: {{ summary.total_cash_expenses | currency: 'TZS': 'symbol' }}</li>
+          <li>Net Cash Settlement: {{ summary.net_cash_settlement | currency: 'TZS': 'symbol' }}</li>
         </ul>
-        <p class="mt-3">
-          **Note:** This is the net cash amount you must settle today.
+        <p class="mt-3" *ngIf="summary.net_cash_settlement > 0">
+          <strong class="text-success">**Note:</strong> This is the net cash amount you must settle today.
+        </p>
+        <p class="mt-3" *ngIf="summary.net_cash_settlement < 0">
+          <strong class="text-danger">**Note:</strong> This is the net cash amount you must settle today.
         </p>
       </div>
     </div>
-  </div>
 
   <div class="modal-footer">
     <button type="button" class="btn btn-primary" (click)="modal.close('OK')">

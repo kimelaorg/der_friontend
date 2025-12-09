@@ -6,7 +6,7 @@ import { SalesRecord, Customer, SaleItem, PaginatedSalesResponse, CloseDaySummar
 import { NgbModule, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of, throwError } from 'rxjs';
 import { ActionButton } from '../../../Layout/Components/page-title/page-title.component';
-import { faEdit, faSearch, faPlus, faTriangleExclamation, faLock, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faFilter, faSearch, faPlus, faTriangleExclamation, faLock, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { catchError, switchMap, tap, finalize, map } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { Data } from './data';
@@ -25,6 +25,7 @@ export class SalesView implements OnInit {
   faEdit = faEdit;
   faSearch = faSearch;
   faTriangleExclamation = faTriangleExclamation;
+  faFilter = faFilter;
 
   currentView = signal<'view' | 'create'>('view');
   isFlipping = signal(false);

@@ -35,7 +35,7 @@ export const MASTER_NAV_CONFIG: RoleMenu = {
         // Sales and Order
         { path: "/der/dashboards/sales", title: "Add sales" },
         { path: "/der/dashboards/view-sales", title: "View sales" },
-        { path: "/der/dashboards/orders", title: "Manage Orders" },
+        { path: "/der/dashboards/sales-orders", title: "Manage Orders" },
         { path: "/der/dashboards/discounts&offers", title: "Discounts & Offers" },
 
         // Expenses and Savings
@@ -60,7 +60,7 @@ export const MASTER_NAV_CONFIG: RoleMenu = {
     "Sales Representative": [
         { path: "/der/dashboards/sales", title: "Add sales" },
         { path: "/der/dashboards/view-sales", title: "View sales" },
-        { path: "/der/dashboards/orders", title: "Manage Orders" },
+        { path: "/der/dashboards/sales-orders", title: "Manage Orders" },
         { path: "/der/dashboards/expenses", title: "Add Expenses" },
         { path: "/der/dashboards/savings", title: "Add Savings" },
     ],

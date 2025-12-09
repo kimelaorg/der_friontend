@@ -1,0 +1,323 @@
+<ul class="nav nav-pills nav-justified mb-4">
+    <li class="nav-item" *ngFor="let stage of stages; let i = index">
+        <a class="nav-link"
+           [class.active]="currentStage() === i + 1"
+           [class.disabled]="currentStage() < i + 1"
+           (click)="goToStage(i + 1)">
+            <span class="badge rounded-pill me-2"
+                  [class.bg-primary]="currentStage() >= i + 1"
+                  [class.bg-secondary]="currentStage() < i + 1">{{ i + 1 }}</span>
+            {{ stage }}
+        </a>
+    </li>
+</ul>
+
+<div *ngIf="errorMessage()" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
+</div>
+
+<div class="card p-4">
+
+    <div *ngIf="currentStage() === 1">
+        <h4 class="card-title text-success mb-4">1. Customer Selection / Details</h4>
+
+        <div class="mb-4 p-3 border rounded bg-light position-relative">
+            <label for="customerSearch" class="form-label fw-bold">Search Existing Customer (Phone/Name/Email)</label>
+            <div class="input-group">
+                <input type="text"
+                       id="customerSearch"
+                       class="form-control"
+                       placeholder="Start typing to search..."
+                       [formControl]="customerSearchControl">
+
+                <button class="btn btn-primary"
+                        type="button"
+                        [disabled]="!selectedCustomer()"
+                        (click)="placeOrderWithExistingCustomer()">
+                    Place Order <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+
+            <ul class="list-group position-absolute w-100 shadow-lg mt-1" style="z-index: 101;" *ngIf="searchResults().length > 0">
+                <li class="list-group-item list-group-item-action py-2 small"
+                    *ngFor="let customer of searchResults()"
+                    (click)="selectExistingCustomer(customer)"> **{{ customer.first_name }} {{ customer.last_name }}** ({{ customer.phone_number }})
+                </li>
+            </ul>
+
+            <div *ngIf="selectedCustomer()" class="alert alert-info small mt-2 py-2">
+                Selected: **{{ selectedCustomer().first_name }} {{ selectedCustomer().last_name }}** ({{ selectedCustomer().email }})
+                <button type="button" class="btn btn-sm btn-link p-0 ms-3" (click)="clearCustomerSelection()">
+                    Clear Selection
+                </button>
+            </div>
+        </div>
+
+        <h5 class="card-title text-success mb-3" *ngIf="!selectedCustomer()">Or Enter New Customer Details:</h5>
+        <form [formGroup]="customerForm" (ngSubmit)="submitCustomerStage()" class="row g-3" *ngIf="!selectedCustomer()">
+            <div class="col-md-6"><label for="firstName" class="form-label">First Name</label><input type="text" id="firstName" formControlName="first_name" class="form-control" placeholder="kidaz"></div>
+            <div class="col-md-6"><label for="lastName" class="form-label">Last Name</label><input type="text" id="lastName" formControlName="last_name" class="form-control" placeholder="boy"></div>
+            <div class="col-12"><label for="phone" class="form-label">Phone number</label><input type="text" id="phone" formControlName="phone_number" class="form-control" placeholder="e.g., 0710203040"></div>
+            <div class="col-12"><label for="email" class="form-label">Email address</label><input type="email" id="email" formControlName="email" class="form-control" placeholder="e.g., customer@gmail.com"></div>
+
+            <div class="col-12 mt-4 d-flex justify-content-end">
+                <button type="submit" class="btn btn-sm btn-primary" [disabled]="customerForm.invalid">
+                    Capture New Customer & Continue <i class="bi bi-person-plus"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div *ngIf="currentStage() === 2">
+        <h4 class="card-title text-success mb-4">2. Add Order Items ({{ totalItems() }} in cart)</h4>
+        <form [formGroup]="salesForm" class="mb-4">
+            <div class="input-group">
+                <div class="autocomplete-container flex-grow-1 position-relative me-2">
+                    <input type="text" formControlName="searchQuery" class="form-control" placeholder="Search by SKU or Product Name" required>
+
+                    <ul class="list-group position-absolute w-100 shadow-sm" style="z-index: 100;" *ngIf="autocompleteResults().length > 0">
+
+                        <li class="list-group-item list-group-item-action py-2 small"
+                            *ngFor="let product of autocompleteResults()"
+                            (click)="selectProduct(product)">
+                            **{{ product.product_name }} - {{ product.model }}** ({{ product.discounted_price | currency: 'TZS' }})
+                        </li>
+                    </ul>
+                </div>
+                <input type="number" formControlName="quantity" class="form-control text-center" style="width: 80px;" min="1" value="1">
+                <span class="input-group-text">Qty</span>
+            </div>
+        </form>
+
+        <div class="table-responsive mt-2">
+            <table class="align-middle text-truncate mb-0 table table-borderless table-hover">
+                <thead class="table-light">
+                    <tr><th>Product</th><th class="text-center">Qty</th><th class="text-end">Sale Price</th><th class="text-end">Subtotal</th><th class="text-center">Action</th></tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr *ngIf="totalItems() === 0">
+                        <td colspan="5" class="text-center text-muted py-3">No Product selected. Start typing to search.</td>
+                    </tr>
+                    <tr *ngFor="let item of cartItems(); index as i">
+                        <td>
+                            <div class="fw-bold">{{ item.name }} - {{ item.model }}</div>
+                            <div class="small text-muted">SKU: {{ item.sku }}</div>
+                        </td>
+                        <td class="text-center">
+                            <input type="number" [value]="item.quantity" (change)="updateItemQuantity(i, $event)" min="1" class="form-control form-control-sm text-center mx-auto" style="width: 70px;">
+                        </td>
+                        <td class="text-end">{{ item.unit_price | currency: 'TZS': 'symbol'}}</td>
+                        <td class="text-end fw-bold">{{ item.subtotal | currency: 'TZS': 'symbol' }}</td>
+                        <td class="text-center">
+                            <button (click)="removeItem(i)" class="btn btn-sm btn-outline-danger p-1" aria-label="Remove item"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr><th colspan="3" class="text-end bg-light h6">GRAND TOTAL:</th><th class="text-end h6 text-success bg-light">{{ subTotal() | currency: 'TZS': 'symbol' }}</th><th></th></tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-sm btn-secondary" (click)="goToStage(1)">
+                <i class="bi bi-arrow-left"></i> Back to Customer
+            </button>
+            <button class="btn btn-sm btn-primary" (click)="nextStage()" [disabled]="totalItems() === 0">
+                Next: Shipping Address <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="currentStage() === 3">
+        <h4 class="card-title text-success mb-4">3. Enter Shipping Address</h4>
+        <form [formGroup]="shippingForm">
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label for="regionId" class="form-label">Region <span class="text-danger">*</span></label>
+                    <select id="regionId" class="form-select" formControlName="region_name" [disabled]="regions().length === 0"
+                        [class.is-invalid]="shippingForm.get('region_name')?.invalid && shippingForm.get('region_name')?.touched">
+                        <option [ngValue]="null" disabled>{{ regions().length > 0 ? 'Select Region' : 'Loading regions...' }}</option>
+                        <option *ngFor="let region of regions()" [ngValue]="region.name">{{ region.name }}</option>
+                    </select>
+                    <div *ngIf="shippingForm.get('region_name')?.invalid && shippingForm.get('region_name')?.touched" class="text-danger small mt-1">
+                        Region is required.
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="districtId" class="form-label">District</label>
+                    <select id="districtId" class="form-select" formControlName="district_name"
+                        [disabled]="!shippingForm.get('region_name')?.value || districts().length === 0">
+                        <option [ngValue]="null" disabled>
+                            {{ shippingForm.get('region_name')?.value ? (districts().length > 0 ? 'Select District' : 'Loading districts...') : 'Select Region First' }}
+                        </option>
+                        <option *ngFor="let district of districts()" [ngValue]="district.name">{{ district.name }}</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="wardId" class="form-label">Ward</label>
+                    <select id="wardId" class="form-select" formControlName="ward_name"
+                        [disabled]="!shippingForm.get('district_name')?.value || wards().length === 0">
+                        <option [ngValue]="null" disabled>
+                            {{ shippingForm.get('district_name')?.value ? (wards().length > 0 ? 'Select Ward' : 'Loading wards...') : 'Select District First' }}
+                        </option>
+                        <option *ngFor="let ward of wards()" [ngValue]="ward.name">{{ ward.name }}</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-sm btn-secondary" (click)="prevStage()">
+                <i class="bi bi-arrow-left"></i> Back to Items
+            </button>
+            <button class="btn btn-sm btn-primary" (click)="nextStage()" [disabled]="shippingForm.get('region_name')?.invalid">
+                Next: Shipping Method <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="currentStage() === 4">
+        <h4 class="card-title text-success mb-4">4. Select Shipping Method</h4>
+        <form [formGroup]="shippingForm">
+            <div class="mb-3">
+                <label for="shippingMethod" class="form-label">Select Method</label>
+                <select id="shippingMethod" formControlName="shipping_method_id" class="form-select"
+                        [class.is-invalid]="shippingForm.get('shipping_method_id')?.invalid && shippingForm.get('shipping_method_id')?.touched">
+                    <option [ngValue]="null" disabled>--- Choose Shipping Method ---</option>
+                    <option *ngFor="let method of availableMethods()" [ngValue]="method.id">
+                        **{{ method.name }}** ({{ method.base_cost | currency: 'TZS' }})
+                    </option>
+                </select>
+            </div>
+            <div *ngIf="selectedMethod()" class="alert alert-info small mt-3">
+                Selected: **{{ selectedMethod()?.name }}** costing **{{ selectedMethod()?.base_cost | currency: 'TZS' }}**.
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-sm btn-secondary" (click)="prevStage()">
+                <i class="bi bi-arrow-left"></i> Back to Address
+            </button>
+            <button class="btn btn-sm btn-primary" (click)="nextStage()" [disabled]="shippingForm.get('shipping_method_id')?.invalid">
+                Next: Payment Details <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="currentStage() === 5">
+        <h4 class="card-title text-success mb-4">5. Payment Details</h4>
+        <form [formGroup]="paymentForm" class="row g-3">
+            <div class="col-md-6">
+                <label for="payment_method" class="form-label">Payment Method</label>
+                <select id="payment_method" formControlName="payment_method" class="form-select">
+                    <option value="CASH">Cash</option><option value="CARD">Credit/Debit Card</option><option value="TRANSFER">Bank Transfer</option><option value="MOMO">Mobile Money</option><option value="OTHER">Other</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="payment_status" class="form-label">Payment Status</label>
+                <select id="payment_status" formControlName="payment_status" class="form-select">
+                    <option value="Completed">Full Paid</option><option value="Partial Paid">Partial Paid</option><option value="Pending">Pending</option><option value="Failed">Failed</option>
+                </select>
+            </div>
+
+            <div class="col-12 mt-4 d-flex justify-content-between">
+                <button type="button" class="btn btn-sm btn-secondary" (click)="prevStage()">
+                    <i class="bi bi-arrow-left"></i> Back to Shipping Method
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" (click)="nextStage()" [disabled]="paymentForm.invalid">
+                    Next: Review & Complete <i class="bi bi-check-circle"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div *ngIf="currentStage() === 6">
+        <h4 class="card-title text-success mb-4">6. Review & Complete Order</h4>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card bg-light">
+                    <div class="card-header bg-light lead">Order & Customer Data</div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Customer Name:</dt>
+                            <dd class="col-sm-7 text-truncate">{{ (customerForm.value.first_name || 'Anonymous') | titlecase }} {{ customerForm.value.last_name | titlecase }}</dd>
+
+                            <dt class="col-sm-5">Shipping Address:</dt>
+                            <dd class="col-sm-7 text-truncate fw-bold">
+                                {{ shippingForm.value.ward_name || shippingForm.value.district_name || shippingForm.value.region_name }}
+                            </dd>
+                            <dt class="col-sm-5">Region:</dt>
+                            <dd class="col-sm-7">{{ shippingForm.value.region_name }}</dd>
+
+                            <dt class="col-sm-5">Shipping Method:</dt>
+                            <dd class="col-sm-7">{{ selectedMethod()?.name }}</dd>
+
+                            <dt class="col-sm-5 mt-2">Payment Method:</dt>
+                            <dd class="col-sm-7 mt-2">{{ paymentForm.get('payment_method')?.value }}</dd>
+                            <dt class="col-sm-5">Payment Status:</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge" [class.bg-success]="paymentForm.get('payment_status')?.value === 'Completed'">{{ paymentForm.get('payment_status')?.value }}</span>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card bg-light h-100">
+                    <div class="card-header lead">Financial Summary</div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Items Count</dt><dd class="col-sm-7">{{ totalItems() }}</dd>
+                            <dt class="col-sm-5">Shipping Cost</dt><dd class="col-sm-7">{{ selectedMethod()?.base_cost | currency: 'TZS': 'symbol' }}</dd>
+                            <hr>
+                            <dt class="col-sm-5 h5 text-success">ORDER TOTAL (Items Only)</dt>
+                            <dd class="col-sm-7 h5 text-success fw-bold">{{ subTotal() | currency: 'TZS': 'symbol' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="mt-4 mb-3">Items Review</h5>
+        <div class="table-responsive">
+            <table class="table table-lg">
+                <thead>
+                    <tr class="table">
+                        <th>#</th><th>Product</th><th class="text-center">Sale Price</th><th class="text-center">Quantity</th><th class="text-end">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr *ngFor="let item of cartItems(); let i = index">
+                        <th>{{ i + 1 }}</th>
+                        <td>{{ item.name }} ({{ item.model }})</td>
+                        <td class="text-center">{{ item.unit_price | currency: 'TZS': 'symbol' }}</td>
+                        <td class="text-center">{{ item.quantity }} PCS</td>
+                        <td class="text-end">{{ item.subtotal | currency: 'TZS': 'symbol' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="button" class="btn btn-secondary btn-sm" (click)="prevStage()">
+                <i class="bi bi-arrow-left"></i> Return to Payment
+            </button>
+            <button type="button" class="btn btn-success btn-sm" (click)="completeSale()" [disabled]="submissionLoading()">
+                <span *ngIf="submissionLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <i *ngIf="!submissionLoading()" class="bi bi-check-all"></i>
+                {{ submissionLoading() ? 'Processing...' : 'Confirm & Complete Order' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="successMessage()" class="alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-4 shadow-lg" role="alert" style="z-index: 999;">
+    <i class="bi bi-check-circle-fill me-2"></i> Order Recorded! Order ID: **{{ successMessage() }}**
+    <button type="button" class="btn-close" (click)="successMessage.set(null)" aria-label="Close"></button>
+</div>

@@ -177,6 +177,7 @@ import {
     Stock,
     Otp,
     SalesView,
+    SalesOrder,
     Home,
     Wishlists,
     Reviews,
@@ -194,6 +195,7 @@ import {
     SoftwareProducts,
     CompleteRegistration,
     Trial,
+    Proof,
     ChangePassword,
     Test
 } from './components.barrel';
@@ -220,6 +222,7 @@ const routes: Routes = [
             { path: 'software', component: Software, data: { extraParameter: '' } },
             { path: 'deals', component: Deals, data: { extraParameter: '' } },
             { path: 'trial', component: Trial, data: { extraParameter: '' } },
+            { path: 'proof', component: Proof, data: { extraParameter: '' } },
             { path: 'test', component: Test, data: { extraParameter: '' } },
             { path: 'search', component: Search, data: { extraParameter: '' } },
             { path: 'product/:id', component: SearchSpecific, data: { extraParameter: '' }, resolve: {singleItem_resolve: specificIdResolver,}},
@@ -294,6 +297,14 @@ const routes: Routes = [
             {
                 path: 'dashboards/view-sales',
                 component: SalesView,
+                data: {
+                    extraParameter: 'elementsMenu',
+                    allowedRoles: ['Sales Representative', 'Executive Manager', 'Reporting Analyst']
+                }
+            },
+            {
+                path: 'dashboards/sales-orders',
+                component: SalesOrder,
                 data: {
                     extraParameter: 'elementsMenu',
                     allowedRoles: ['Sales Representative', 'Executive Manager', 'Reporting Analyst']

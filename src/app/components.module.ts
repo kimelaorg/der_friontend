@@ -37,6 +37,7 @@ import { SearchSpecific } from './DemoPages/Welcome/search-specific/search-speci
 import { Test } from './test/test';
 import { SoftwareProducts } from './DemoPages/Components/software-products/software-products';
 import { ProductMedia } from './DemoPages/Components/products/product-media/product-media';
+import { Proof } from './proof/proof';
 
 @NgModule({
   declarations: [
@@ -70,7 +71,8 @@ import { ProductMedia } from './DemoPages/Components/products/product-media/prod
     SearchSpecific,
     Test,
     SoftwareProducts,
-    ProductMedia
+    ProductMedia,
+    Proof
   ],
   imports: [
     SharedModule,

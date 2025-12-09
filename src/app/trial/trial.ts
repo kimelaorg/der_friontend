@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, inject, signal, WritableSignal, ViewChild } from '@angular/core';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { faTrash, faTimesCircle, faCheckCircle, faSpinner, faHdd } from '@fortawesome/free-solid-svg-icons';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { faTrash, faTimesCircle, faCheckCircle, faSpinner, faHdd, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { catchError, finalize } from 'rxjs/operators';
 import { throwError, forkJoin, Observable } from 'rxjs';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -51,6 +51,7 @@ export class Trial implements OnInit {
     faCheckCircle = faCheckCircle;
     faSpinner = faSpinner;
     faHdd = faHdd;
+    faDownload = faDownload;
 
     generalModalError: string | null = null;
     fieldValidationErrors: FieldErrors = {};
@@ -73,6 +74,54 @@ export class Trial implements OnInit {
                 console.error('Error fetching software library:', err);
                 this.generalModalError = 'Failed to load software library.';
             }
+        });
+    }
+
+    // Download logic
+    downloadSoftware(record: SoftwareRecord): void {
+        // Construct the full URL. If 'record.file' is already a full URL, use it directly.
+        // Assuming record.file is the path to the file on the backend server.
+        const fileUrl = record.file.startsWith('http') ? record.file : `http://127.0.0.1:8000${record.file}`;
+
+        // **1. Make a GET request for the file data**
+        // We use { responseType: 'blob', observe: 'response' } to handle binary data
+        // and to get access to headers (specifically Content-Disposition for the filename).
+        this.http.get(fileUrl, { responseType: 'blob', observe: 'response' }).pipe(
+            catchError((error: HttpErrorResponse) => {
+                this.handleModalError(error, `Failed to download file: ${record.name}.`);
+                return throwError(() => error);
+            })
+        ).subscribe((response: HttpResponse<Blob>) => {
+            if (!response.body) {
+                this.generalModalError = `Download failed: Empty response body for ${record.name}.`;
+                return;
+            }
+
+            // **2. Determine the filename**
+            // Prefer the filename from the Content-Disposition header if available.
+            let filename = record.name;
+            const contentDisposition = response.headers.get('Content-Disposition');
+            if (contentDisposition) {
+                const match = contentDisposition.match(/filename="?(.+?)"?($|;)/i);
+                if (match && match[1]) {
+                    filename = match[1];
+                }
+            }
+
+            // **3. Create a download link and trigger the download**
+            const blob = new Blob([response.body], { type: record.mime_type });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename; // Set the filename
+            document.body.appendChild(a);
+            a.click();
+
+            // Cleanup
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            console.log(`Successfully triggered download for ${filename}`);
         });
     }
 
