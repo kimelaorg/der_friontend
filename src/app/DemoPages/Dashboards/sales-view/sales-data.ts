@@ -24,10 +24,8 @@ export interface SalesRecord {
   status: string;
   payment_method: string;
   payment_status: string;
-  sales_outlet: number;
-  sales_outlet_name: string;
+  sales_outlet: string;
   sales_agent: string;
-  sales_agent_name: string;
   customer: Customer;
   items: SaleItem[];
 }

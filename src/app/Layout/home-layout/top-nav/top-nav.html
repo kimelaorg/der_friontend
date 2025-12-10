@@ -1,0 +1,75 @@
+<!-- NAVIGATION BAR (STICKY) -->
+<nav class="navbar" [class.menu-open]="isMobileMenuOpen()">
+  <div class="">
+    <!-- Main Header Row -->
+    <div class="nav-header">
+      <!-- 1. LEFT GROUP: Mobile Menu Button & Brand Logo -->
+      <div class="nav-left">
+        <button (click)="toggleMenu()" type="button" aria-controls="mobile-menu"
+                [attr.aria-expanded]="isMobileMenuOpen()" class="menu-toggle">
+          @if (!isMobileMenuOpen()) {
+            <svg class="icon-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+          } @else {
+            <svg class="icon-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          }
+        </button>
+        <a href="/" class="brand-logo">Daz Electronics</a>
+      </div>
+
+      <!-- 2. CENTER GROUP: Search Input (Flexible width on mobile, fixed width on desktop) -->
+      <div class="search-container">
+        <div class="search-wrapper">
+          <!-- <app-search /> -->
+          <input type="search" placeholder="Search for products..." class="search-input">
+          <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- <div class="searchBox">
+        <app-search />
+      </div> -->
+
+      <!-- 3. RIGHT GROUP: Desktop Links & Mobile/Desktop Actions -->
+      <div class="nav-right">
+        <!-- Desktop Navigation Links -->
+        <div class="desktop-links">
+          @for (nav of mainNavLinks; track nav.label) {
+            <a [routerLink]="nav.link" routerLinkActive="active-item" class="nav-link" [class.deal-link]="nav.label === 'Deals'">
+              {{ nav.label }}
+            </a>
+          }
+        </div>
+
+        <!-- Action Icons (Sign In & Cart) -->
+        <a [routerLink]="'/der/account/login'" title="Sign in" class="action-icon">
+          <svg class="icon-24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+          <span class="sr-only">Sign in</span>
+        </a>
+        <a [routerLink]="'/der/cart'" title="Cart" class="action-icon cart-icon-wrapper">
+          <svg class="icon-24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+          <span class="sr-only">Cart</span>
+          <span class="cart-badge">3</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Drawer -->
+    @if (isMobileMenuOpen()) {
+      <div id="mobile-menu" class="mobile-menu-drawer">
+        <div class="mobile-links-container">
+          @for (nav of mobileNavLinks; track nav.label) {
+            <a [href]="nav.link" class="mobile-nav-link" [class.deal-link]="nav.label === 'Deals'">
+              {{ nav.label }}
+            </a>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</nav>

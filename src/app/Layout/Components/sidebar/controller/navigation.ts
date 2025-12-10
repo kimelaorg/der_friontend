@@ -15,11 +15,12 @@ export class Navigation {
      */
     private getGroupInfo(path: string): { key: string, title: string, icon: string } {
         // This logic MUST match the way you want to organize your sidebar!
-        if (path.includes('/users')) return { key: 'adminMenu', title: 'User Managements', icon: 'pe-7s-config' };
+        if (path.includes('/users')) return { key: 'adminMenu', title: 'User Managements', icon: 'pe-7s-users' };
         if (path.startsWith('/reports') || path.includes('/transactions') || path.includes('/dashboards/reports')) return { key: 'reportsMenu', title: 'Reporting & Analytics', icon: 'pe-7s-graph' };
         if (path.startsWith('/finance') || path.includes('/pnl')) return { key: 'financeMenu', title: 'Financial Management', icon: 'pe-7s-cash' };
         if (path.startsWith('/sales') || path.includes('/discounts&offers') || path.includes('/dashboards/orders') || path.includes('/sales') || path.includes('/view-sales')) return { key: 'salesMenu', title: 'Sales & Orders', icon: 'pe-7s-shopbag' };
         if (path.startsWith('/der/dashboards/software-products') || path.includes('/products') || path.includes('/stock') || path.includes('/inventory') || path.includes('/inventory') || path.includes('/suppliers') || path.includes('/dashboards/purchasing')) return { key: 'inventoryMenu', title: 'Inventory & Supply', icon: 'pe-7s-box2' };
+        if (path.startsWith('/dashboards/fulfillment/requests') || path.includes('/dashboards/shipping/zones') || path.includes('/dashboards/shipping/methods') || path.includes('/shipping') || path.includes('/fulfillment')) return { key: 'fulfillmentMenu', title: 'Fulfillment & Shipments', icon: 'pe-7s-target' };
         if (path.startsWith('/service')) return { key: 'serviceMenu', title: 'Service Desk', icon: 'pe-7s-tools' };
         if (path.startsWith('/content')) return { key: 'contentMenu', title: 'Content Management', icon: 'pe-7s-video' };
         // if (path.startsWith('/dashboards/orders&Tracking')) return { key: 'contentMenu', title: 'My Orders', icon: 'pe-7s-shopbag' };

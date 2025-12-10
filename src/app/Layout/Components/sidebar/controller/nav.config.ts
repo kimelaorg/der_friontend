@@ -46,10 +46,18 @@ export const MASTER_NAV_CONFIG: RoleMenu = {
         { path: "/der/dashboards/users", title: "Manage Staff" },
 
         // Inventory Management
-        { path: "/der/dashboards/purchasing", title: "Manage   Purchase Order" },
+        { path: "/der/dashboards/purchasing", title: "Manage Purchase Order" },
         { path: "/der/dashboards/products", title: "Manage Products" },
         { path: "/der/dashboards/software-products", title: "Manage Software" },
         { path: "/der/dashboards/stock", title: "Stock Levels" },
+
+        // Fulfillment & Shipment Management
+        {path: 'dashboards/shipping/methods', title: "Manage Methods"},
+        {path: 'dashboards/shipping/zones', title: "Manage Zones"},
+        {path: 'dashboards/shipping/rates', title: "Manage Rates"},
+        {path: 'dashboards/fulfillment/requests', title: "Manage Request"},
+        {path: 'dashboards/fulfillment/shipments', title: "Manage Shipments"},
+
 
         // Report and Analytics
         { path: "/der/dashboards/transactions", title: "Financial Summary" },

@@ -21,6 +21,11 @@ import { Orders } from './DemoPages/Customer/orders/orders';
 import { Profile } from './DemoPages/Customer/profile/profile';
 import { Me } from './DemoPages/Customer/me/me';
 import { SalesOrder } from './DemoPages/Dashboards/sales-order/sales-order';
+import { Requests } from './DemoPages/Fulfillment/requests/requests';
+import { Shipments } from './DemoPages/Fulfillment/shipments/shipments';
+import { Zone } from './DemoPages/Fulfillment/zone/zone';
+import { Rates } from './DemoPages/Fulfillment/rates/rates';
+import { Methods } from './DemoPages/Fulfillment/methods/methods';
 
 @NgModule({
   declarations: [
@@ -41,6 +46,11 @@ import { SalesOrder } from './DemoPages/Dashboards/sales-order/sales-order';
     Profile,
     Me,
     SalesOrder,
+    Requests,
+    Shipments,
+    Zone,
+    Rates,
+    Methods,
   ],
   imports: [
     SharedModule,

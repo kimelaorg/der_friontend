@@ -142,6 +142,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { authenticityGuard } from './DemoPages/UserPages/login-boxed/guard/authenticity-guard';
 // Note: If you renamed it to just `auth.guard.ts`, the import path will change.
 
+import { HomeLayout } from './Layout/home-layout/home-layout';
 import { BaseLayoutComponent } from './Layout/base-layout/base-layout.component';
 import { PagesLayoutComponent } from './Layout/pages-layout/pages-layout.component';
 import { specificIdResolver } from './DemoPages/Welcome/search/specific-id-resolver';
@@ -194,18 +195,49 @@ import {
     SearchSpecific,
     SoftwareProducts,
     CompleteRegistration,
+    Requests,
+    Shipments,
+    Zone,
+    Rates,
+    Methods,
     Trial,
     Proof,
     ChangePassword,
-    Test
+    Test,
+    Listing,
+    ProductDetails,
+    ShoppingCart,
 } from './components.barrel';
 
 
 const routes: Routes = [
-    { path: 'der', component: Home, data: { extraParameter: 'elementsMenu' } },
     { path: '', redirectTo: '/der', pathMatch: 'full' },
 
     // --- PUBLIC ROUTES (No Guard) ---
+    {
+        path: 'der',
+        component: HomeLayout,
+        children: [
+            { path: '', component: Home, data: { extraParameter: 'elementsMenu' } },
+            { path: 'motherboards', component: Listing, data: { extraParameter: '' } },
+            { path: 'screens', component: Listing, data: { extraParameter: '' } },
+            { path: 't-con', component: Listing, data: { extraParameter: '' } },
+            { path: 'accessories', component: Listing, data: { extraParameter: '' } },
+            { path: 'software', component: Listing, data: { extraParameter: '' } },
+            { path: 'deals', component: Listing, data: { extraParameter: '' } },
+            { path: 'cart', component: ShoppingCart, data: { extraParameter: '' } },
+
+            // 2c. Other Non-Category Pages (Keep these pointing to their specific components)
+            { path: 'trial', component: Trial, data: { extraParameter: '' } },
+            { path: 'proof', component: Proof, data: { extraParameter: '' } },
+            { path: 'test', component: Test, data: { extraParameter: '' } },
+            { path: 'search', component: Search, data: { extraParameter: '' } },
+            { path: 'product/:id', component: ProductDetails, data: { extraParameter: '' } },
+
+            // 2d. Dynamic Product Detail Route (Ensure SearchSpecific is imported)
+            // { path: 'product/:id', component: SearchSpecific, data: { extraParameter: '' }, resolve: { singleItem_resolve: specificIdResolver } },
+        ]
+    },
     {
         path: 'der',
         component: PagesLayoutComponent,
@@ -215,18 +247,18 @@ const routes: Routes = [
             { path: 'account/forgot-password', component: ForgotPasswordBoxedComponent, data: { extraParameter: '' } },
             { path: 'account/otp', component: Otp, data: { extraParameter: '' } },
             // { path: 'account/complete-registration', component: CompleteRegistration, data: { extraParameter: '' } },
-            { path: 'motherboards', component: Motherboards, data: { extraParameter: '' } },
-            { path: 'screens', component: Screens, data: { extraParameter: '' } },
-            { path: 't-con', component: TCoins, data: { extraParameter: '' } },
-            { path: 'accessories', component: Accessories, data: { extraParameter: '' } },
-            { path: 'software', component: Software, data: { extraParameter: '' } },
-            { path: 'deals', component: Deals, data: { extraParameter: '' } },
-            { path: 'trial', component: Trial, data: { extraParameter: '' } },
-            { path: 'proof', component: Proof, data: { extraParameter: '' } },
-            { path: 'test', component: Test, data: { extraParameter: '' } },
-            { path: 'search', component: Search, data: { extraParameter: '' } },
-            { path: 'product/:id', component: SearchSpecific, data: { extraParameter: '' }, resolve: {singleItem_resolve: specificIdResolver,}},
-            { path: 'components/modals', component: ModalsComponent, data: { extraParameter: 'componentsMenu' } },
+            // { path: 'motherboards', component: Motherboards, data: { extraParameter: '' } },
+            // { path: 'screens', component: Screens, data: { extraParameter: '' } },
+            // { path: 't-con', component: TCoins, data: { extraParameter: '' } },
+            // { path: 'accessories', component: Accessories, data: { extraParameter: '' } },
+            // { path: 'software', component: Software, data: { extraParameter: '' } },
+            // { path: 'deals', component: Deals, data: { extraParameter: '' } },
+            // { path: 'trial', component: Trial, data: { extraParameter: '' } },
+            // { path: 'proof', component: Proof, data: { extraParameter: '' } },
+            // { path: 'test', component: Test, data: { extraParameter: '' } },
+            // { path: 'search', component: Search, data: { extraParameter: '' } },
+            // { path: 'product/:id', component: SearchSpecific, data: { extraParameter: '' }, resolve: {singleItem_resolve: specificIdResolver,}},
+            // { path: 'components/modals', component: ModalsComponent, data: { extraParameter: 'componentsMenu' } },
         ]
     },
 
@@ -260,6 +292,56 @@ const routes: Routes = [
                     extraParameter: 'dashboardsMenu',
                     // Example: Default dashboard is visible to Executives and Reporting Analysts
                     allowedRoles: ['Executive Manager', 'Reporting Analyst']
+                }
+            },
+
+            // Shipping and Logistic Pages
+            {
+                path: 'dashboards/fulfillment/requests',
+                component: Requests,
+                data: {
+                    extraParameter: 'elementsMenu',
+                    // allowedRoles: ['Executive Manager', 'Financial Controller']
+                }
+            },
+            {
+                path: 'dashboards/fulfillment/shipments',
+                component: Shipments,
+                data: {
+                    extraParameter: 'elementsMenu',
+                    // allowedRoles: ['Executive Manager', 'Financial Controller']
+                }
+            },
+            {
+                path: 'dashboards/shipping/zones',
+                component: Zone,
+                data: {
+                    extraParameter: 'elementsMenu',
+                    // allowedRoles: ['Executive Manager', 'Financial Controller']
+                }
+            },
+            {
+                path: 'dashboards/shipping/rates',
+                component: Rates,
+                data: {
+                    extraParameter: 'elementsMenu',
+                    // allowedRoles: ['Executive Manager', 'Financial Controller']
+                }
+            },
+            {
+                path: 'dashboards/shipping/methods',
+                component: Methods,
+                data: {
+                    extraParameter: 'elementsMenu',
+                    // allowedRoles: ['Executive Manager', 'Financial Controller']
+                }
+            },
+            {
+                path: 'dashboards/shipping',
+                component: Shipping,
+                data: {
+                    extraParameter: 'elementsMenu',
+                    // allowedRoles: ['Warehouse/Logistics Manager']
                 }
             },
 
@@ -324,14 +406,6 @@ const routes: Routes = [
                 data: {
                     extraParameter: 'elementsMenu',
                     // allowedRoles: ['Warehouse/Logistics Manager']
-                }
-            },
-            {
-                path: 'dashboards/shipping',
-                component: Shipping,
-                data: {
-                    extraParameter: 'elementsMenu',
-                    allowedRoles: ['Warehouse/Logistics Manager']
                 }
             },
 

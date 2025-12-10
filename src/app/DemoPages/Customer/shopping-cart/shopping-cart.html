@@ -1,0 +1,137 @@
+<div class="container my-5">
+  <div class="row">
+
+    <div class="col-lg-8">
+      <h2 class="mb-4">Product</h2>
+
+      <div class="d-flex justify-content-between text-muted border-bottom py-2 mb-3 fw-bold">
+        <span style="flex: 2;">Product</span>
+        <span style="flex: 1; text-align: center;">Price</span>
+        <span style="flex: 1; text-align: center;">Quantity</span>
+        <span style="flex: 1; text-align: right;">Total</span>
+      </div>
+
+      <div *ngIf="(cartItems$ | async) as cartItems">
+        <div *ngIf="cartItems.length === 0" class="alert alert-warning text-center">
+          Your shopping cart is empty!
+        </div>
+
+        <div *ngFor="let item of cartItems" class="d-flex border-bottom py-3 align-items-center">
+
+          <div style="flex: 2;" class="d-flex align-items-center">
+            <img [src]="item.product.images[0]?.image || 'placeholder.jpg'"
+                 alt="{{ item.product.parent_product_name }}"
+                 class="img-fluid me-3"
+                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+            <div>
+              <h5 class="mb-1">{{ item.product.parent_product_name }}</h5>
+              <p class="small text-muted mb-1">
+                Color: {{ item.selectedColor }} | Size: {{ item.selectedSize }}
+              </p>
+              <button class="btn btn-link btn-sm p-0 text-danger" (click)="removeItem(item.id)">
+                <i class="fa fa-times me-1"></i> Remove
+              </button>
+            </div>
+          </div>
+
+          <span style="flex: 1; text-align: center;" class="fw-bold">
+            {{ item.product.discounted_price | currency: 'TZS': 'symbol' }}
+          </span>
+
+          <div style="flex: 1; text-align: center;">
+            <input type="number"
+                   [value]="item.quantity"
+                   min="1"
+                   class="form-control form-control-sm text-center mx-auto"
+                   style="width: 70px;"
+                   (change)="updateQuantity(item.id, $event)">
+          </div>
+
+          <span style="flex: 1; text-align: right;" class="fw-bold">
+            {{ getItemSubtotal(item) | currency: 'TZS': 'symbol' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between mt-4 p-3 bg-light rounded">
+        <div class="input-group" style="max-width: 300px;">
+          <input type="text" class="form-control" placeholder="Coupon code">
+          <button class="btn btn-dark" type="button">Apply Coupon</button>
+        </div>
+        <div class="d-flex">
+            <button class="btn btn-outline-secondary me-2">Update Cart</button>
+            <button class="btn btn-danger">Clear Cart</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title mb-4 border-bottom pb-2">Order Summary</h4>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal</span>
+            <span class="fw-bold">{{ cartService.subtotal | currency: 'TZS': 'symbol' }}</span>
+          </div>
+
+          <div class="mb-3 border-bottom pb-3">
+            <div class="d-flex justify-content-between mb-2">
+                <span>Shipping</span>
+                <span *ngIf="cartService.shippingCost === 0" class="text-success fw-bold">Free Shipping</span>
+                <span *ngIf="cartService.shippingCost > 0" class="fw-bold">{{ cartService.shippingCost | currency: 'TZS': 'symbol' }}</span>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="shipping" id="standardShipping" checked>
+              <label class="form-check-label" for="standardShipping">
+                Standard Delivery - TZS 4.99
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="shipping" id="expressShipping">
+              <label class="form-check-label" for="expressShipping">
+                Express Delivery - TZS 12.99
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="shipping" id="freeShipping">
+              <label class="form-check-label" for="freeShipping">
+                Free Shipping (Orders over TZS 300)
+              </label>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span>Tax</span>
+            <span class="fw-bold">{{ cartService.tax | currency: 'TZS': 'symbol' }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-4 border-bottom pb-3">
+            <span>Discount</span>
+            <span class="fw-bold text-danger">{{ 0 | currency: 'TZS': 'symbol' }}</span> </div>
+
+          <div class="d-flex justify-content-between mb-4">
+            <h5 class="mb-0">Total</h5>
+            <h4 class="fw-bold text-dark">{{ cartService.total | currency: 'TZS': 'symbol' }}</h4>
+          </div>
+
+          <button class="btn btn-dark btn-lg w-100 mb-3" routerLink="/checkout">
+            Proceed to Checkout
+          </button>
+
+          <p class="text-center">
+            <a routerLink="/products" class="text-muted">← Continue Shopping</a>
+          </p>
+
+          <div class="text-center mt-4 border-top pt-3">
+            <p class="small text-muted mb-2">We Accept</p>
+            <i class="fa fa-cc-visa fa-2x me-2 text-muted"></i>
+            <i class="fa fa-cc-mastercard fa-2x me-2 text-muted"></i>
+            <i class="fa fa-cc-paypal fa-2x text-muted"></i>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,1 +1,37 @@
-<p>motherboards works!</p>
+<section class="section-container">
+  <h2 class="section-title">Pick Your Favorite Product</h2>
+  <div class="product-list">
+
+    @for (spec of products; track spec.id) {
+      <a [href]="'/der/product/' + spec.id" class="product-card">
+
+        <img [src]="spec.images.length > 0 ? spec.images[0].image : ''"
+              [alt]="spec.parent_product_name + ' ' + spec.model"
+              class="product-image"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/a5b4fc/4338ca?text=Product';" />
+
+        <div class="product-info">
+
+          <h3 class="product-name">{{ spec.parent_product_name }} - {{ spec.model }}</h3>
+
+          <p class="product-price">{{ spec.discounted_price }}</p>
+
+          <button class="add-to-cart-button">Add to Cart</button>
+        </div>
+      </a>
+    }
+  </div>
+
+  @if (isLoading()) {
+      <div class="loading-indicator" style="text-align: center; padding: 20px;">
+          <p style="font-style: italic; color: #4338ca;">Loading more products...</p>
+          </div>
+  }
+
+  <!-- @if (!nextPageUrl && products.length > 0 && !isLoading()) {
+      <div class="end-of-list" style="text-align: center; padding: 20px;">
+          <p style="color: #6b7280;">— You have reached the end of the catalog —</p>
+      </div>
+  } -->
+
+  </section>

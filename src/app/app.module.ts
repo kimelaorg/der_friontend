@@ -2,7 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {RouterModule} from '@angular/router';
+import {RouterModule, RouterOutlet } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { configReducer } from './ThemeOptions/store/config.reducer.ngrx';
@@ -33,6 +33,9 @@ import { SharedModule } from './shared.module';
 // LAYOUT
 import {BaseLayoutComponent} from './Layout/base-layout/base-layout.component';
 import {PagesLayoutComponent} from './Layout/pages-layout/pages-layout.component';
+import {HomeLayout} from './Layout/home-layout/home-layout';
+import {HomeFooter} from './Layout/home-layout/home-footer/home-footer';
+import {TopNav} from './Layout/home-layout/top-nav/top-nav';
 
 // HEADER
 import {HeaderComponent} from './Layout/Components/header/header.component';
@@ -62,8 +65,11 @@ import { roleGuard } from './DemoPages/UserPages/login-boxed/guard/role-guard';
   declarations: [
     // LAYOUT
     AppComponent,
+    HomeLayout,
     BaseLayoutComponent,
     PagesLayoutComponent,
+    HomeFooter,
+    TopNav,
 
     // HEADER
     HeaderComponent,
@@ -91,6 +97,7 @@ import { roleGuard } from './DemoPages/UserPages/login-boxed/guard/role-guard';
     StoreModule.forRoot({ config: configReducer }),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
     CommonModule,
+    RouterOutlet,
 
     // Angular Bootstrap Components
     NgbModule,

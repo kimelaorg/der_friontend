@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+/* Variable approximations */
+:root {
+  --primary-color: #4f46e5; /* indigo-600 */
+  --primary-hover: #4338ca; /* indigo-700 */
+  --primary-light: #eef2ff; /* indigo-50 */
+  --red-color: #ef4444; /* red-500 */
+  --text-color: #374151; /* gray-700 */
+  --header-height: 4rem;
+  --lg-breakpoint: 1024px;
+}
+
+
+
+/* --- FOOTER STYLES --- */
+.main-footer {
+    background-color: #1f2937; /* gray-800 */
+    color: white;
+    padding: 3rem 1rem 1.5rem;
+    margin-top: 3rem;
+}
+.footer-container {
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #4b5563; /* gray-600 */
+}
+@media (min-width: 768px) {
+    .footer-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4rem;
+    }
+}
+.footer-col h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #eef2ff;
+}
+.footer-col p {
+    font-size: 0.875rem;
+    color: #d1d5db;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.footer-col li {
+    margin-bottom: 0.5rem;
+}
+.footer-col a {
+    color: #d1d5db;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+}
+.footer-col a:hover {
+    color: var(--primary-color);
+}
+.footer-logo {
+    color: var(--primary-color);
+}
+.social-links {
+    display: flex;
+    gap: 0.75rem;
+}
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
+    background-color: #4b5563;
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+.social-icon:hover {
+    background-color: var(--primary-color);
+}
+.copyright {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    padding-top: 1.5rem;
+}

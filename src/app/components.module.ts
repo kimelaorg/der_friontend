@@ -38,6 +38,9 @@ import { Test } from './test/test';
 import { SoftwareProducts } from './DemoPages/Components/software-products/software-products';
 import { ProductMedia } from './DemoPages/Components/products/product-media/product-media';
 import { Proof } from './proof/proof';
+import { Listing } from './DemoPages/Welcome/listing/listing';
+import { ProductDetails } from './DemoPages/Welcome/product-details/product-details';
+import { ShoppingCart } from './DemoPages/Customer/shopping-cart/shopping-cart';
 
 @NgModule({
   declarations: [
@@ -72,7 +75,10 @@ import { Proof } from './proof/proof';
     Test,
     SoftwareProducts,
     ProductMedia,
-    Proof
+    Proof,
+    Listing,
+    ProductDetails,
+    ShoppingCart
   ],
   imports: [
     SharedModule,

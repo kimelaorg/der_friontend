@@ -78,4 +78,12 @@ export { ChangePassword } from './DemoPages/UserPages/change-password/change-pas
 export { Profile } from './DemoPages/UserPages/profile/profile';
 export { CompleteRegistration } from './DemoPages/UserPages/complete-registration/complete-registration';
 export { SalesOrder } from './DemoPages/Dashboards/sales-order/sales-order';
+export { Requests } from './DemoPages/Fulfillment/requests/requests';
+export { Shipments } from './DemoPages/Fulfillment/shipments/shipments';
+export { Zone } from './DemoPages/Fulfillment/zone/zone';
+export { Rates } from './DemoPages/Fulfillment/rates/rates';
+export { Methods } from './DemoPages/Fulfillment/methods/methods';
+export { Listing } from './DemoPages/Welcome/listing/listing';
+export { ProductDetails } from './DemoPages/Welcome/product-details/product-details';
 export { Proof } from './proof/proof';
+export { ShoppingCart } from './DemoPages/Customer/shopping-cart/shopping-cart';

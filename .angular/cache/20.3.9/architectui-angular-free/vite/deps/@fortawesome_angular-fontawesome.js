@@ -1,10 +1,10 @@
 import {
   DomSanitizer
-} from "./chunk-J6BOA5VV.js";
-import "./chunk-ONGOCZWA.js";
-import "./chunk-CFR6N4ZA.js";
-import "./chunk-4MKYF4ZC.js";
-import "./chunk-RDHXSB74.js";
+} from "./chunk-63EV7C7A.js";
+import "./chunk-A5Z2TCVZ.js";
+import "./chunk-VHHVPVQ4.js";
+import "./chunk-2LAUDM5U.js";
+import "./chunk-SKMEPECG.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -25,7 +25,7 @@ import {
   ɵɵprojection,
   ɵɵprojectionDef,
   ɵɵsanitizeHtml
-} from "./chunk-TBFC7GME.js";
+} from "./chunk-RZ7IX5X6.js";
 import {
   DOCUMENT,
   computed,
@@ -33,16 +33,16 @@ import {
   inject,
   ɵɵdefineInjectable,
   ɵɵdefineInjector
-} from "./chunk-WNSG6DLE.js";
-import "./chunk-HWYXSU2G.js";
-import "./chunk-JRFR6BLO.js";
-import "./chunk-MARUHEWW.js";
+} from "./chunk-GR4E2AAA.js";
+import "./chunk-47U22DKC.js";
+import "./chunk-7T4GQ266.js";
+import "./chunk-KQPXKPIY.js";
 import {
   __spreadProps,
   __spreadValues
 } from "./chunk-WDMUDEB6.js";
 
-// node_modules/@fortawesome/fontawesome-svg-core/index.mjs
+// ../../../../node_modules/@fortawesome/fontawesome-svg-core/index.mjs
 function _arrayLikeToArray(r2, a2) {
   (null == a2 || a2 > r2.length) && (a2 = r2.length);
   for (var e2 = 0, n2 = Array(a2); e2 < a2; e2++) n2[e2] = r2[e2];
@@ -3963,7 +3963,7 @@ var layer = api.layer;
 var text = api.text;
 var counter = api.counter;
 
-// node_modules/@fortawesome/angular-fontawesome/fesm2022/angular-fontawesome.mjs
+// ../../../../node_modules/@fortawesome/angular-fontawesome/fesm2022/angular-fontawesome.mjs
 var _c0 = ["*"];
 var FaConfig = class _FaConfig {
   /**

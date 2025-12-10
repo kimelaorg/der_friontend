@@ -66,6 +66,7 @@
                           <th>Location</th>
                           <th>Stock Qty</th>
                           <th>Safety Stock</th>
+                          <th>Last Restoke</th>
                           <th>Status</th>
                           <th>Action</th>
                       </tr>
@@ -80,6 +81,8 @@
                                   <strong>{{ item.quantity_in_stock }}</strong>
                               </td>
                               <td>{{ item.safety_stock_level }}</td>
+                              <td *ngIf="item.last_restock_date">{{ item.last_restock_date | date:'MMM d, y h:mm a' }}</td>
+                              <td *ngIf="!item.last_restock_date">NULL</td>
                               <td>
                                   <span class="badge" [ngClass]="{'bg-danger': item.is_low_stock, 'bg-success': !item.is_low_stock}">
                                       {{ item.is_low_stock ? 'LOW STOCK' : 'OK' }}
